@@ -1,0 +1,319 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* `dark` class on <html> toggles the dark palette (see ThemeProvider). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                       */
+/* Modern Editorial Christian Palette                                  */
+/* ------------------------------------------------------------------ */
+:root {
+  --bg: #F0F6FB; /* Clean Light Blue background */
+  --surface: #FFFFFF; /* Pure Crisp White surface */
+  --surface-2: #E5EFF8; /* Secondary Light Blue neutral */
+  --ink: #182541; /* Headings: Deep Navy */
+  --body: #4A5568; /* Body text: High-contrast legible slate */
+  --muted: #64748B; /* Secondary text */
+  --line: #D0E1F0; /* Clean Light Blue border */
+
+  --primary: #182541; /* Deep Navy */
+  --primary-hover: #10182E;
+  --primary-ink: #FFFFFF;
+  --primary-soft: #E5EFF8;
+  --link: #182541;
+
+  --accent: #D9A62E; /* Warm Gold */
+  --accent-soft: #F3E6BE; /* Soft Gold */
+  --accent-ink: #10182E; /* Dark navy text on gold */
+  --accent-text: #966F17; /* High contrast gold for text */
+
+  --dark-navy: #E5EFF8; /* Converted to Light Blue */
+  --dark-navy-surface: #FFFFFF;
+  --dark-navy-line: #D0E1F0;
+
+  --ring: #D9A62E;
+  --shadow-sm: 0 1px 2px rgba(24, 37, 65, 0.04);
+  --shadow: 0 2px 8px -2px rgba(24, 37, 65, 0.06), 0 1px 4px rgba(24, 37, 65, 0.03);
+  --shadow-md: 0 4px 16px -4px rgba(24, 37, 65, 0.08);
+
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0B1120; /* Deep midnight navy background */
+  --surface: #111A2E; /* Elevated dark navy card surface */
+  --surface-2: #19243C; /* Soft dark contrast surface */
+  --ink: #F8FAFC; /* Clean bright text for headings */
+  --body: #CBD5E1; /* High-legibility light slate for body */
+  --muted: #94A3B8; /* Secondary light gray text */
+  --line: #223254; /* Slate navy borders */
+
+  --primary: #D9A62E; /* Warm gold */
+  --primary-hover: #E5B84B;
+  --primary-ink: #0B1120;
+  --primary-soft: #1E2D4A;
+  --link: #D9A62E;
+
+  --accent: #D9A62E; /* Warm Gold */
+  --accent-soft: #382D13;
+  --accent-ink: #0B1120;
+  --accent-text: #F3E6BE;
+
+  --dark-navy: #0B1120;
+  --dark-navy-surface: #111A2E;
+  --dark-navy-line: #223254;
+
+  --ring: #D9A62E;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 20px -4px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-link: var(--link);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-text: var(--accent-text);
+  --color-dark-navy: var(--dark-navy);
+  --color-dark-navy-surface: var(--dark-navy-surface);
+  --color-dark-navy-line: var(--dark-navy-line);
+  --shadow-card: var(--shadow);
+  --shadow-subtle: var(--shadow-sm);
+  --shadow-elevated: var(--shadow-md);
+}
+
+@theme {
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Raw palette references */
+  --color-navy-deep: #182541;
+  --color-navy-dark: #10182E;
+  --color-blue-light: #F0F6FB;
+  --color-blue-soft: #E5EFF8;
+  --color-gold-warm: #D9A62E;
+  --color-gold-soft: #F3E6BE;
+  --color-editorial-text: #4A5568;
+
+  --breakpoint-xs: 30rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-body antialiased selection:bg-accent-soft selection:text-ink;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight text-ink;
+    text-wrap: balance;
+  }
+  p {
+    @apply text-body leading-relaxed;
+  }
+  a {
+    @apply transition-colors duration-150;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  img {
+    @apply max-w-full;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem; /* ~1280px */
+  padding-inline: 1.25rem;
+  @media (min-width: 40rem) {
+    padding-inline: 2rem;
+  }
+  @media (min-width: 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Article / rich content (WordPress HTML)                             */
+/* ------------------------------------------------------------------ */
+.prose {
+  --tw-prose-body: var(--body);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--muted);
+  --tw-prose-links: var(--link);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--accent);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: #F7F6F2;
+  --tw-prose-pre-bg: #10182E;
+  --tw-prose-th-borders: var(--line);
+  --tw-prose-td-borders: var(--line);
+  max-width: 68ch;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-serif);
+}
+.prose a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose img,
+.prose video {
+  border-radius: 10px;
+  height: auto;
+}
+.prose iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 10px;
+}
+.prose figure {
+  margin-block: 2rem;
+}
+.prose .alignright {
+  float: right;
+  margin: 0.25rem 0 1rem 1.5rem;
+  max-width: 45%;
+}
+.prose .alignleft {
+  float: left;
+  margin: 0.25rem 1.5rem 1rem 0;
+  max-width: 45%;
+}
+.prose .aligncenter {
+  margin-inline: auto;
+}
+@media (max-width: 40rem) {
+  .prose .alignright,
+  .prose .alignleft {
+    float: none;
+    max-width: 100%;
+    margin: 1.5rem 0;
+  }
+}
+.prose .wp-block-pullquote {
+  border-block: 2px solid var(--accent);
+  padding: 1.25rem 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  line-height: 1.5;
+}
+.prose .wp-block-pullquote blockquote {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-style: italic;
+}
+.prose .has-drop-cap:not(:focus)::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  line-height: 0.8;
+  padding: 0.35rem 0.6rem 0 0;
+  color: var(--accent-text);
+}
+.prose .wp-block-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.prose .wp-block-column {
+  flex: 1 1 14rem;
+}
+.prose .wp-block-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+.prose .wp-block-gallery figure {
+  margin: 0;
+}
+.prose .wp-block-button__link {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--primary-ink);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.prose table {
+  display: block;
+  overflow-x: auto;
+}
