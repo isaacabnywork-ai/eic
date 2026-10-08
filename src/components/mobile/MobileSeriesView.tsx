@@ -119,7 +119,10 @@ export function MobileSeriesView() {
       {/* 4. Series Articles Highlights */}
       {featuredArticles?.items && featuredArticles.items.length > 0 && (
         <section className="mt-6 px-4">
-          <h3 className="font-serif text-lg font-bold tracking-tight text-white mb-3">
+          <h3
+            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
+            style={{ color: '#FFFFFF' }}
+          >
             Foundational Guides
           </h3>
           <div className="space-y-3">
@@ -130,7 +133,10 @@ export function MobileSeriesView() {
                 className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-3.5 hover:bg-white/10 transition"
               >
                 <div className="flex-1 min-w-0 pr-3">
-                  <h4 className="font-serif text-sm font-bold text-white line-clamp-1">
+                  <h4
+                    className="font-serif text-sm font-bold text-white !text-white line-clamp-1"
+                    style={{ color: '#FFFFFF' }}
+                  >
                     {art.title}
                   </h4>
                   <p className="text-xs text-white/50 truncate mt-0.5">

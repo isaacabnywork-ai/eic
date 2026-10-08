@@ -33,7 +33,10 @@ export function MobileLibraryView() {
         </div>
 
         {/* Headline */}
-        <h2 className="font-serif text-2xl font-bold tracking-tight text-white leading-tight">
+        <h2
+          className="font-serif text-2xl font-bold tracking-tight text-white !text-white leading-tight"
+          style={{ color: '#FFFFFF' }}
+        >
           Subscribe to get full access
         </h2>
 
@@ -85,7 +88,10 @@ export function MobileLibraryView() {
       {/* 2. Saved / Bookmarked Items Section */}
       <div className="border-t border-white/10 px-4 pt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-serif text-base font-bold text-white flex items-center gap-2">
+          <h3
+            className="font-serif text-base font-bold text-white !text-white flex items-center gap-2"
+            style={{ color: '#FFFFFF' }}
+          >
             <span>Saved in Your Library</span>
             <span className="text-xs font-normal text-white/40">({savedItems.length})</span>
           </h3>
@@ -123,7 +129,10 @@ export function MobileLibraryView() {
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-[#FF533D] block">
                       {item.type}
                     </span>
-                    <h4 className="font-serif text-xs font-bold text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors">
+                    <h4
+                      className="font-serif text-xs font-bold text-white !text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors"
+                      style={{ color: '#FFFFFF' }}
+                    >
                       {item.title}
                     </h4>
                     {(item.speaker || item.authorName) && (

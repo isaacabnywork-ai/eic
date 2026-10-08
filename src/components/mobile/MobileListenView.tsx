@@ -86,7 +86,10 @@ export function MobileListenView() {
       {/* 4. Audio Playlist List */}
       {audioSermons?.items && audioSermons.items.length > 3 && (
         <section className="mt-6 px-4">
-          <h3 className="font-serif text-lg font-bold tracking-tight text-white mb-3">
+          <h3
+            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
+            style={{ color: '#FFFFFF' }}
+          >
             Recent Recordings
           </h3>
           <div className="space-y-2.5">
@@ -100,7 +103,10 @@ export function MobileListenView() {
                   <PlayIcon size={16} className="ml-0.5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-xs font-semibold text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors">
+                  <h4
+                    className="text-xs font-semibold text-white !text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors"
+                    style={{ color: '#FFFFFF' }}
+                  >
                     {item.title}
                   </h4>
                   <p className="text-[11px] text-white/50 truncate mt-0.5">

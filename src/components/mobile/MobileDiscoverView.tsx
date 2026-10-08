@@ -100,7 +100,10 @@ export function MobileDiscoverView() {
                     {art.terms.category[0].name}
                   </span>
                 )}
-                <h4 className="font-serif text-sm font-bold text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors">
+                <h4
+                  className="font-serif text-sm font-bold text-white !text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors"
+                  style={{ color: '#FFFFFF' }}
+                >
                   {art.title}
                 </h4>
                 {art.excerpt && (
@@ -137,13 +140,16 @@ export function MobileDiscoverView() {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs font-serif font-bold text-white">
+                  <div className="flex h-full w-full items-center justify-center p-2 text-center text-xs font-serif font-bold text-white !text-white" style={{ color: '#FFFFFF' }}>
                     {book.title}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                 <div className="absolute bottom-2 inset-x-2">
-                  <h4 className="text-[11px] font-bold text-white line-clamp-1">
+                  <h4
+                    className="text-[11px] font-bold text-white !text-white line-clamp-1"
+                    style={{ color: '#FFFFFF' }}
+                  >
                     {book.bookTitle || book.title}
                   </h4>
                 </div>

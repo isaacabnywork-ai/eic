@@ -269,11 +269,17 @@ export function MobilePosterCard({
 
       {/* Poster text content */}
       <div className="absolute bottom-0 inset-x-0 p-3 text-white">
-        <h4 className="font-serif text-sm font-bold leading-tight line-clamp-2 drop-shadow-md group-hover:text-[#FF533D] transition-colors">
+        <h4
+          className="font-serif text-sm font-bold leading-tight line-clamp-2 drop-shadow-md text-white !text-white group-hover:text-[#FF533D] transition-colors"
+          style={{ color: '#FFFFFF' }}
+        >
           {item.title}
         </h4>
         {item.count !== undefined && item.count > 0 && (
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/60">
+          <p
+            className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 !text-white/70"
+            style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          >
             {item.count} Resources
           </p>
         )}

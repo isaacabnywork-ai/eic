@@ -45,7 +45,10 @@ export function MobileWatchView() {
       {/* 4. More Videos Grid */}
       {justAdded?.items && justAdded.items.length > 4 && (
         <section className="mt-6 px-4">
-          <h3 className="font-serif text-lg font-bold tracking-tight text-white mb-3">
+          <h3
+            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
+            style={{ color: '#FFFFFF' }}
+          >
             All Video Messages
           </h3>
           <div className="grid grid-cols-1 gap-4">
