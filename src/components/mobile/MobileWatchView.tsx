@@ -14,7 +14,7 @@ export function MobileWatchView() {
   const { data: sermons } = useContentList('sermon', { perPage: 8 });
 
   return (
-    <div className="flex flex-col bg-[#070A0F] text-white min-h-screen pb-24 md:hidden">
+    <div className="flex flex-col bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pb-24 md:hidden transition-colors">
       {/* 1. Watch Hero Feature matching Screenshot 4 */}
       {featuredVideos && featuredVideos.length > 0 && (
         <MobileHeroBanner items={featuredVideos} actionLabel="Watch Now" type="video" />
@@ -45,10 +45,7 @@ export function MobileWatchView() {
       {/* 4. More Videos Grid */}
       {justAdded?.items && justAdded.items.length > 4 && (
         <section className="mt-6 px-4">
-          <h3
-            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
-            style={{ color: '#FFFFFF' }}
-          >
+          <h3 className="font-serif text-lg font-bold tracking-tight text-[#182541] dark:text-white mb-3">
             All Video Messages
           </h3>
           <div className="grid grid-cols-1 gap-4">

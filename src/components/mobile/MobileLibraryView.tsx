@@ -17,11 +17,11 @@ export function MobileLibraryView() {
   };
 
   return (
-    <div className="flex flex-col bg-[#070A0F] text-white min-h-screen pb-28 md:hidden">
+    <div className="flex flex-col bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pb-28 md:hidden transition-colors">
       {/* 1. Subscription / Access Card matching Screenshot 2 */}
       <div className="flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center">
         {/* Mobile Logo Mark */}
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-lg p-2.5">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 shadow-sm dark:shadow-lg p-2.5">
           <img
             src={site.mobileLogoUrl}
             alt={site.name}
@@ -33,22 +33,19 @@ export function MobileLibraryView() {
         </div>
 
         {/* Headline */}
-        <h2
-          className="font-serif text-2xl font-bold tracking-tight text-white !text-white leading-tight"
-          style={{ color: '#FFFFFF' }}
-        >
+        <h2 className="font-serif text-2xl font-bold tracking-tight text-[#182541] dark:text-white leading-tight">
           Subscribe to get full access
         </h2>
 
         {/* Subtitle */}
-        <p className="mt-2.5 max-w-xs text-xs text-white/70 leading-relaxed">
+        <p className="mt-2.5 max-w-xs text-xs text-slate-600 dark:text-white/70 leading-relaxed">
           Join the Equip Indian Churches network for unlimited access to biblical sermons, theological articles, and study series delivered weekly.
         </p>
 
         {/* Subscribe Form / CTA matching Screenshot 2 */}
         {subscribed ? (
-          <div className="mt-6 w-full rounded-xl bg-emerald-950/60 border border-emerald-500/40 p-4 text-center">
-            <p className="text-xs font-semibold text-emerald-400">
+          <div className="mt-6 w-full rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-400 dark:border-emerald-500/40 p-4 text-center">
+            <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-400">
               ✓ You are subscribed to Equip Indian Churches updates!
             </p>
           </div>
@@ -60,11 +57,11 @@ export function MobileLibraryView() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address..."
               required
-              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-xs text-white placeholder-white/40 focus:border-[#F0F6FB] focus:outline-none focus:ring-1 focus:ring-[#F0F6FB]"
+              className="w-full rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-white/10 px-4 py-3 text-xs text-[#182541] dark:text-white placeholder-slate-400 dark:placeholder-white/40 focus:border-primary dark:focus:border-[#F0F6FB] focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-[#F0F6FB]"
             />
             <button
               type="submit"
-              className="w-full rounded-xl bg-[#F0F6FB] py-3.5 text-xs font-bold uppercase tracking-wider text-[#070A0F] shadow-lg active:scale-98 hover:brightness-105 transition cursor-pointer"
+              className="w-full rounded-xl bg-[#182541] dark:bg-[#F0F6FB] py-3.5 text-xs font-bold uppercase tracking-wider text-white dark:text-[#070A0F] shadow-lg active:scale-98 hover:brightness-105 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -73,37 +70,34 @@ export function MobileLibraryView() {
 
         {/* Secondary Links matching Screenshot 2 */}
         <div className="mt-5 flex flex-col items-center gap-2 text-xs">
-          <p className="text-white/60">
+          <p className="text-slate-600 dark:text-white/60">
             Already a partner?{' '}
-            <Link to="/articles" className="font-semibold text-[#F0F6FB] hover:underline">
+            <Link to="/articles" className="font-semibold text-[#182541] dark:text-[#F0F6FB] hover:underline">
               Explore Articles
             </Link>
           </p>
-          <Link to="/series" className="text-white/45 hover:text-white/75 transition">
+          <Link to="/series" className="text-slate-500 hover:text-slate-800 dark:text-white/45 dark:hover:text-white/75 transition">
             Browse All Series & Themes
           </Link>
         </div>
       </div>
 
       {/* 2. Saved / Bookmarked Items Section */}
-      <div className="border-t border-white/10 px-4 pt-6">
+      <div className="border-t border-[#D0E1F0] dark:border-white/10 px-4 pt-6">
         <div className="flex items-center justify-between mb-3">
-          <h3
-            className="font-serif text-base font-bold text-white !text-white flex items-center gap-2"
-            style={{ color: '#FFFFFF' }}
-          >
+          <h3 className="font-serif text-base font-bold text-[#182541] dark:text-white flex items-center gap-2">
             <span>Saved in Your Library</span>
-            <span className="text-xs font-normal text-white/40">({savedItems.length})</span>
+            <span className="text-xs font-normal text-slate-400 dark:text-white/40">({savedItems.length})</span>
           </h3>
           {savedItems.length > 0 && (
-            <span className="text-[11px] text-white/50">Stored locally</span>
+            <span className="text-[11px] text-slate-500 dark:text-white/50">Stored locally</span>
           )}
         </div>
 
         {savedItems.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-white/15 bg-white/5 p-6 text-center text-xs text-white/50">
+          <div className="rounded-xl border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 p-6 text-center text-xs text-slate-500 dark:text-white/50">
             <p>You haven't saved any sermons or articles yet.</p>
-            <p className="mt-1 text-[11px] text-white/40">
+            <p className="mt-1 text-[11px] text-slate-400 dark:text-white/40">
               Tap the bookmark icon on any message or video to save it here for offline reading.
             </p>
           </div>
@@ -112,7 +106,7 @@ export function MobileLibraryView() {
             {savedItems.map((item) => (
               <div
                 key={item.id}
-                className="group relative flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition"
+                className="group relative flex items-center gap-3 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
               >
                 <Link
                   to={itemPath(item.type, item.slug)}
@@ -126,17 +120,14 @@ export function MobileLibraryView() {
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#F0F6FB] block">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary dark:text-[#F0F6FB] block">
                       {item.type}
                     </span>
-                    <h4
-                      className="font-serif text-xs font-bold text-white !text-white line-clamp-1 group-hover:text-[#F0F6FB] transition-colors"
-                      style={{ color: '#FFFFFF' }}
-                    >
+                    <h4 className="font-serif text-xs font-bold text-[#182541] dark:text-white line-clamp-1 group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
                       {item.title}
                     </h4>
                     {(item.speaker || item.authorName) && (
-                      <p className="text-[10px] text-white/50 truncate">
+                      <p className="text-[10px] text-slate-500 dark:text-white/50 truncate">
                         {item.speaker || item.authorName}
                       </p>
                     )}
@@ -147,7 +138,7 @@ export function MobileLibraryView() {
                   type="button"
                   onClick={() => removeItem(item.id)}
                   aria-label="Remove item from library"
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 hover:bg-white/10 hover:text-white transition"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:text-white/40 dark:hover:bg-white/10 dark:hover:text-white transition"
                 >
                   <CloseIcon size={14} />
                 </button>
@@ -158,32 +149,32 @@ export function MobileLibraryView() {
       </div>
 
       {/* 3. Quick Browse Grid */}
-      <div className="mt-8 border-t border-white/10 px-4 pt-6">
-        <h3 className="font-serif text-sm font-bold text-white mb-3">
+      <div className="mt-8 border-t border-[#D0E1F0] dark:border-white/10 px-4 pt-6">
+        <h3 className="font-serif text-sm font-bold text-[#182541] dark:text-white mb-3">
           Quick Navigation
         </h3>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <Link
             to="/videos"
-            className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/80 hover:bg-white/10 transition"
+            className="rounded-lg border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 text-slate-700 dark:text-white/80 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
           >
             Video Catalogue &rarr;
           </Link>
           <Link
             to="/sermons"
-            className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/80 hover:bg-white/10 transition"
+            className="rounded-lg border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 text-slate-700 dark:text-white/80 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
           >
             Sermon Audio &rarr;
           </Link>
           <Link
             to="/authors"
-            className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/80 hover:bg-white/10 transition"
+            className="rounded-lg border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 text-slate-700 dark:text-white/80 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
           >
             Preachers & Authors &rarr;
           </Link>
           <Link
             to="/events"
-            className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/80 hover:bg-white/10 transition"
+            className="rounded-lg border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 text-slate-700 dark:text-white/80 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
           >
             Events & Conferences &rarr;
           </Link>

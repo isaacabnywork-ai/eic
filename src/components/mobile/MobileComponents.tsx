@@ -120,16 +120,16 @@ export function MobileSectionHeader({
 }) {
   return (
     <div className="flex items-center justify-between px-4 pt-6 pb-2.5">
-      <h3 className="font-serif text-lg font-bold tracking-tight text-white flex items-center gap-2">
+      <h3 className="font-serif text-lg font-bold tracking-tight text-[#182541] dark:text-white flex items-center gap-2">
         <span>{title}</span>
         {count !== undefined && (
-          <span className="text-xs text-white/40 font-normal">({count})</span>
+          <span className="text-xs text-slate-400 dark:text-white/40 font-normal">({count})</span>
         )}
       </h3>
       {seeAllLink && (
         <Link
           to={seeAllLink}
-          className="text-xs font-semibold uppercase tracking-wider text-white/50 hover:text-white transition-colors"
+          className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-[#182541] dark:text-white/50 dark:hover:text-white transition-colors"
         >
           See All
         </Link>
@@ -154,7 +154,7 @@ export function MobileVideoCard({
   return (
     <div className="group relative w-56 shrink-0 flex flex-col snap-start select-none">
       {/* 16:9 Thumbnail */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-white/5 border border-white/10">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10">
         <Link to={href} tabIndex={-1} aria-hidden="true">
           <Img
             image={item.image}
@@ -188,13 +188,13 @@ export function MobileVideoCard({
 
       {/* Info below */}
       <div className="mt-2 flex flex-col">
-        <h4 className="font-medium text-xs sm:text-sm text-white !text-white line-clamp-2 leading-snug group-hover:text-[#F0F6FB] transition-colors">
-          <Link to={href} className="text-white !text-white hover:text-[#F0F6FB]" style={{ color: '#FFFFFF' }}>
+        <h4 className="font-medium text-xs sm:text-sm text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
+          <Link to={href} className="text-[#182541] dark:text-white hover:text-primary dark:hover:text-[#F0F6FB]">
             {item.title}
           </Link>
         </h4>
         {speaker && (
-          <p className="mt-0.5 text-[11px] text-white/60 line-clamp-1">{speaker}</p>
+          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-white/60 line-clamp-1">{speaker}</p>
         )}
       </div>
     </div>
@@ -210,7 +210,7 @@ export function MobileSpeakerAvatar({ person }: { person: Person }) {
       to={href}
       className="group flex flex-col items-center shrink-0 w-20 sm:w-24 text-center snap-start select-none"
     >
-      <div className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border-2 border-white/15 bg-white/5 shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:border-[#F0F6FB]">
+      <div className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border-2 border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-white/5 shadow-xs dark:shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:border-primary dark:group-hover:border-[#F0F6FB]">
         {person.avatar ? (
           <img
             src={person.avatar}
@@ -219,12 +219,12 @@ export function MobileSpeakerAvatar({ person }: { person: Person }) {
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-white/10 text-white/60 font-serif text-xl font-bold">
+          <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/60 font-serif text-xl font-bold">
             {person.name.charAt(0)}
           </div>
         )}
       </div>
-      <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#F0F6FB] transition-colors">
+      <span className="mt-2 text-xs font-medium text-[#182541] dark:text-white/90 line-clamp-1 group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
         {person.name}
       </span>
     </Link>

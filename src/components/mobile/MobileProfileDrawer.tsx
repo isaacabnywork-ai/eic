@@ -50,11 +50,11 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
       />
 
       {/* Drawer Content */}
-      <div className="relative z-10 flex h-full w-[85%] max-w-sm flex-col bg-[#090D14] border-r border-white/10 text-white shadow-2xl animate-in slide-in-from-left duration-250">
+      <div className="relative z-10 flex h-full w-[85%] max-w-sm flex-col bg-[#F0F6FB] dark:bg-[#090D14] border-r border-[#D0E1F0] dark:border-white/10 text-[#182541] dark:text-white shadow-2xl animate-in slide-in-from-left duration-250 transition-colors">
         {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-white/10 p-5">
+        <div className="flex items-center justify-between border-b border-[#D0E1F0] dark:border-white/10 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 border border-white/15 p-2">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white dark:bg-white/10 border border-[#D0E1F0] dark:border-white/15 p-2 shadow-xs">
               <img
                 src={site.mobileLogoUrl}
                 alt={site.name}
@@ -66,7 +66,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             </div>
             <div>
               <h2 className="font-serif text-base font-bold leading-tight">Equip Indian Churches</h2>
-              <p className="text-[11px] text-white/50">Christian Ministry & Media</p>
+              <p className="text-[11px] text-slate-500 dark:text-white/50">Christian Ministry & Media</p>
             </div>
           </div>
 
@@ -74,7 +74,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             type="button"
             onClick={onClose}
             aria-label="Close profile drawer"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white transition"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 dark:text-white/70 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition cursor-pointer"
           >
             <CloseIcon size={20} />
           </button>
@@ -83,14 +83,14 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {/* Mission Capsule */}
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs leading-relaxed text-white/80">
-            <span className="font-serif font-bold text-white block mb-1">Our Mission</span>
+          <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-4 text-xs leading-relaxed text-slate-600 dark:text-white/80 shadow-xs dark:shadow-none">
+            <span className="font-serif font-bold text-[#182541] dark:text-white block mb-1">Our Mission</span>
             Equipping pastors, leaders, and saints across India through sound biblical theology and gospel-centered resources.
           </div>
 
           {/* Core Navigation Links */}
           <div className="space-y-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40 px-2 block mb-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-2">
               Browse Ministry Sections
             </span>
 
@@ -103,26 +103,26 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
           </div>
 
           {/* Quick Preferences */}
-          <div className="border-t border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40 px-2 block mb-2">
+          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-2">
               Preferences
             </span>
             <button
               type="button"
               onClick={toggle}
-              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-white/90 hover:bg-white/5 active:bg-white/10 transition"
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-[#182541] dark:text-white/90 hover:bg-white/70 dark:hover:bg-white/5 active:bg-white dark:active:bg-white/10 transition cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                {theme === 'dark' ? <SunIcon size={18} className="text-[#F0F6FB]" /> : <MoonIcon size={18} className="text-[#F0F6FB]" />}
+                {theme === 'dark' ? <SunIcon size={18} className="text-primary dark:text-[#F0F6FB]" /> : <MoonIcon size={18} className="text-primary dark:text-[#F0F6FB]" />}
                 <span>Appearance</span>
               </div>
-              <span className="text-xs text-white/50 capitalize">{theme} Mode</span>
+              <span className="text-xs text-slate-500 dark:text-white/50 capitalize">{theme} Mode</span>
             </button>
           </div>
 
           {/* Social Links */}
-          <div className="border-t border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40 px-2 block mb-3">
+          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-3">
               Connect With Us
             </span>
             <div className="flex items-center gap-3 px-2">
@@ -131,7 +131,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-xs dark:shadow-none transition"
                   aria-label="YouTube"
                 >
                   <YoutubeIcon size={18} />
@@ -142,7 +142,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-xs dark:shadow-none transition"
                   aria-label="Facebook"
                 >
                   <FacebookIcon size={18} />
@@ -153,7 +153,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-xs dark:shadow-none transition"
                   aria-label="Instagram"
                 >
                   <InstagramIcon size={18} />
@@ -164,7 +164,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.x}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-xs dark:shadow-none transition"
                   aria-label="X"
                 >
                   <XIcon size={16} />
@@ -175,7 +175,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
         </div>
 
         {/* Footer info */}
-        <div className="border-t border-white/10 p-4 text-[11px] text-white/40 text-center">
+        <div className="border-t border-[#D0E1F0] dark:border-white/10 p-4 text-[11px] text-slate-400 dark:text-white/40 text-center">
           © {new Date().getFullYear()} Equip Indian Churches
         </div>
       </div>
@@ -198,9 +198,9 @@ function DrawerLink({
     <Link
       to={to}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/5 hover:text-white active:bg-white/10 transition"
+      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#182541] dark:text-white/85 hover:bg-white/70 dark:hover:bg-white/5 hover:text-[#182541] dark:hover:text-white active:bg-white dark:active:bg-white/10 transition"
     >
-      <Icon size={18} className="text-white/60" />
+      <Icon size={18} className="text-slate-400 dark:text-white/60" />
       <span>{label}</span>
     </Link>
   );

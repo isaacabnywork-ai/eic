@@ -17,7 +17,7 @@ export function MobileListenView() {
   const { data: podcastAudio } = useContentList('video', { perPage: 6 });
 
   return (
-    <div className="flex flex-col bg-[#070A0F] text-white min-h-screen pb-24 md:hidden">
+    <div className="flex flex-col bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pb-24 md:hidden transition-colors">
       {/* 1. Listen Hero Feature matching Screenshot 3 */}
       {featuredSermons && featuredSermons.length > 0 && (
         <MobileHeroBanner items={featuredSermons} actionLabel="Listen Now" type="sermon" />
@@ -31,7 +31,7 @@ export function MobileListenView() {
             <Link
               key={item.id}
               to={itemPath('sermon', item.slug)}
-              className="group relative w-60 shrink-0 flex flex-col rounded-xl border border-white/10 bg-white/5 p-3.5 snap-start select-none transition hover:border-[#F0F6FB]/50"
+              className="group relative w-60 shrink-0 flex flex-col rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 snap-start select-none transition hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 shadow-xs dark:shadow-none"
             >
               {/* Audio Card graphic header */}
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-[#111927]">
@@ -52,17 +52,17 @@ export function MobileListenView() {
                   <HeadphonesIcon size={11} />
                   <span>Audio</span>
                 </div>
-                <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#F0F6FB] text-[#070A0F]">
+                <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#182541] text-white dark:bg-[#F0F6FB] dark:text-[#070A0F]">
                   <PlayIcon size={10} className="ml-0.5" />
                 </div>
               </div>
 
               {/* Title & speaker */}
               <div className="mt-2.5">
-                <h4 className="font-serif text-sm font-bold text-white line-clamp-2 leading-snug group-hover:text-[#F0F6FB] transition-colors">
+                <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
                   {item.title}
                 </h4>
-                <p className="mt-1 text-xs text-white/50 line-clamp-1">
+                <p className="mt-1 text-xs text-slate-500 dark:text-white/50 line-clamp-1">
                   {item.speaker || item.author?.name || 'Expository Sermon'}
                 </p>
               </div>
@@ -86,10 +86,7 @@ export function MobileListenView() {
       {/* 4. Audio Playlist List */}
       {audioSermons?.items && audioSermons.items.length > 3 && (
         <section className="mt-6 px-4">
-          <h3
-            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
-            style={{ color: '#FFFFFF' }}
-          >
+          <h3 className="font-serif text-lg font-bold tracking-tight text-[#182541] dark:text-white mb-3">
             Recent Recordings
           </h3>
           <div className="space-y-2.5">
@@ -97,19 +94,16 @@ export function MobileListenView() {
               <Link
                 key={item.id}
                 to={itemPath('sermon', item.slug)}
-                className="group flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition"
+                className="group flex items-center gap-3.5 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black/40 text-[#F0F6FB]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-black/40 text-primary dark:text-[#F0F6FB]">
                   <PlayIcon size={16} className="ml-0.5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4
-                    className="text-xs font-semibold text-white !text-white line-clamp-1 group-hover:text-[#F0F6FB] transition-colors"
-                    style={{ color: '#FFFFFF' }}
-                  >
+                  <h4 className="text-xs font-semibold text-[#182541] dark:text-white line-clamp-1 group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
                     {item.title}
                   </h4>
-                  <p className="text-[11px] text-white/50 truncate mt-0.5">
+                  <p className="text-[11px] text-slate-500 dark:text-white/50 truncate mt-0.5">
                     {item.speaker || item.author?.name || 'Equip Indian Churches'}
                   </p>
                 </div>

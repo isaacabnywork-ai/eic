@@ -18,7 +18,7 @@ export function MobileSeriesView() {
   const heroSeries = seriesList?.[0];
 
   return (
-    <div className="flex flex-col bg-[#070A0F] text-white min-h-screen pb-24 md:hidden">
+    <div className="flex flex-col bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pb-24 md:hidden transition-colors">
       {/* 1. Series Hero matching Screenshot 1 */}
       {heroSeries && (
         <div className="relative w-full aspect-[4/5] overflow-hidden bg-black select-none">
@@ -31,24 +31,18 @@ export function MobileSeriesView() {
           ) : (
             <div className="h-full w-full bg-gradient-to-b from-[#1E293B] to-[#0A0E17]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#070A0F] via-[#070A0F]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
           {/* Hero text */}
           <div className="absolute bottom-6 inset-x-0 px-5 flex flex-col justify-end text-white">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#F0F6FB] mb-1">
               Featured Teaching Series
             </span>
-            <h2
-              className="font-serif text-3xl font-black leading-tight drop-shadow-md text-white !text-white"
-              style={{ color: '#FFFFFF' }}
-            >
+            <h2 className="font-serif text-3xl font-black leading-tight drop-shadow-md text-white">
               {heroSeries.term.name}
             </h2>
             {heroSeries.term.description && (
-              <p
-                className="mt-2 text-xs text-white/90 line-clamp-2 max-w-sm !text-white/90"
-                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
-              >
+              <p className="mt-2 text-xs text-white/90 line-clamp-2 max-w-sm">
                 {heroSeries.term.description}
               </p>
             )}
@@ -76,7 +70,7 @@ export function MobileSeriesView() {
                 to={`/articles?category=${cat.slug}`}
                 className="group flex flex-col items-center shrink-0 w-20 text-center snap-start select-none"
               >
-                <div className={`relative h-20 w-20 overflow-hidden rounded-full border-2 border-white/15 shadow-md flex items-center justify-center font-serif text-xl font-bold transition-transform group-hover:scale-105 group-hover:border-[#F0F6FB] ${
+                <div className={`relative h-20 w-20 overflow-hidden rounded-full border-2 border-slate-300 dark:border-white/15 shadow-xs dark:shadow-md flex items-center justify-center font-serif text-xl font-bold transition-transform group-hover:scale-105 group-hover:border-primary dark:group-hover:border-[#F0F6FB] ${
                   idx % 3 === 0
                     ? 'bg-gradient-to-br from-amber-600 to-amber-900 text-amber-100'
                     : idx % 3 === 1
@@ -85,7 +79,7 @@ export function MobileSeriesView() {
                 }`}>
                   {cat.name.slice(0, 2).toUpperCase()}
                 </div>
-                <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#F0F6FB] transition-colors">
+                <span className="mt-2 text-xs font-medium text-[#182541] dark:text-white/90 line-clamp-1 group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
                   {cat.name}
                 </span>
               </Link>
@@ -119,10 +113,7 @@ export function MobileSeriesView() {
       {/* 4. Series Articles Highlights */}
       {featuredArticles?.items && featuredArticles.items.length > 0 && (
         <section className="mt-6 px-4">
-          <h3
-            className="font-serif text-lg font-bold tracking-tight text-white !text-white mb-3"
-            style={{ color: '#FFFFFF' }}
-          >
+          <h3 className="font-serif text-lg font-bold tracking-tight text-[#182541] dark:text-white mb-3">
             Foundational Guides
           </h3>
           <div className="space-y-3">
@@ -130,20 +121,17 @@ export function MobileSeriesView() {
               <Link
                 key={art.id}
                 to={`/articles/${art.slug}`}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-3.5 hover:bg-white/10 transition"
+                className="flex items-center justify-between rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 hover:bg-[#E5EFF8] dark:hover:bg-white/10 shadow-xs dark:shadow-none transition"
               >
                 <div className="flex-1 min-w-0 pr-3">
-                  <h4
-                    className="font-serif text-sm font-bold text-white !text-white line-clamp-1"
-                    style={{ color: '#FFFFFF' }}
-                  >
+                  <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-1">
                     {art.title}
                   </h4>
-                  <p className="text-xs text-white/50 truncate mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-white/50 truncate mt-0.5">
                     {art.author?.name || 'Equip Indian Churches'}
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-[#F0F6FB] shrink-0">Read &rarr;</span>
+                <span className="text-xs font-semibold text-[#182541] dark:text-[#F0F6FB] shrink-0">Read &rarr;</span>
               </Link>
             ))}
           </div>

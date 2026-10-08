@@ -136,18 +136,18 @@
   }
 
   /* In dark mobile streaming views, all headings must strictly be white */
-  .bg-\[\#070A0F\] h1,
-  .bg-\[\#070A0F\] h2,
-  .bg-\[\#070A0F\] h3,
-  .bg-\[\#070A0F\] h4,
-  .bg-\[\#070A0F\] h5,
-  .bg-\[\#070A0F\] h6,
-  .bg-\[\#090D14\] h1,
-  .bg-\[\#090D14\] h2,
-  .bg-\[\#090D14\] h3,
-  .bg-\[\#090D14\] h4,
-  .bg-\[\#090D14\] h5,
-  .bg-\[\#090D14\] h6 {
+  .dark .bg-\[\#070A0F\] h1,
+  .dark .bg-\[\#070A0F\] h2,
+  .dark .bg-\[\#070A0F\] h3,
+  .dark .bg-\[\#070A0F\] h4,
+  .dark .bg-\[\#070A0F\] h5,
+  .dark .bg-\[\#070A0F\] h6,
+  .dark .bg-\[\#090D14\] h1,
+  .dark .bg-\[\#090D14\] h2,
+  .dark .bg-\[\#090D14\] h3,
+  .dark .bg-\[\#090D14\] h4,
+  .dark .bg-\[\#090D14\] h5,
+  .dark .bg-\[\#090D14\] h6 {
     color: #FFFFFF !important;
   }
 
