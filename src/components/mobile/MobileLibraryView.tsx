@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChurchEmblemIcon, CloseIcon } from '@/components/ui/Icons';
+import { CloseIcon } from '@/components/ui/Icons';
 import { useBookmarks } from '@/lib/bookmarks';
 import { itemPath } from '@/lib/routes';
+import { site } from '@/config/site';
 
 export function MobileLibraryView() {
   const { items: savedItems, removeItem } = useBookmarks();
@@ -19,9 +20,16 @@ export function MobileLibraryView() {
     <div className="flex flex-col bg-[#070A0F] text-white min-h-screen pb-28 md:hidden">
       {/* 1. Subscription / Access Card matching Screenshot 2 */}
       <div className="flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center">
-        {/* Church Stained-Glass Spire Emblem */}
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-lg">
-          <ChurchEmblemIcon size={34} />
+        {/* Mobile Logo Mark */}
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-lg p-2.5">
+          <img
+            src={site.mobileLogoUrl}
+            alt={site.name}
+            className="h-full w-auto object-contain"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
+            }}
+          />
         </div>
 
         {/* Headline */}

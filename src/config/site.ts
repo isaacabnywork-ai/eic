@@ -16,6 +16,9 @@ export const site = {
   /** Official logo image link */
   logoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
   logoFallback: '/logo.png',
+  /** Dedicated mobile app icon logo */
+  mobileLogoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1-e1783059827609.webp',
+  mobileLogoFallback: '/mobile-logo.webp',
   /** Default social share image (optional, absolute URL or path under /public). */
   defaultOgImage: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
 };

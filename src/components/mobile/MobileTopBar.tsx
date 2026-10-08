@@ -1,10 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChevronLeftIcon,
-  ChurchEmblemIcon,
   SearchIcon,
   UserIcon,
 } from '@/components/ui/Icons';
+import { site } from '@/config/site';
 
 interface MobileTopBarProps {
   onOpenProfile: () => void;
@@ -67,14 +67,18 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
         )}
       </div>
 
-      {/* Center: Church Emblem or Serif Title */}
+      {/* Center: Official Mobile Logo or Serif Title */}
       <div className="flex flex-1 items-center justify-center">
         {isHome ? (
-          <Link to="/" className="flex items-center gap-2 group">
-            <ChurchEmblemIcon size={24} />
-            <span className="font-serif text-lg font-bold tracking-tight text-white group-hover:text-[#FF533D] transition-colors">
-              EIC
-            </span>
+          <Link to="/" className="flex items-center justify-center group" aria-label="Equip Indian Churches">
+            <img
+              src={site.mobileLogoUrl}
+              alt={site.name}
+              className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
+              }}
+            />
           </Link>
         ) : (
           <h1 className="font-serif text-xl font-bold tracking-tight text-white">

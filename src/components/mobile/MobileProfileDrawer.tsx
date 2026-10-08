@@ -4,7 +4,6 @@ import {
   CloseIcon,
   SunIcon,
   MoonIcon,
-  ChurchEmblemIcon,
   BookIcon,
   UserIcon,
   CalendarIcon,
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/Icons';
 import { useTheme } from '@/hooks/useTheme';
 import { env } from '@/config/env';
+import { site } from '@/config/site';
 
 interface MobileProfileDrawerProps {
   open: boolean;
@@ -54,8 +54,15 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-white/10 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 border border-white/15">
-              <ChurchEmblemIcon size={24} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 border border-white/15 p-2">
+              <img
+                src={site.mobileLogoUrl}
+                alt={site.name}
+                className="h-full w-auto object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
+                }}
+              />
             </div>
             <div>
               <h2 className="font-serif text-base font-bold leading-tight">Equip Indian Churches</h2>
