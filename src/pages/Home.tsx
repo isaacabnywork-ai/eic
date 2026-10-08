@@ -20,6 +20,7 @@ import {
   VideoCard,
 } from '@/components/cards';
 import { Img } from '@/components/ui/Img';
+import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
 import {
   ArrowRightIcon,
   BookIcon,
@@ -103,10 +104,15 @@ export function HomePage() {
     <>
       <SeoHead title="Home" description={site.description} path="/" />
 
-      {/* ============================================================== */}
-      {/* 1. HERO SECTION: Two-column Modern Editorial                   */}
-      {/* ============================================================== */}
-      <section className="border-b border-line bg-bg py-16 sm:py-20 lg:py-24 transition-colors">
+      {/* Mobile Native Streaming Experience (< md) */}
+      <MobileDiscoverView />
+
+      {/* Desktop Modern Editorial Layout (>= md) */}
+      <div className="hidden md:block">
+        {/* ============================================================== */}
+        {/* 1. HERO SECTION: Two-column Modern Editorial                   */}
+        {/* ============================================================== */}
+        <section className="border-b border-line bg-bg py-16 sm:py-20 lg:py-24 transition-colors">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-14 items-center">
             {/* Left Column: Editorial Messaging */}
@@ -937,6 +943,7 @@ export function HomePage() {
           )}
         </Section>
       )}
+      </div>
     </>
   );
 }

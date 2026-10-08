@@ -7,6 +7,7 @@ import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { VideoCard } from '@/components/cards/VideoCard';
+import { MobileListenView } from '@/components/mobile/MobileListenView';
 
 export function SermonsArchivePage() {
   const { state, listParams, update, clear, hasFilters } = useArchiveParams('sermon');
@@ -22,6 +23,12 @@ export function SermonsArchivePage() {
         description="Expository messages and conference sermons delivered to equip Indian churches."
         path="/sermons"
       />
+
+      {/* Mobile Streaming View (< md) */}
+      {!hasFilters && <MobileListenView />}
+
+      {/* Desktop / Filtered Archive Container */}
+      <div className={!hasFilters ? 'hidden md:block' : ''}>
 
       <PageHeader
         title="Sermons & Expositions"
@@ -67,6 +74,7 @@ export function SermonsArchivePage() {
             }
           />
         )}
+      </div>
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSeriesCards } from '@/api/series';
+import { MobileSeriesView } from '@/components/mobile/MobileSeriesView';
 
 export function SeriesArchivePage() {
   const { data: termsPage, isLoading: termsLoading, isError, error, refetch } = useTerms('series', {
@@ -38,11 +39,16 @@ export function SeriesArchivePage() {
         path="/series"
       />
 
-      <PageHeader
-        title="Teaching Series"
-        eyebrow="Thematic Collections"
-        description="Comprehensive collections of articles, sermons, and studies grouped together for deep and sequential study."
-      />
+      {/* Mobile Streaming View (< md) */}
+      <MobileSeriesView />
+
+      {/* Desktop Archive Container (>= md) */}
+      <div className="hidden md:block">
+        <PageHeader
+          title="Teaching Series"
+          eyebrow="Thematic Collections"
+          description="Comprehensive collections of articles, sermons, and studies grouped together for deep and sequential study."
+        />
 
       <div className="container-page py-10">
         {isLoading ? (
@@ -61,6 +67,7 @@ export function SeriesArchivePage() {
             message="No series collections are available right now."
           />
         )}
+      </div>
       </div>
     </>
   );

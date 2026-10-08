@@ -201,3 +201,99 @@ export function LogoMark({
     />
   );
 }
+
+/** Dedicated mobile streaming app navigation icons */
+export const DiscoverIcon = make(
+  <>
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </>,
+);
+
+export const WatchScreenIcon = make(
+  <>
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </>,
+);
+
+export const ListenHeadphonesIcon = HeadphonesIcon;
+
+export const SailboatIcon = make(
+  <>
+    <path d="M2 20a2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1" />
+    <path d="M4 18L12 3v15" />
+    <path d="M12 7l7 11h-7" />
+  </>,
+);
+
+export const LibraryBookIcon = make(
+  <>
+    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z" />
+    <path d="M6 6h10" />
+    <path d="M6 10h10" />
+    <path d="M6 14h6" />
+  </>,
+);
+
+export const BookmarkIcon = make(
+  <>
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </>,
+);
+
+/** Church Tower / Stained-Glass Stained Spire Emblem matching screenshots 2 & 5 */
+export function ChurchEmblemIcon({
+  size = 28,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="churchTowerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="50%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#EA580C" />
+        </linearGradient>
+        <linearGradient id="churchArchGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FB923C" />
+          <stop offset="100%" stopColor="#38BDF8" />
+        </linearGradient>
+      </defs>
+      {/* Arch Gothic Windows */}
+      <path
+        d="M8 32V18C8 14 11 11 14 11V32H8Z"
+        fill="url(#churchArchGrad)"
+        fillOpacity="0.85"
+      />
+      {/* Tall Spire Tower */}
+      <path
+        d="M16 4L22 10V32H16V4Z"
+        fill="url(#churchTowerGrad)"
+      />
+      {/* Subtle Cross/Accent mark */}
+      <path
+        d="M23 7H27M25 5V9"
+        stroke="#38BDF8"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      {/* Windows Details */}
+      <rect x="10" y="21" width="2.5" height="5" rx="1.25" fill="#0A0E17" opacity="0.6" />
+      <rect x="18" y="16" width="2.5" height="6" rx="1.25" fill="#0A0E17" opacity="0.6" />
+      <rect x="18" y="24" width="2.5" height="5" rx="1.25" fill="#0A0E17" opacity="0.6" />
+    </svg>
+  );
+}

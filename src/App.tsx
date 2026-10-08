@@ -18,6 +18,7 @@ import { AuthorsArchivePage } from '@/pages/AuthorsArchive';
 import { AuthorSinglePage } from '@/pages/AuthorSingle';
 import { SearchPage } from '@/pages/SearchPage';
 import { ChurchesArchivePage } from '@/pages/ChurchesArchive';
+import { LibraryPage } from '@/pages/LibraryPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const router = createBrowserRouter([
@@ -51,6 +52,8 @@ const router = createBrowserRouter([
       { path: 'authors/:id', element: <AuthorSinglePage /> },
       // Search
       { path: 'search', element: <SearchPage /> },
+      // Library (Bookmarks & Newsletter)
+      { path: 'library', element: <LibraryPage /> },
       // Churches (directory)
       { path: 'churches', element: <ChurchesArchivePage /> },
       // 404
