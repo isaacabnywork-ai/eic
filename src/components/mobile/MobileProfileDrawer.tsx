@@ -5,7 +5,6 @@ import {
   SunIcon,
   MoonIcon,
   BookIcon,
-  UserIcon,
   CalendarIcon,
   ImageIcon,
   SearchIcon,
@@ -205,7 +204,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
               Fellowship & Ministry Network
             </span>
-            <DrawerLink to="/authors" icon={UserIcon} label="Preachers & Authors Directory" onClick={onClose} />
             <DrawerLink to="/events" icon={CalendarIcon} label="Conferences & Pastors Roundtables" onClick={onClose} />
             <DrawerLink to="/gallery" icon={ImageIcon} label="Conference Photos & Albums" onClick={onClose} />
             <DrawerLink to="/churches" icon={MapPinIcon} label="Church Directory" onClick={onClose} />

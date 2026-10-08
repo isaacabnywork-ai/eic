@@ -3,16 +3,15 @@ import {
   useContentList,
   useFeatured,
   useSeriesCards,
-  useUsers,
 } from '@/hooks/queries';
 import {
   MobileHeroBanner,
   MobileSectionHeader,
   MobileVideoCard,
-  MobileSpeakerAvatar,
   MobilePosterCard,
 } from './MobileComponents';
 import { itemPath } from '@/lib/routes';
+import { formatDateShort } from '@/lib/format';
 
 export function MobileDiscoverView() {
   // Hero: Featured videos/sermons
@@ -20,9 +19,6 @@ export function MobileDiscoverView() {
 
   // Watch This Week
   const { data: watchThisWeek } = useContentList('video', { perPage: 8 });
-
-  // Preachers & Teachers (Circular Avatars)
-  const { data: speakers } = useUsers({ perPage: 12 });
 
   // Start a Series / Shows (2:3 Vertical Poster Cards)
   const { data: seriesList } = useSeriesCards({ count: 6, coverType: 'video' });
@@ -50,19 +46,7 @@ export function MobileDiscoverView() {
         </div>
       </section>
 
-      {/* 3. Featured Preachers & Authors (Circular Avatars) */}
-      {speakers?.items && speakers.items.length > 0 && (
-        <section className="mt-4">
-          <MobileSectionHeader title="Equip Indian Preachers" seeAllLink="/authors" />
-          <div className="flex gap-4 overflow-x-auto px-4 pb-2 pt-1 scrollbar-none snap-x">
-            {speakers.items.map((person) => (
-              <MobileSpeakerAvatar key={person.id} person={person} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 4. Start a Series (Vertical Posters - "Start a Show") */}
+      {/* 3. Start a Series (Vertical Posters - "Start a Show") */}
       {seriesList && seriesList.length > 0 && (
         <section className="mt-4">
           <MobileSectionHeader title="Start a Series" seeAllLink="/series" />
@@ -84,7 +68,7 @@ export function MobileDiscoverView() {
         </section>
       )}
 
-      {/* 5. Featured Articles & Publications */}
+      {/* 4. Featured Articles & Publications */}
       {articles?.items && articles.items.length > 0 && (
         <section className="mt-4">
           <MobileSectionHeader title="Featured Articles" seeAllLink="/articles" />
@@ -109,7 +93,7 @@ export function MobileDiscoverView() {
                   </p>
                 )}
                 <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-white/40 pt-2 border-t border-[#D0E1F0] dark:border-white/10">
-                  <span>{art.author?.name || 'EIC Contributor'}</span>
+                  <span>{art.date ? formatDateShort(art.date) : 'Equip Article'}</span>
                   <span className="font-semibold text-[#182541] dark:text-white/70">Read &rarr;</span>
                 </div>
               </Link>
@@ -118,7 +102,7 @@ export function MobileDiscoverView() {
         </section>
       )}
 
-      {/* 6. Book Reviews Shelf */}
+      {/* 5. Book Reviews Shelf */}
       {books?.items && books.items.length > 0 && (
         <section className="mt-4">
           <MobileSectionHeader title="Book Reviews" seeAllLink="/book-reviews" />

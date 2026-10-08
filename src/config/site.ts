@@ -17,8 +17,8 @@ export const site = {
   logoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
   logoFallback: '/logo.png',
   /** Dedicated mobile app icon logo */
-  mobileLogoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1-e1783059827609.webp',
-  mobileLogoFallback: '/mobile-logo.webp',
+  mobileLogoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
+  mobileLogoFallback: '/logo.png',
   /** Default social share image (optional, absolute URL or path under /public). */
   defaultOgImage: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
 };
@@ -131,9 +131,8 @@ export const navItems: NavItem[] = [
           ],
         },
         {
-          title: 'Fellowship & People',
+          title: 'Fellowship & Community',
           links: [
-            { label: 'Authors & Speakers Directory', to: '/authors' },
             { label: 'Resource Library Search', to: '/search' },
             ...(t.church.enabled ? [{ label: 'Church Directory', to: `/${t.church.route}` }] : []),
           ],
@@ -186,7 +185,6 @@ export const footerColumns: { title: string; links: { label: string; to: string;
     links: [
       { label: 'Gallery', to: `/${t.gallery.route}` },
       { label: 'Events', to: `/${t.event.route}` },
-      { label: 'Authors', to: '/authors' },
       ...(t.church.enabled ? [{ label: 'Church directory', to: `/${t.church.route}` }] : []),
     ],
   },

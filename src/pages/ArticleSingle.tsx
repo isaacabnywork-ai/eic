@@ -2,14 +2,14 @@ import { useParams, Link } from 'react-router-dom';
 import { useContentItem, useRelated } from '@/hooks/queries';
 import { formatDate } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
-import { authorPath, termPath } from '@/lib/routes';
+import { termPath } from '@/lib/routes';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { RichContent } from '@/components/content/RichContent';
 import { Img } from '@/components/ui/Img';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/States';
-import { ClockIcon, ShareIcon, UserIcon } from '@/components/ui/Icons';
+import { ClockIcon, ShareIcon } from '@/components/ui/Icons';
 import { useState } from 'react';
 
 export function ArticleSinglePage() {
@@ -110,60 +110,20 @@ export function ArticleSinglePage() {
 
           {/* Meta line */}
           <div className="mt-6 flex items-center justify-between gap-3 border-y border-line py-3.5 sm:py-4">
-            <div className="flex items-center gap-3 min-w-0">
-              {article.author ? (
-                <Link
-                  to={authorPath(article.author.id)}
-                  className="shrink-0 group"
-                  aria-label={`View articles by ${article.author.name}`}
-                >
-                  {article.author.avatar ? (
-                    <img
-                      src={article.author.avatar}
-                      alt={article.author.name}
-                      className="h-10 w-10 sm:h-11 sm:w-11 rounded-full object-cover border border-line group-hover:border-link transition-colors"
-                    />
-                  ) : (
-                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
-                      <UserIcon size={18} />
-                    </div>
-                  )}
-                </Link>
-              ) : (
-                <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
-                  <UserIcon size={18} />
-                </div>
-              )}
-
-              <div className="min-w-0">
-                {article.author ? (
-                  <Link
-                    to={authorPath(article.author.id)}
-                    className="font-medium text-ink hover:text-link block truncate text-sm sm:text-base leading-tight"
-                  >
-                    {article.author.name}
-                  </Link>
-                ) : (
-                  <span className="font-medium text-ink block truncate text-sm sm:text-base leading-tight">
-                    Equip Indian Churches
-                  </span>
-                )}
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-                  <time dateTime={article.date}>{formatDate(article.date)}</time>
-                  <span>•</span>
-                  <span className="inline-flex items-center gap-1">
-                    <ClockIcon size={13} />
-                    <span>{readTime} min read</span>
-                  </span>
-                </div>
-              </div>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted">
+              <time dateTime={article.date}>{formatDate(article.date)}</time>
+              <span>•</span>
+              <span className="inline-flex items-center gap-1">
+                <ClockIcon size={14} />
+                <span>{readTime} min read</span>
+              </span>
             </div>
 
             {/* Share button */}
             <button
               type="button"
               onClick={handleShare}
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:text-ink hover:border-ink/40 active:scale-95 shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:text-ink hover:border-ink/40 active:scale-95 shadow-2xs transition cursor-pointer"
               aria-label="Share this article"
             >
               <ShareIcon size={15} />
@@ -209,41 +169,6 @@ export function ArticleSinglePage() {
                     #{top.name}
                   </Link>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* Author Box */}
-          {article.author && (
-            <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5 rounded-2xl border border-line bg-surface-2/40 p-6">
-              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-primary-soft">
-                {article.author.avatar ? (
-                  <img
-                    src={article.author.avatar}
-                    alt={article.author.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-link">
-                    <UserIcon size={28} />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-serif text-lg font-bold text-ink">
-                  About {article.author.name}
-                </h4>
-                {article.author.description && (
-                  <p className="mt-1 text-sm text-muted leading-relaxed">
-                    {article.author.description}
-                  </p>
-                )}
-                <Link
-                  to={authorPath(article.author.id)}
-                  className="mt-2 inline-block text-xs font-semibold text-link hover:underline"
-                >
-                  More articles and teachings by {article.author.name} →
-                </Link>
               </div>
             </div>
           )}

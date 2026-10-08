@@ -128,7 +128,7 @@ export function MobileSeriesView() {
                     {art.title}
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-white/50 truncate mt-0.5">
-                    {art.author?.name || 'Equip Indian Churches'}
+                    Foundational Series Article
                   </p>
                 </div>
                 <span className="text-xs font-semibold text-[#182541] dark:text-[#F0F6FB] shrink-0">Read &rarr;</span>

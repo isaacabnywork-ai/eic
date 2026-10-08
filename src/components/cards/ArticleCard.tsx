@@ -67,7 +67,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
               <ArrowRightIcon size={16} />
             </Link>
             <div className="flex items-center gap-2 text-xs text-muted">
-              {article.author && <span className="font-medium text-ink">{article.author.name}</span>}
+              <time dateTime={article.date}>{formatDateShort(article.date)}</time>
               <span>•</span>
               <span className="inline-flex items-center gap-1">
                 <ClockIcon size={13} />
@@ -125,12 +125,11 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
         )}
 
         <div className="mt-auto pt-4 flex items-center justify-between text-xs text-muted border-t border-line/60">
-          <span className="font-medium text-ink/80">{article.author?.name || 'EIC Contributor'}</span>
-          <div className="flex items-center gap-2">
-            <time dateTime={article.date}>{formatDateShort(article.date)}</time>
-            <span>•</span>
-            <span>{readTime}m</span>
-          </div>
+          <time dateTime={article.date}>{formatDateShort(article.date)}</time>
+          <span className="inline-flex items-center gap-1">
+            <ClockIcon size={13} />
+            <span>{readTime}m read</span>
+          </span>
         </div>
       </div>
     </article>
