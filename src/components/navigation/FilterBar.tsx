@@ -4,7 +4,7 @@ import { contentTypes, taxonomies } from '@/config/content';
 import type { ContentKey, TaxKey } from '@/config/content';
 import { useFilterTerms } from '@/hooks/queries';
 import { useDebounce } from '@/hooks/useDebounce';
-import { CloseIcon, SearchIcon } from '@/components/ui/Icons';
+import { ChevronDownIcon, CloseIcon, SearchIcon } from '@/components/ui/Icons';
 import { Button } from '@/components/ui/Button';
 
 interface FilterBarProps {
@@ -50,7 +50,7 @@ export function FilterBar({
 
   return (
     <div className="space-y-4 mb-8">
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-4 shadow-sm">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 rounded-2xl border border-line bg-surface p-3.5 sm:p-4 shadow-sm">
         {/* Search input */}
         <div className="relative flex-1">
           <SearchIcon
@@ -72,7 +72,7 @@ export function FilterBar({
                 setSearchTerm('');
                 onUpdate({ q: undefined });
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink cursor-pointer"
               aria-label="Clear search text"
             >
               <CloseIcon size={16} />
@@ -80,8 +80,8 @@ export function FilterBar({
           )}
         </div>
 
-        {/* Taxonomy dropdowns */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Taxonomy dropdowns: clean 2-column grid on mobile (< md), aligned inline flex on desktop (>= md) */}
+        <div className="grid grid-cols-2 gap-2.5 w-full lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-2.5">
           {cfg.taxonomies.map((taxKey) => (
             <TaxonomySelect
               key={taxKey}
@@ -93,17 +93,19 @@ export function FilterBar({
           ))}
 
           {hasFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearchTerm('');
-                onClear();
-              }}
-              className="text-xs font-semibold text-muted hover:text-ink"
-            >
-              Reset
-            </Button>
+            <div className="col-span-2 lg:col-auto flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  onClear();
+                }}
+                className="w-full lg:w-auto text-xs font-semibold text-muted hover:text-ink cursor-pointer h-10"
+              >
+                Reset Filters
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -138,21 +140,27 @@ function TaxonomySelect({
   if (isLoading || !terms || terms.length === 0) return null;
 
   return (
-    <select
-      value={selectedId || ''}
-      onChange={(e) => {
-        const val = e.target.value ? Number(e.target.value) : undefined;
-        onChange(val);
-      }}
-      aria-label={`Filter by ${taxConfig.label}`}
-      className="h-11 rounded-xl border border-line bg-surface px-3.5 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-    >
-      <option value="">All {taxConfig.plural}</option>
-      {terms.map((term) => (
-        <option key={term.id} value={term.id}>
-          {term.name} {term.count !== undefined ? `(${term.count})` : ''}
-        </option>
-      ))}
-    </select>
+    <div className="relative w-full lg:w-auto lg:min-w-[130px] lg:max-w-[185px]">
+      <select
+        value={selectedId || ''}
+        onChange={(e) => {
+          const val = e.target.value ? Number(e.target.value) : undefined;
+          onChange(val);
+        }}
+        aria-label={`Filter by ${taxConfig.label}`}
+        className="h-11 w-full rounded-xl border border-line bg-surface pl-3.5 pr-8 text-xs sm:text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer truncate shadow-2xs transition-colors hover:border-line/80"
+      >
+        <option value="">All {taxConfig.plural}</option>
+        {terms.map((term) => (
+          <option key={term.id} value={term.id}>
+            {term.name} {term.count !== undefined ? `(${term.count})` : ''}
+          </option>
+        ))}
+      </select>
+      <ChevronDownIcon
+        size={14}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+      />
+    </div>
   );
 }

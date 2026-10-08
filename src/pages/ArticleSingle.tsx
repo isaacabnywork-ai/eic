@@ -109,47 +109,64 @@ export function ArticleSinglePage() {
           </h1>
 
           {/* Meta line */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-line py-4 text-sm text-muted">
-            <div className="flex items-center gap-3">
+          <div className="mt-6 flex items-center justify-between gap-3 border-y border-line py-3.5 sm:py-4">
+            <div className="flex items-center gap-3 min-w-0">
               {article.author ? (
                 <Link
                   to={authorPath(article.author.id)}
-                  className="flex items-center gap-2.5 font-medium text-ink hover:text-link"
+                  className="shrink-0 group"
+                  aria-label={`View articles by ${article.author.name}`}
                 >
                   {article.author.avatar ? (
                     <img
                       src={article.author.avatar}
                       alt={article.author.name}
-                      className="h-10 w-10 rounded-full object-cover"
+                      className="h-10 w-10 sm:h-11 sm:w-11 rounded-full object-cover border border-line group-hover:border-link transition-colors"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-link">
+                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
                       <UserIcon size={18} />
                     </div>
                   )}
-                  <span>{article.author.name}</span>
                 </Link>
               ) : (
-                <span>EIC Contributor</span>
+                <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
+                  <UserIcon size={18} />
+                </div>
               )}
 
-              <span>•</span>
-              <time dateTime={article.date}>{formatDate(article.date)}</time>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1">
-                <ClockIcon size={15} />
-                {readTime} min read
-              </span>
+              <div className="min-w-0">
+                {article.author ? (
+                  <Link
+                    to={authorPath(article.author.id)}
+                    className="font-medium text-ink hover:text-link block truncate text-sm sm:text-base leading-tight"
+                  >
+                    {article.author.name}
+                  </Link>
+                ) : (
+                  <span className="font-medium text-ink block truncate text-sm sm:text-base leading-tight">
+                    Equip Indian Churches
+                  </span>
+                )}
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
+                  <time dateTime={article.date}>{formatDate(article.date)}</time>
+                  <span>•</span>
+                  <span className="inline-flex items-center gap-1">
+                    <ClockIcon size={13} />
+                    <span>{readTime} min read</span>
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Share button */}
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-link"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-muted hover:text-ink hover:border-ink/40 active:scale-95 shadow-2xs transition cursor-pointer"
               aria-label="Share this article"
             >
-              <ShareIcon size={16} />
+              <ShareIcon size={15} />
               <span>{copied ? 'Copied URL!' : 'Share'}</span>
             </button>
           </div>
