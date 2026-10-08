@@ -51,7 +51,7 @@ export function MobileHeroBanner({
       <div className="absolute bottom-6 inset-x-0 px-5 flex flex-col justify-end text-white">
         {/* Eyebrow / Tag */}
         {current.terms.series?.[0] && (
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#FF533D] mb-1 drop-shadow">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#F0F6FB] mb-1 drop-shadow">
             {current.terms.series[0].name}
           </span>
         )}
@@ -78,10 +78,10 @@ export function MobileHeroBanner({
         <div className="mt-3.5 flex items-center justify-between">
           <Link
             to={href}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:text-[#FF533D] group transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:text-[#F0F6FB] group transition-colors"
           >
             <span>{actionLabel}</span>
-            <ChevronRightIcon size={16} className="text-[#FF533D] group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRightIcon size={16} className="text-[#F0F6FB] group-hover:translate-x-0.5 transition-transform" />
           </Link>
 
           {/* Dash indicators */}
@@ -180,16 +180,16 @@ export function MobileVideoCard({
             toggle(item);
           }}
           aria-label={bookmarked ? 'Remove from library' : 'Save to library'}
-          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white/80 hover:text-[#FF533D] active:scale-90 transition backdrop-blur-xs"
+          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white/80 hover:text-[#F0F6FB] active:scale-90 transition backdrop-blur-xs"
         >
-          <BookmarkIcon size={14} className={bookmarked ? 'fill-[#FF533D] text-[#FF533D]' : ''} />
+          <BookmarkIcon size={14} className={bookmarked ? 'fill-[#F0F6FB] text-[#F0F6FB]' : ''} />
         </button>
       </div>
 
       {/* Info below */}
       <div className="mt-2 flex flex-col">
-        <h4 className="font-medium text-xs sm:text-sm text-white !text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors">
-          <Link to={href} className="text-white !text-white hover:text-[#FF533D]" style={{ color: '#FFFFFF' }}>
+        <h4 className="font-medium text-xs sm:text-sm text-white !text-white line-clamp-2 leading-snug group-hover:text-[#F0F6FB] transition-colors">
+          <Link to={href} className="text-white !text-white hover:text-[#F0F6FB]" style={{ color: '#FFFFFF' }}>
             {item.title}
           </Link>
         </h4>
@@ -210,7 +210,7 @@ export function MobileSpeakerAvatar({ person }: { person: Person }) {
       to={href}
       className="group flex flex-col items-center shrink-0 w-20 sm:w-24 text-center snap-start select-none"
     >
-      <div className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border-2 border-white/15 bg-white/5 shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:border-[#FF533D]">
+      <div className="relative h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-full border-2 border-white/15 bg-white/5 shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:border-[#F0F6FB]">
         {person.avatar ? (
           <img
             src={person.avatar}
@@ -224,7 +224,7 @@ export function MobileSpeakerAvatar({ person }: { person: Person }) {
           </div>
         )}
       </div>
-      <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#FF533D] transition-colors">
+      <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#F0F6FB] transition-colors">
         {person.name}
       </span>
     </Link>
@@ -270,7 +270,7 @@ export function MobilePosterCard({
       {/* Poster text content */}
       <div className="absolute bottom-0 inset-x-0 p-3 text-white">
         <h4
-          className="font-serif text-sm font-bold leading-tight line-clamp-2 drop-shadow-md text-white !text-white group-hover:text-[#FF533D] transition-colors"
+          className="font-serif text-sm font-bold leading-tight line-clamp-2 drop-shadow-md text-white !text-white group-hover:text-[#F0F6FB] transition-colors"
           style={{ color: '#FFFFFF' }}
         >
           {item.title}

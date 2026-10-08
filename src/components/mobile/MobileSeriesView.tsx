@@ -35,7 +35,7 @@ export function MobileSeriesView() {
 
           {/* Hero text */}
           <div className="absolute bottom-6 inset-x-0 px-5 flex flex-col justify-end text-white">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#FF533D] mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#F0F6FB] mb-1">
               Featured Teaching Series
             </span>
             <h2
@@ -55,10 +55,10 @@ export function MobileSeriesView() {
             <div className="mt-4">
               <Link
                 to={`/series/${heroSeries.term.slug}`}
-                className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:text-[#FF533D] group transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:text-[#F0F6FB] group transition-colors"
               >
                 <span>Explore Series</span>
-                <ChevronRightIcon size={16} className="text-[#FF533D] group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRightIcon size={16} className="text-[#F0F6FB] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
           </div>
@@ -76,7 +76,7 @@ export function MobileSeriesView() {
                 to={`/articles?category=${cat.slug}`}
                 className="group flex flex-col items-center shrink-0 w-20 text-center snap-start select-none"
               >
-                <div className={`relative h-20 w-20 overflow-hidden rounded-full border-2 border-white/15 shadow-md flex items-center justify-center font-serif text-xl font-bold transition-transform group-hover:scale-105 group-hover:border-[#FF533D] ${
+                <div className={`relative h-20 w-20 overflow-hidden rounded-full border-2 border-white/15 shadow-md flex items-center justify-center font-serif text-xl font-bold transition-transform group-hover:scale-105 group-hover:border-[#F0F6FB] ${
                   idx % 3 === 0
                     ? 'bg-gradient-to-br from-amber-600 to-amber-900 text-amber-100'
                     : idx % 3 === 1
@@ -85,7 +85,7 @@ export function MobileSeriesView() {
                 }`}>
                   {cat.name.slice(0, 2).toUpperCase()}
                 </div>
-                <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#FF533D] transition-colors">
+                <span className="mt-2 text-xs font-medium text-white/90 line-clamp-1 group-hover:text-[#F0F6FB] transition-colors">
                   {cat.name}
                 </span>
               </Link>
@@ -143,7 +143,7 @@ export function MobileSeriesView() {
                     {art.author?.name || 'Equip Indian Churches'}
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-[#FF533D] shrink-0">Read &rarr;</span>
+                <span className="text-xs font-semibold text-[#F0F6FB] shrink-0">Read &rarr;</span>
               </Link>
             ))}
           </div>

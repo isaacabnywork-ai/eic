@@ -31,7 +31,7 @@ export function MobileListenView() {
             <Link
               key={item.id}
               to={itemPath('sermon', item.slug)}
-              className="group relative w-60 shrink-0 flex flex-col rounded-xl border border-white/10 bg-white/5 p-3.5 snap-start select-none transition hover:border-[#FF533D]/50"
+              className="group relative w-60 shrink-0 flex flex-col rounded-xl border border-white/10 bg-white/5 p-3.5 snap-start select-none transition hover:border-[#F0F6FB]/50"
             >
               {/* Audio Card graphic header */}
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-[#111927]">
@@ -52,14 +52,14 @@ export function MobileListenView() {
                   <HeadphonesIcon size={11} />
                   <span>Audio</span>
                 </div>
-                <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#FF533D] text-white">
+                <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#F0F6FB] text-[#070A0F]">
                   <PlayIcon size={10} className="ml-0.5" />
                 </div>
               </div>
 
               {/* Title & speaker */}
               <div className="mt-2.5">
-                <h4 className="font-serif text-sm font-bold text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors">
+                <h4 className="font-serif text-sm font-bold text-white line-clamp-2 leading-snug group-hover:text-[#F0F6FB] transition-colors">
                   {item.title}
                 </h4>
                 <p className="mt-1 text-xs text-white/50 line-clamp-1">
@@ -99,12 +99,12 @@ export function MobileListenView() {
                 to={itemPath('sermon', item.slug)}
                 className="group flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black/40 text-[#FF533D]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black/40 text-[#F0F6FB]">
                   <PlayIcon size={16} className="ml-0.5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4
-                    className="text-xs font-semibold text-white !text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors"
+                    className="text-xs font-semibold text-white !text-white line-clamp-1 group-hover:text-[#F0F6FB] transition-colors"
                     style={{ color: '#FFFFFF' }}
                   >
                     {item.title}

@@ -113,7 +113,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
               className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-white/90 hover:bg-white/5 active:bg-white/10 transition"
             >
               <div className="flex items-center gap-3">
-                {theme === 'dark' ? <SunIcon size={18} className="text-[#FF533D]" /> : <MoonIcon size={18} className="text-[#FF533D]" />}
+                {theme === 'dark' ? <SunIcon size={18} className="text-[#F0F6FB]" /> : <MoonIcon size={18} className="text-[#F0F6FB]" />}
                 <span>Appearance</span>
               </div>
               <span className="text-xs text-white/50 capitalize">{theme} Mode</span>
@@ -131,7 +131,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#FF533D] hover:text-white transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
                   aria-label="YouTube"
                 >
                   <YoutubeIcon size={18} />
@@ -142,7 +142,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#FF533D] hover:text-white transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
                   aria-label="Facebook"
                 >
                   <FacebookIcon size={18} />
@@ -153,7 +153,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#FF533D] hover:text-white transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
                   aria-label="Instagram"
                 >
                   <InstagramIcon size={18} />
@@ -164,7 +164,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.x}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#FF533D] hover:text-white transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-[#F0F6FB] hover:text-[#070A0F] transition"
                   aria-label="X"
                 >
                   <XIcon size={16} />

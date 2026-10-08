@@ -60,11 +60,11 @@ export function MobileLibraryView() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address..."
               required
-              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-xs text-white placeholder-white/40 focus:border-[#FF533D] focus:outline-none focus:ring-1 focus:ring-[#FF533D]"
+              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-xs text-white placeholder-white/40 focus:border-[#F0F6FB] focus:outline-none focus:ring-1 focus:ring-[#F0F6FB]"
             />
             <button
               type="submit"
-              className="w-full rounded-xl bg-[#FF533D] py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg active:scale-98 hover:brightness-105 transition cursor-pointer"
+              className="w-full rounded-xl bg-[#F0F6FB] py-3.5 text-xs font-bold uppercase tracking-wider text-[#070A0F] shadow-lg active:scale-98 hover:brightness-105 transition cursor-pointer"
             >
               Subscribe
             </button>
@@ -75,7 +75,7 @@ export function MobileLibraryView() {
         <div className="mt-5 flex flex-col items-center gap-2 text-xs">
           <p className="text-white/60">
             Already a partner?{' '}
-            <Link to="/articles" className="font-semibold text-[#FF533D] hover:underline">
+            <Link to="/articles" className="font-semibold text-[#F0F6FB] hover:underline">
               Explore Articles
             </Link>
           </p>
@@ -126,11 +126,11 @@ export function MobileLibraryView() {
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#FF533D] block">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#F0F6FB] block">
                       {item.type}
                     </span>
                     <h4
-                      className="font-serif text-xs font-bold text-white !text-white line-clamp-1 group-hover:text-[#FF533D] transition-colors"
+                      className="font-serif text-xs font-bold text-white !text-white line-clamp-1 group-hover:text-[#F0F6FB] transition-colors"
                       style={{ color: '#FFFFFF' }}
                     >
                       {item.title}

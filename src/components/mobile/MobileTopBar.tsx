@@ -100,7 +100,7 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
               }}
             />
             <span
-              className="font-serif text-lg font-bold tracking-wider text-white !text-white drop-shadow-md group-hover:text-[#FF533D] transition-colors"
+              className="font-serif text-lg font-bold tracking-wider text-white !text-white drop-shadow-md group-hover:text-[#F0F6FB] transition-colors"
               style={{ color: '#FFFFFF' }}
             >
               EIC

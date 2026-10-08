@@ -67,21 +67,21 @@ export function MobileBottomNav() {
             to={tab.to}
             className={`group relative flex flex-1 flex-col items-center justify-center py-1 transition-all duration-200 active:scale-95 ${
               active
-                ? 'text-[#FF533D]'
+                ? 'text-[#F0F6FB]'
                 : 'text-white/45 hover:text-white/80'
             }`}
           >
             <div className="relative">
               <Icon size={22} className={active ? 'stroke-[2.2]' : 'stroke-[1.8]'} />
               {tab.badge !== undefined && tab.badge > 0 && (
-                <span className="absolute -top-1 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#FF533D] text-[9px] font-bold text-white">
+                <span className="absolute -top-1 -right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#F0F6FB] text-[9px] font-bold text-[#070A0F]">
                   {tab.badge > 9 ? '9+' : tab.badge}
                 </span>
               )}
             </div>
             <span
               className={`mt-1 text-[10px] font-medium tracking-tight ${
-                active ? 'font-semibold text-[#FF533D]' : 'text-white/55'
+                active ? 'font-semibold text-[#F0F6FB]' : 'text-white/55'
               }`}
             >
               {tab.label}

@@ -93,15 +93,15 @@ export function MobileDiscoverView() {
               <Link
                 key={art.id}
                 to={itemPath('article', art.slug)}
-                className="group w-64 shrink-0 rounded-xl border border-white/10 bg-white/5 p-4 snap-start select-none transition hover:border-[#FF533D]/50"
+                className="group w-64 shrink-0 rounded-xl border border-white/10 bg-white/5 p-4 snap-start select-none transition hover:border-[#F0F6FB]/50"
               >
                 {art.terms.category?.[0] && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF533D] block mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#F0F6FB] block mb-1">
                     {art.terms.category[0].name}
                   </span>
                 )}
                 <h4
-                  className="font-serif text-sm font-bold text-white !text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors"
+                  className="font-serif text-sm font-bold text-white !text-white line-clamp-2 leading-snug group-hover:text-[#F0F6FB] transition-colors"
                   style={{ color: '#FFFFFF' }}
                 >
                   {art.title}
