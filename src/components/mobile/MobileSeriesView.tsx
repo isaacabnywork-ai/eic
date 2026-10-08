@@ -38,11 +38,17 @@ export function MobileSeriesView() {
             <span className="text-xs font-semibold uppercase tracking-wider text-[#FF533D] mb-1">
               Featured Teaching Series
             </span>
-            <h2 className="font-serif text-3xl font-black leading-tight drop-shadow-md">
+            <h2
+              className="font-serif text-3xl font-black leading-tight drop-shadow-md text-white !text-white"
+              style={{ color: '#FFFFFF' }}
+            >
               {heroSeries.term.name}
             </h2>
             {heroSeries.term.description && (
-              <p className="mt-2 text-xs text-white/80 line-clamp-2 max-w-sm">
+              <p
+                className="mt-2 text-xs text-white/90 line-clamp-2 max-w-sm !text-white/90"
+                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+              >
                 {heroSeries.term.description}
               </p>
             )}

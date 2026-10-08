@@ -57,13 +57,19 @@ export function MobileHeroBanner({
         )}
 
         {/* Title */}
-        <h2 className="font-serif text-2xl sm:text-3xl font-black leading-tight drop-shadow-md line-clamp-2">
+        <h2
+          className="font-serif text-2xl sm:text-3xl font-black leading-tight drop-shadow-md line-clamp-2 text-white !text-white"
+          style={{ color: '#FFFFFF' }}
+        >
           {current.title}
         </h2>
 
         {/* Description or Quote */}
         {current.excerpt && (
-          <p className="mt-2 text-xs sm:text-sm text-white/80 line-clamp-2 drop-shadow leading-relaxed max-w-sm">
+          <p
+            className="mt-2 text-xs sm:text-sm text-white/90 line-clamp-2 drop-shadow leading-relaxed max-w-sm !text-white/90"
+            style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+          >
             {current.excerpt}
           </p>
         )}
@@ -182,11 +188,13 @@ export function MobileVideoCard({
 
       {/* Info below */}
       <div className="mt-2 flex flex-col">
-        <h4 className="font-medium text-xs sm:text-sm text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors">
-          <Link to={href}>{item.title}</Link>
+        <h4 className="font-medium text-xs sm:text-sm text-white !text-white line-clamp-2 leading-snug group-hover:text-[#FF533D] transition-colors">
+          <Link to={href} className="text-white !text-white hover:text-[#FF533D]" style={{ color: '#FFFFFF' }}>
+            {item.title}
+          </Link>
         </h4>
         {speaker && (
-          <p className="mt-0.5 text-[11px] text-white/50 line-clamp-1">{speaker}</p>
+          <p className="mt-0.5 text-[11px] text-white/60 line-clamp-1">{speaker}</p>
         )}
       </div>
     </div>

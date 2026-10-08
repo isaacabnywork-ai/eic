@@ -15,6 +15,13 @@ export function Layout() {
     setProfileOpen(false);
   }, [location.pathname, location.search]);
 
+  const isHeroRoute =
+    location.pathname === '/' ||
+    location.pathname === '/discover' ||
+    location.pathname === '/videos' ||
+    location.pathname === '/sermons' ||
+    location.pathname === '/series';
+
   return (
     <div className="flex min-h-screen flex-col bg-bg text-ink selection:bg-accent selection:text-accent-ink transition-colors">
       {/* Skip to Content for screen reader / keyboard accessibility */}
@@ -35,7 +42,10 @@ export function Layout() {
       </div>
 
       {/* Main Content View */}
-      <main id="main-content" className="flex-1">
+      <main
+        id="main-content"
+        className={`flex-1 ${!isHeroRoute ? 'pt-14 md:pt-0' : ''}`}
+      >
         <Outlet />
       </main>
 
