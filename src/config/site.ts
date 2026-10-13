@@ -14,13 +14,13 @@ export const site = {
   mission:
     'Equip Indian Churches exists to strengthen the Church in India through sound, Scripture-centred teaching — freely available to every pastor, leader and believer.',
   /** Official logo image link */
-  logoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
+  logoUrl: '/eic-logo.png',
   logoFallback: '/logo.png',
   /** Dedicated mobile app icon logo */
-  mobileLogoUrl: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
+  mobileLogoUrl: '/eic-logo.png',
   mobileLogoFallback: '/logo.png',
   /** Default social share image (optional, absolute URL or path under /public). */
-  defaultOgImage: 'https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png',
+  defaultOgImage: '/eic-logo.png',
 };
 
 export const wpLink = (path: string): string => `${env.wpUrl}${path}`;

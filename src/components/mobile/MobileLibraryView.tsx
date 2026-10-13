@@ -21,11 +21,11 @@ export function MobileLibraryView() {
       {/* 1. Subscription / Access Card matching Screenshot 2 */}
       <div className="flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center">
         {/* Mobile Logo Mark */}
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 shadow-sm dark:shadow-lg p-2.5">
+        <div className="mb-6 flex h-14 px-5 items-center justify-center rounded-2xl bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 shadow-sm dark:shadow-lg py-2.5">
           <img
             src={site.mobileLogoUrl}
             alt={site.name}
-            className="h-full w-auto object-contain"
+            className="h-full w-auto object-contain invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
             }}

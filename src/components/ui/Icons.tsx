@@ -190,7 +190,7 @@ export function LogoMark({
 }) {
   return (
     <img
-      src="https://equipindianchurches.com/wp-content/uploads/2023/11/eic2-1.png"
+      src="/eic-logo.png"
       alt="Equip Indian Churches"
       height={size}
       style={{ height: `${size}px`, width: 'auto' }}

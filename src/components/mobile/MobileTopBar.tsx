@@ -96,31 +96,26 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
         )}
       </div>
 
-      {/* Center: Official Mobile Logo with EIC or Serif Title */}
+      {/* Center: Official Mobile Logo or Serif Title */}
       <div className="flex flex-1 items-center justify-center">
         {isHome ? (
           <Link
             to="/"
-            className="flex items-center gap-2 group focus:outline-none"
+            className="flex items-center justify-center group focus:outline-none"
             aria-label="Equip Indian Churches"
           >
             <img
               src={site.mobileLogoUrl}
               alt={site.name}
-              className="h-7 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-md"
+              className={`h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 ${
+                isOverHero
+                  ? 'drop-shadow-md'
+                  : 'invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0 drop-shadow-xs dark:drop-shadow-md'
+              }`}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
               }}
             />
-            <span
-              className={`font-serif text-lg font-bold tracking-wider drop-shadow-md transition-colors ${
-                isOverHero
-                  ? 'text-white group-hover:text-[#F0F6FB]'
-                  : 'text-[#182541] dark:text-white group-hover:text-primary dark:group-hover:text-[#F0F6FB]'
-              }`}
-            >
-              EIC
-            </span>
           </Link>
         ) : (
           <h1

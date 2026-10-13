@@ -84,7 +84,7 @@ export function Footer() {
               <img
                 src={site.logoUrl}
                 alt={site.name}
-                className="h-10 w-auto object-contain transition-all group-hover:opacity-90 dark:brightness-0 dark:invert"
+                className="h-10 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = site.logoFallback;
                 }}

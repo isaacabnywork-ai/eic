@@ -88,22 +88,17 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
       <div className="relative z-10 flex h-full w-[88%] max-w-sm flex-col bg-[#F0F6FB] dark:bg-[#090D14] border-r border-[#D0E1F0] dark:border-white/10 text-[#182541] dark:text-white shadow-2xl animate-in slide-in-from-left duration-250 transition-colors">
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-[#D0E1F0] dark:border-white/10 p-4 sm:p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white dark:bg-white/10 border border-[#D0E1F0] dark:border-white/15 p-2 shadow-xs">
-              <img
-                src={site.mobileLogoUrl}
-                alt={site.name}
-                className="h-full w-auto object-contain"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
-                }}
-              />
-            </div>
-            <div>
-              <h2 className="font-serif text-base font-bold leading-tight">Equip Indian Churches</h2>
-              <p className="text-[11px] text-slate-500 dark:text-white/50">Christian Ministry & Media</p>
-            </div>
-          </div>
+          <Link to="/" onClick={onClose} className="flex flex-col gap-1 focus:outline-none">
+            <img
+              src={site.mobileLogoUrl}
+              alt={site.name}
+              className="h-8 w-auto object-contain object-left invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
+              }}
+            />
+            <p className="text-[11px] text-slate-500 dark:text-white/50">Christian Ministry & Media</p>
+          </Link>
 
           <button
             type="button"
