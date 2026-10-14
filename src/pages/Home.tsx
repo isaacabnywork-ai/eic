@@ -24,8 +24,10 @@ import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
 import {
   ArrowRightIcon,
   BookIcon,
+  CalendarIcon,
   ClockIcon,
   LayersIcon,
+  MapPinIcon,
   MicIcon,
   PlayIcon,
   StarIcon,
@@ -189,7 +191,7 @@ export function HomePage() {
             <span className="text-xs text-muted hidden sm:inline">Sound biblical doctrine for India</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
             {/* Articles */}
             <Link
               to={`/${contentTypes.article.route}`}
@@ -244,6 +246,24 @@ export function HomePage() {
               </div>
             </Link>
 
+            {/* Events */}
+            <Link
+              to={`/${contentTypes.event.route}`}
+              className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-sm"
+            >
+              <div className="text-accent mb-3 group-hover:scale-105 transition-transform">
+                <CalendarIcon size={24} />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-ink group-hover:text-accent-text transition-colors">
+                  Events
+                </h3>
+                <p className="mt-1 text-xs text-muted leading-snug">
+                  National conferences & roundtables
+                </p>
+              </div>
+            </Link>
+
             {/* Series */}
             <Link
               to="/series"
@@ -265,7 +285,7 @@ export function HomePage() {
             {/* Book Reviews */}
             <Link
               to={`/${contentTypes.bookReview.route}`}
-              className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-sm col-span-2 md:col-span-1"
+              className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-sm"
             >
               <div className="text-accent mb-3 group-hover:scale-105 transition-transform">
                 <StarIcon size={24} />
@@ -923,26 +943,165 @@ export function HomePage() {
         )}
       </Section>
 
-      {/* Upcoming Events */}
-      {events && events.items.length > 0 && (
-        <Section
-          title="Upcoming Events & Roundtables"
-          eyebrow="CONNECT & MEET"
-          description="Pastoral training events, theological consultations, and local assemblies."
-          to={`/${contentTypes.event.route}`}
-          toLabel="All Events"
-        >
+      {/* ============================================================== */}
+      {/* 12. UPCOMING EVENTS & CONFERENCES (Dedicated Desktop Section)   */}
+      {/* ============================================================== */}
+      <section className="py-16 sm:py-20 lg:py-24 bg-surface border-b border-line">
+        <div className="container-page">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-text mb-2 flex items-center gap-2">
+                <CalendarIcon size={14} />
+                <span>FELLOWSHIP & NATIONAL GATHERINGS</span>
+              </p>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-[40px] font-bold text-ink leading-tight">
+                Upcoming Events & Conferences
+              </h2>
+              <p className="mt-2 text-base text-body max-w-2xl">
+                National pastor conferences, regional fellowship roundtables, and expository training seminars across India.
+              </p>
+            </div>
+            <Link
+              to={`/${contentTypes.event.route}`}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink hover:text-accent-text transition-colors shrink-0"
+            >
+              <span>Explore All Events</span>
+              <ArrowRightIcon size={15} />
+            </Link>
+          </div>
+
           {eventsLoading ? (
-            <CardGridSkeleton variant="event" count={2} />
+            <CardGridSkeleton variant="event" count={3} />
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {events.items.map((ev) => (
-                <EventCard key={ev.id} item={ev} />
-              ))}
+              {events?.items && events.items.length > 0 ? (
+                events.items.map((ev) => (
+                  <EventCard key={ev.id} item={ev} />
+                ))
+              ) : (
+                <>
+                  {/* Card 1: Annual All India Pastors Conference */}
+                  <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-ink/20 hover:shadow-md">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
+                          <span className="text-xs uppercase tracking-wider text-accent-text font-semibold">Annual</span>
+                          <span className="text-lg font-black leading-none mt-0.5">AIPC</span>
+                        </div>
+                        <span className="rounded bg-accent/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-accent-text">
+                          National Summit
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
+                        <MapPinIcon size={13} />
+                        <span>All India Pastoral Assembly</span>
+                      </div>
+
+                      <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
+                        <Link to="/events">All India Pastors Conference</Link>
+                      </h3>
+
+                      <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
+                        Gathering pastors, elders, and church leaders from across India for faithful expository preaching, mutual encouragement, and biblical fellowship.
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+                      <span className="text-muted font-medium">Equipping Local Pastors</span>
+                      <Link
+                        to="/events"
+                        className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-accent-text transition-colors"
+                      >
+                        <span>Conference Details</span>
+                        <ArrowRightIcon size={13} />
+                      </Link>
+                    </div>
+                  </article>
+
+                  {/* Card 2: Regional Roundtables */}
+                  <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-ink/20 hover:shadow-md">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
+                          <span className="text-xs uppercase tracking-wider text-accent-text font-semibold">Regional</span>
+                          <span className="text-sm font-bold leading-none mt-0.5">Hubs</span>
+                        </div>
+                        <span className="rounded bg-surface-2 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-muted">
+                          Fellowship
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
+                        <MapPinIcon size={13} />
+                        <span>Delhi • Bangalore • Mumbai • Northeast</span>
+                      </div>
+
+                      <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
+                        <Link to="/events">Regional Pastors Roundtables</Link>
+                      </h3>
+
+                      <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
+                        Regional ministerial fellowships and roundtables connecting local church shepherds for prayer, theological study, and mutual accountability.
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+                      <span className="text-muted font-medium">Regional Gatherings</span>
+                      <Link
+                        to="/events"
+                        className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-accent-text transition-colors"
+                      >
+                        <span>Learn More</span>
+                        <ArrowRightIcon size={13} />
+                      </Link>
+                    </div>
+                  </article>
+
+                  {/* Card 3: Preaching Seminars & Workshops */}
+                  <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-ink/20 hover:shadow-md">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
+                          <span className="text-xs uppercase tracking-wider text-accent-text font-semibold">Training</span>
+                          <span className="text-sm font-bold leading-none mt-0.5">Seminars</span>
+                        </div>
+                        <span className="rounded bg-surface-2 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-muted">
+                          Training
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
+                        <MapPinIcon size={13} />
+                        <span>Preaching & Shepherding</span>
+                      </div>
+
+                      <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
+                        <Link to="/events">Expository Preaching Workshops</Link>
+                      </h3>
+
+                      <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
+                        Intensive hands-on preaching seminars equipping preachers to faithfully handle, study, and expound God's Word in local church pulpits.
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+                      <span className="text-muted font-medium">Workshops</span>
+                      <Link
+                        to="/events"
+                        className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-accent-text transition-colors"
+                      >
+                        <span>View Workshops</span>
+                        <ArrowRightIcon size={13} />
+                      </Link>
+                    </div>
+                  </article>
+                </>
+              )}
             </div>
           )}
-        </Section>
-      )}
+        </div>
+      </section>
       </div>
     </>
   );
