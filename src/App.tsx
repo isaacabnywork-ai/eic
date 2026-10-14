@@ -18,6 +18,10 @@ import { AuthorsArchivePage } from '@/pages/AuthorsArchive';
 import { AuthorSinglePage } from '@/pages/AuthorSingle';
 import { SearchPage } from '@/pages/SearchPage';
 import { ChurchesArchivePage } from '@/pages/ChurchesArchive';
+import { SeminariesArchivePage } from '@/pages/SeminariesArchive';
+import { SeminarySinglePage } from '@/pages/SeminarySingle';
+import { BookstoresArchivePage } from '@/pages/BookstoresArchive';
+import { BookstoreSinglePage } from '@/pages/BookstoreSingle';
 import { LibraryPage } from '@/pages/LibraryPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -56,6 +60,12 @@ const router = createBrowserRouter([
       { path: 'library', element: <LibraryPage /> },
       // Churches (directory)
       { path: 'churches', element: <ChurchesArchivePage /> },
+      // Recommendations: Seminaries
+      { path: 'seminaries', element: <SeminariesArchivePage /> },
+      { path: 'seminaries/:slug', element: <SeminarySinglePage /> },
+      // Recommendations: Bookstores
+      { path: 'bookstores', element: <BookstoresArchivePage /> },
+      { path: 'bookstores/:slug', element: <BookstoreSinglePage /> },
       // 404
       { path: '*', element: <NotFoundPage /> },
     ],

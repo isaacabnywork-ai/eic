@@ -75,6 +75,9 @@ export function Header() {
     if (label === 'Events & Gallery') {
       return p.startsWith('/events') || p.startsWith('/gallery') || p.startsWith('/authors');
     }
+    if (label === 'Recommendations') {
+      return p.startsWith('/seminaries') || p.startsWith('/bookstores');
+    }
     return to ? p.startsWith(to) : false;
   };
 

@@ -203,7 +203,39 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             <DrawerLink to="/churches" icon={MapPinIcon} label="Church Directory" onClick={onClose} />
           </div>
 
-          {/* Section 4: About & Statement of Faith */}
+          {/* Section 4: Recommendations (Seminaries & Bookstores) */}
+          <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
+              Recommendations
+            </span>
+            <DrawerLink to="/seminaries" icon={BookIcon} label="Recommended Seminaries" onClick={onClose} />
+            <div className="pl-7 space-y-1 pb-1">
+              <Link to="/seminaries/calvary-baptist-bible-college" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • Calvary Baptist Bible College
+              </Link>
+              <Link to="/seminaries/evangelical-theological-seminary" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • Evangelical Theological Seminary
+              </Link>
+              <Link to="/seminaries/satya-vachan-seminary" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • Satya Vachan Seminary
+              </Link>
+            </div>
+
+            <DrawerLink to="/bookstores" icon={BookIcon} label="Recommended Bookstores" onClick={onClose} />
+            <div className="pl-7 space-y-1 pb-1">
+              <Link to="/bookstores/alethia-books" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • Alethia Books
+              </Link>
+              <Link to="/bookstores/for-the-truth" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • For The Truth
+              </Link>
+              <Link to="/bookstores/sola-books" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
+                • Sola Books
+              </Link>
+            </div>
+          </div>
+
+          {/* Section 5: About & Statement of Faith */}
           <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
               About EIC & Doctrine

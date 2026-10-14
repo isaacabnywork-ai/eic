@@ -142,6 +142,34 @@ export const navItems: NavItem[] = [
     },
   },
   {
+    label: 'Recommendations',
+    to: '/seminaries',
+    mega: {
+      blurb: 'Trusted biblical seminaries and faithful gospel bookstores recommended for believers and churches across India.',
+      columns: [
+        {
+          title: 'Seminaries',
+          links: [
+            { label: 'All Seminaries & Colleges', to: '/seminaries' },
+            { label: 'Calvary Baptist Bible College', to: '/seminaries/calvary-baptist-bible-college' },
+            { label: 'Evangelical Theological Seminary', to: '/seminaries/evangelical-theological-seminary' },
+            { label: 'Satya Vachan Seminary', to: '/seminaries/satya-vachan-seminary' },
+          ],
+        },
+        {
+          title: 'Bookstores',
+          links: [
+            { label: 'All Bookstores & Publishers', to: '/bookstores' },
+            { label: 'Alethia Books', to: '/bookstores/alethia-books' },
+            { label: 'For The Truth', to: '/bookstores/for-the-truth' },
+            { label: 'Sola Books', to: '/bookstores/sola-books' },
+          ],
+        },
+      ],
+      cta: { label: 'Explore recommended ministries', to: '/seminaries' },
+    },
+  },
+  {
     label: 'About',
     to: wpLink(wpPages.about),
     mega: {
@@ -178,6 +206,19 @@ export const footerColumns: { title: string; links: { label: string; to: string;
       { label: 'Sermons', to: `/${t.sermon.route}` },
       { label: 'Series', to: '/series' },
       { label: 'Book Reviews', to: `/${t.bookReview.route}` },
+    ],
+  },
+  {
+    title: 'Recommendations',
+    links: [
+      { label: 'Seminaries', to: '/seminaries' },
+      { label: 'Calvary Baptist Bible College', to: '/seminaries/calvary-baptist-bible-college' },
+      { label: 'Evangelical Theological Seminary', to: '/seminaries/evangelical-theological-seminary' },
+      { label: 'Satya Vachan Seminary', to: '/seminaries/satya-vachan-seminary' },
+      { label: 'Bookstores', to: '/bookstores' },
+      { label: 'Alethia Books', to: '/bookstores/alethia-books' },
+      { label: 'For The Truth', to: '/bookstores/for-the-truth' },
+      { label: 'Sola Books', to: '/bookstores/sola-books' },
     ],
   },
   {
