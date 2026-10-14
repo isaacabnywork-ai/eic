@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChevronLeftIcon,
   SearchIcon,
-  UserIcon,
+  MenuIcon,
   SunIcon,
   MoonIcon,
 } from '@/components/ui/Icons';
@@ -89,10 +89,10 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
           <button
             type="button"
             onClick={onOpenProfile}
-            aria-label="Open profile & menu"
+            aria-label="Open menu"
             className={actionBtnClass}
           >
-            <UserIcon size={18} />
+            <MenuIcon size={20} />
           </button>
         )}
       </div>
