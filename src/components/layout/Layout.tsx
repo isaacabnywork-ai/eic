@@ -20,7 +20,8 @@ export function Layout() {
     location.pathname === '/discover' ||
     location.pathname === '/videos' ||
     location.pathname === '/sermons' ||
-    location.pathname === '/series';
+    location.pathname === '/series' ||
+    location.pathname === '/events';
 
   return (
     <div className="flex min-h-screen flex-col bg-bg text-ink selection:bg-accent selection:text-accent-ink transition-colors">

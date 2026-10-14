@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   DiscoverIcon,
   WatchScreenIcon,
-  ListenHeadphonesIcon,
+  CalendarIcon,
   SailboatIcon,
   LibraryBookIcon,
 } from '@/components/ui/Icons';
@@ -22,18 +22,18 @@ export function MobileBottomNav() {
       isActive: path === '/' || path === '/discover',
     },
     {
-      id: 'watch',
-      label: 'Watch',
+      id: 'media',
+      label: 'Watch & Listen',
       to: '/videos',
       icon: WatchScreenIcon,
-      isActive: path.startsWith('/videos'),
+      isActive: path.startsWith('/videos') || path.startsWith('/sermons'),
     },
     {
-      id: 'listen',
-      label: 'Listen',
-      to: '/sermons',
-      icon: ListenHeadphonesIcon,
-      isActive: path.startsWith('/sermons'),
+      id: 'events',
+      label: 'Events',
+      to: '/events',
+      icon: CalendarIcon,
+      isActive: path.startsWith('/events'),
     },
     {
       id: 'series',

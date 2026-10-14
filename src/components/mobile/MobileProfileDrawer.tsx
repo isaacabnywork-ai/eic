@@ -13,7 +13,6 @@ import {
   InstagramIcon,
   XIcon,
   WatchScreenIcon,
-  HeadphonesIcon,
   SailboatIcon,
   BookmarkIcon,
   ExternalLinkIcon,
@@ -136,10 +135,10 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
           {/* Section 1: Media & Streaming */}
           <div className="space-y-1">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              Audio & Video Media
+              Watch, Listen & Events
             </span>
-            <DrawerLink to="/sermons" icon={HeadphonesIcon} label="Expository Sermons" onClick={onClose} />
-            <DrawerLink to="/videos" icon={WatchScreenIcon} label="Video Messages & Q&A" onClick={onClose} />
+            <DrawerLink to="/videos" icon={WatchScreenIcon} label="Watch & Listen (Media)" onClick={onClose} />
+            <DrawerLink to="/events" icon={CalendarIcon} label="Events & Conferences" onClick={onClose} />
             <DrawerLink to="/series" icon={SailboatIcon} label="Teaching Series & Expositions" onClick={onClose} />
             <DrawerLink
               to="/library"

@@ -44,18 +44,19 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
     path.startsWith('/gallery/') ||
     path.startsWith('/authors/');
 
-  const isHeroRoute = isHome || isWatch || isListen || isSeries;
+  const isMedia = isWatch || isListen;
+  const isEvents = path.startsWith('/events');
+  const isHeroRoute = isHome || isMedia || isSeries || isEvents;
   const isOverHero = isHeroRoute && !scrolled;
 
   let title = '';
-  if (isWatch && !isSingle) title = 'Watch';
-  else if (isListen && !isSingle) title = 'Listen';
+  if (isMedia && !isSingle) title = 'Watch & Listen';
+  else if (isEvents && !isSingle) title = 'Events';
   else if (isSeries && !isSingle) title = 'Series';
   else if (isLibrary && !isSingle) title = 'Library';
   else if (path.startsWith('/articles') && !isSingle) title = 'Articles';
   else if (path.startsWith('/book-reviews') && !isSingle) title = 'Book Reviews';
   else if (path.startsWith('/gallery') && !isSingle) title = 'Gallery';
-  else if (path.startsWith('/events') && !isSingle) title = 'Events';
   else if (path.startsWith('/authors') && !isSingle) title = 'Teachers';
   else if (path.startsWith('/search')) title = 'Search';
 

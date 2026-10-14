@@ -7,6 +7,7 @@ import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { EventCard } from '@/components/cards/EventCard';
+import { MobileEventsView } from '@/components/mobile/MobileEventsView';
 
 export function EventsArchivePage() {
   const { state, listParams, update, clear, hasFilters } = useArchiveParams('event');
@@ -23,11 +24,16 @@ export function EventsArchivePage() {
         path="/events"
       />
 
-      <PageHeader
-        title="Events & Gatherings"
-        eyebrow="Fellowship & Assembly"
-        description="Conferences, regional leaders' forums, and training seminars designed to sharpen pastors and bring believers together."
-      />
+      {/* Mobile & Tablet Streaming View (< md) */}
+      {!hasFilters && <MobileEventsView />}
+
+      {/* Desktop / Filtered Archive Container */}
+      <div className={!hasFilters ? 'hidden md:block' : ''}>
+        <PageHeader
+          title="Events & Gatherings"
+          eyebrow="Fellowship & Assembly"
+          description="Conferences, regional leaders' forums, and training seminars designed to sharpen pastors and bring believers together."
+        />
 
       <div className="container-page py-10">
         <FilterBar
@@ -67,6 +73,7 @@ export function EventsArchivePage() {
             }
           />
         )}
+      </div>
       </div>
     </>
   );

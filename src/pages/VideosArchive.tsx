@@ -7,7 +7,7 @@ import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { VideoCard } from '@/components/cards/VideoCard';
-import { MobileWatchView } from '@/components/mobile/MobileWatchView';
+import { MobileWatchListenView } from '@/components/mobile/MobileWatchListenView';
 
 export function VideosArchivePage() {
   const { state, listParams, update, clear, hasFilters } = useArchiveParams('video');
@@ -19,13 +19,13 @@ export function VideosArchivePage() {
   return (
     <>
       <SeoHead
-        title="Videos"
+        title="Watch & Listen - Videos & Audio"
         description="Biblical discussions, Q&A, and practical teachings produced for Indian churches."
         path="/videos"
       />
 
-      {/* Mobile Streaming View (< md) */}
-      {!hasFilters && <MobileWatchView />}
+      {/* Mobile & Tablet Streaming View (< md) */}
+      {!hasFilters && <MobileWatchListenView initialTab="all" />}
 
       {/* Desktop / Filtered Archive Container */}
       <div className={!hasFilters ? 'hidden md:block' : ''}>
