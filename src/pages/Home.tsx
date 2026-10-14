@@ -55,7 +55,6 @@ export function HomePage() {
   const { data: featuredVideos, isLoading: videoLoading } = useFeatured('video', 4);
   const primarySermon = featuredSermons?.[0];
   const sideSermons = featuredSermons?.slice(1, 4) || [];
-  const primaryVideo = featuredVideos?.[0];
 
   // Teaching Series
   const { data: seriesList, isLoading: seriesLoading } = useSeriesCards({
@@ -722,105 +721,7 @@ export function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 7. VIDEO SECTION (Light Blue & White)                           */}
-      {/* ============================================================== */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-bg border-b border-line">
-        <div className="container-page">
-          <div className="mb-10 sm:mb-12 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-text mb-2">
-                FROM EQUIP INDIAN CHURCHES
-              </p>
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-[40px] font-bold text-ink leading-tight">
-                Conversations. Teaching. Stories.
-              </h2>
-              <p className="mt-2 text-base text-body">
-                Practical discussions, panel interviews, and theological Q&A for ministry life.
-              </p>
-            </div>
-            <Link
-              to={`/${contentTypes.video.route}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink hover:text-accent-text transition-colors"
-            >
-              <span>Browse All Videos</span>
-              <ArrowRightIcon size={15} />
-            </Link>
-          </div>
-
-          {videoLoading ? (
-            <CardGridSkeleton variant="video" count={3} />
-          ) : primaryVideo ? (
-            <div className="grid gap-8 lg:grid-cols-12 items-center">
-              {/* Featured Video Player Preview (7 cols) */}
-              <div className="lg:col-span-7">
-                <div className="group relative overflow-hidden rounded-xl border border-line bg-surface shadow-md p-2 sm:p-3">
-                  <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-surface-2">
-                    <Link to={itemPath('video', primaryVideo.slug)} tabIndex={-1} aria-hidden="true">
-                      <Img
-                        image={primaryVideo.image}
-                        alt={primaryVideo.title}
-                        wrapperClassName="h-full w-full"
-                        className="transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </Link>
-                    <div className="pointer-events-none absolute inset-0 bg-black/25" />
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-ink shadow-lg transition-transform group-hover:scale-110">
-                        <PlayIcon size={26} className="ml-1" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Video Info & YouTube CTA (5 cols) */}
-              <div className="lg:col-span-5 space-y-5">
-                <span className="rounded bg-accent/20 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-accent-text">
-                  FEATURED VIDEO
-                </span>
-
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ink leading-snug">
-                  <Link
-                    to={itemPath('video', primaryVideo.slug)}
-                    className="hover:text-accent-text transition-colors"
-                  >
-                    {primaryVideo.title}
-                  </Link>
-                </h3>
-
-                {primaryVideo.excerpt && (
-                  <p className="text-sm sm:text-base text-body leading-relaxed line-clamp-3">
-                    {primaryVideo.excerpt}
-                  </p>
-                )}
-
-                <div className="pt-2 flex flex-wrap items-center gap-4">
-                  <Link
-                    to={itemPath('video', primaryVideo.slug)}
-                    className="inline-flex items-center gap-2 rounded-[6px] bg-accent px-5 py-3 text-sm font-semibold text-accent-ink hover:brightness-105 transition-all shadow-xs"
-                  >
-                    <span>Watch Video</span>
-                    <PlayIcon size={14} />
-                  </Link>
-                  <a
-                    href="https://www.youtube.com/@EquipIndianChurches"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-[6px] border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink hover:bg-surface-2 hover:border-accent hover:text-accent-text transition-colors shadow-xs"
-                  >
-                    <span>Watch on YouTube →</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted">No video items currently available.</p>
-          )}
-        </div>
-      </section>
-
-      {/* ============================================================== */}
-      {/* 8. FEATURED SERIES SECTION                                     */}
+      {/* 7. FEATURED SERIES SECTION                                     */}
       {/* ============================================================== */}
       <Section
         title="Featured Teaching Series"
