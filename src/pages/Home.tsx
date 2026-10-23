@@ -18,7 +18,6 @@ import { Img } from '@/components/ui/Img';
 import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
 import {
   ArrowRightIcon,
-  ClockIcon,
   MapPinIcon,
   PlayIcon,
   StarIcon,
@@ -30,6 +29,141 @@ import { itemPath } from '@/lib/routes';
 import { formatDateShort } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
 import { seminariesData, bookstoresData } from '@/data/recommendations';
+
+function PlayableSermonBlock({
+  sermon,
+  badgeText = 'Featured Sermon',
+  eager = false,
+}: {
+  sermon?: ContentItem;
+  badgeText?: string;
+  eager?: boolean;
+}) {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  if (!sermon) {
+    return (
+      <div className="rounded-lg border border-line bg-surface p-5 shadow-xs animate-pulse">
+        <div className="aspect-video bg-surface-2 rounded-md mb-3" />
+        <div className="h-4 bg-surface-2 rounded w-3/4 mb-2" />
+        <div className="h-3 bg-surface-2 rounded w-1/2" />
+      </div>
+    );
+  }
+
+  const video = sermon.video;
+  const embedUrl = video?.embedUrl;
+
+  return (
+    <article className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-4 sm:p-5 shadow-xs transition-all hover:border-accent">
+      <div>
+        {/* Playable Video Player Container (16:9) */}
+        <div className="relative aspect-video w-full overflow-hidden rounded-md bg-black mb-3.5 border border-line/60">
+          {isPlaying && embedUrl ? (
+            <div className="relative h-full w-full">
+              <iframe
+                src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`}
+                title={sermon.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="h-full w-full border-0"
+              />
+              <button
+                type="button"
+                onClick={() => setIsPlaying(false)}
+                className="absolute top-2 right-2 rounded-full bg-black/85 text-white hover:bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xs border border-white/20 transition cursor-pointer z-10"
+              >
+                ✕ Close Player
+              </button>
+            </div>
+          ) : (
+            <div className="relative h-full w-full">
+              <Img
+                image={sermon.image}
+                alt={sermon.title}
+                wrapperClassName="h-full w-full"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                eager={eager}
+              />
+              <div className="absolute inset-0 bg-black/35 transition-colors group-hover:bg-black/45" />
+
+              {/* Big Interactive Play Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (embedUrl) {
+                    setIsPlaying(true);
+                  }
+                }}
+                className="group/btn absolute inset-0 m-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-accent text-accent-ink shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent"
+                aria-label={`Play sermon video: ${sermon.title}`}
+              >
+                <PlayIcon size={24} className="ml-1" />
+              </button>
+
+              {/* Top-left Video Badge */}
+              <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/80 backdrop-blur-xs px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white border border-white/15">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                <span>Play Sermon</span>
+              </div>
+
+              {/* Bottom-right Speaker badge */}
+              {sermon.speaker && (
+                <div className="absolute bottom-2.5 right-2.5 max-w-[70%] truncate rounded-md bg-black/75 backdrop-blur-xs px-2 py-0.5 text-[11px] font-medium text-white/90">
+                  {sermon.speaker}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Category & Badge */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
+            {badgeText}
+          </span>
+          {sermon.terms.videoCategory?.[0] && (
+            <span className="text-[11px] font-medium text-muted">
+              {sermon.terms.videoCategory[0].name}
+            </span>
+          )}
+        </div>
+
+        {/* Sermon Title */}
+        <h3 className="font-serif text-xl sm:text-2xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
+          <Link to={itemPath('sermon', sermon.slug)}>
+            {sermon.title}
+          </Link>
+        </h3>
+
+        {/* Speaker Name */}
+        {sermon.speaker && (
+          <p className="mt-1 text-xs font-semibold text-accent-text">
+            Speaker: {sermon.speaker}
+          </p>
+        )}
+
+        {/* Excerpt */}
+        {sermon.excerpt && (
+          <p className="mt-2 text-xs sm:text-sm text-body line-clamp-2 leading-relaxed">
+            {sermon.excerpt}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs text-muted">
+        <time dateTime={sermon.date}>{formatDateShort(sermon.date)}</time>
+        <Link
+          to={itemPath('sermon', sermon.slug)}
+          className="font-semibold text-ink hover:text-accent-text inline-flex items-center gap-1 transition-colors"
+        >
+          <span>Listen & Details</span>
+          <ArrowRightIcon size={12} />
+        </Link>
+      </div>
+    </article>
+  );
+}
 
 export function HomePage() {
   // 1. Hero / Featured Lead Article
@@ -45,7 +179,6 @@ export function HomePage() {
   // 3. Featured Sermons & Media (fetch 8 for ticker and photo triplets)
   const { data: featuredSermons } = useFeatured('sermon', 8);
   const sermonsList = featuredSermons || [];
-  const primarySermon = sermonsList[0];
   const sideSermons = sermonsList.slice(1, 4);
   const tickerSermons = sermonsList.slice(0, 6);
 
@@ -90,26 +223,30 @@ export function HomePage() {
     return pool.slice(start, start + 3);
   }, [articlesList, sermonsList, editorFilter, editorPage]);
 
-  // Items for the 3-Column Top Resources Mosaic
-  const leadArticle = heroItem || articlesList[0];
-  const subArticleA = articlesList[1] || articlesList[0];
-  const subArticleB = articlesList[2] || articlesList[1];
-  const centerCardTop = articlesList[3] || primarySermon;
-  const centerCardBottom = articlesList[4] || articlesList[2];
+  // Items for the 3-Column Top Resources Mosaic:
+  // Left blocks (up & down) feature TWO playable sermons!
+  const heroSermonTop = sermonsList[0];
+  const heroSermonBottom = sermonsList[1];
+
+  // Center column features articles / digests
+  const centerCardTop = heroItem || articlesList[0];
+  const centerCardBottom = articlesList[1] || articlesList[0];
+
+  // Right column features stacked articles
   const rightStackItems = [
-    articlesList[5] || sermonsList[1],
-    articlesList[6] || sermonsList[2],
-    articlesList[7] || articlesList[3],
+    articlesList[2] || articlesList[0],
+    articlesList[3] || articlesList[1],
+    articlesList[4] || articlesList[2],
   ].filter(Boolean);
 
   // Items for Latest Teaching 3-card top row
-  const latestRowTop1 = articlesList[4] || articlesList[0];
-  const latestRowTop2 = articlesList[5] || articlesList[1]; // Dark Accent Card
-  const latestRowTop3 = articlesList[6] || articlesList[2];
+  const latestRowTop1 = articlesList[5] || articlesList[0];
+  const latestRowTop2 = articlesList[6] || articlesList[1]; // Dark Accent Card
+  const latestRowTop3 = articlesList[7] || articlesList[2];
 
   // Items for Latest Teaching 2-card bottom wide row
-  const latestRowBottom1 = articlesList[7] || articlesList[0];
-  const latestRowBottom2 = articlesList[8] || articlesList[1];
+  const latestRowBottom1 = articlesList[8] || articlesList[0];
+  const latestRowBottom2 = articlesList[9] || articlesList[1];
 
   // Curated Recommendation item
   const featuredSeminary = seminariesData[0];
@@ -156,120 +293,21 @@ export function HomePage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
                 {/* ------------------------------------------------------ */}
-                {/* COLUMN 1 (LEFT, 5.5 cols): Lead Story + Split Duo Sub-Cards */}
+                {/* COLUMN 1 (LEFT, 5.5 cols): Two Playable Sermons (Up & Down) */}
                 {/* ------------------------------------------------------ */}
-                <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-between space-y-6 lg:border-r lg:border-line/80 lg:pr-6">
-                  {leadArticle && (
-                    <article className="group flex flex-col">
-                      <div className="overflow-hidden rounded-md bg-surface-2 mb-3.5 border border-line/60">
-                        <Link to={itemPath(leadArticle.type, leadArticle.slug)} tabIndex={-1} aria-hidden="true">
-                          <Img
-                            image={leadArticle.image}
-                            alt={leadArticle.title}
-                            wrapperClassName="aspect-[16/10] w-full"
-                            className="transition-transform duration-700 group-hover:scale-[1.02]"
-                            eager
-                          />
-                        </Link>
-                      </div>
+                <div className="lg:col-span-6 xl:col-span-5 flex flex-col space-y-6 lg:border-r lg:border-line/80 lg:pr-6">
+                  {/* Up Block: First Playable Sermon */}
+                  <PlayableSermonBlock
+                    sermon={heroSermonTop}
+                    badgeText="Featured Sermon"
+                    eager
+                  />
 
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                          {leadArticle.type === 'article' ? 'Featured Essay' : leadArticle.type}
-                        </span>
-                        {leadArticle.terms.category?.[0] && (
-                          <span className="text-[11px] font-medium text-muted">
-                            {leadArticle.terms.category[0].name}
-                          </span>
-                        )}
-                        <span className="text-[11px] text-muted">•</span>
-                        <span className="inline-flex items-center gap-1 text-[11px] text-muted">
-                          <ClockIcon size={11} />
-                          {readingTimeMinutes(leadArticle.html || leadArticle.excerpt)}m read
-                        </span>
-                      </div>
-
-                      <h2 className="font-serif text-2xl lg:text-3xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
-                        <Link to={itemPath(leadArticle.type, leadArticle.slug)}>
-                          {leadArticle.title}
-                        </Link>
-                      </h2>
-
-                      {leadArticle.excerpt && (
-                        <p className="mt-2 text-sm text-body line-clamp-2 leading-relaxed">
-                          {leadArticle.excerpt}
-                        </p>
-                      )}
-
-                      <div className="mt-3 flex items-center justify-between text-xs text-muted pt-2 border-t border-line/50">
-                        <span className="font-semibold text-ink">{leadArticle.author?.name || 'Equip Indian Churches'}</span>
-                        <time dateTime={leadArticle.date}>{formatDateShort(leadArticle.date)}</time>
-                      </div>
-                    </article>
-                  )}
-
-                  {/* Split Duo Cards (Matching bottom left of reference image) */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-line/80">
-                    {/* Sub-Card A: Light Compact */}
-                    {subArticleA && (
-                      <article className="group flex flex-col justify-between rounded-md border border-line bg-surface p-3.5 shadow-xs transition-all hover:border-accent">
-                        <div>
-                          {subArticleA.image && (
-                            <div className="overflow-hidden rounded-sm mb-2.5 aspect-[16/10] bg-surface-2">
-                              <Link to={itemPath(subArticleA.type, subArticleA.slug)}>
-                                <Img
-                                  image={subArticleA.image}
-                                  alt={subArticleA.title}
-                                  thumb
-                                  wrapperClassName="w-full h-full"
-                                  className="transition-transform duration-500 group-hover:scale-105"
-                                />
-                              </Link>
-                            </div>
-                          )}
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                            {subArticleA.terms.category?.[0]?.name || 'Article'}
-                          </span>
-                          <h3 className="font-serif text-sm font-bold leading-snug text-ink line-clamp-2 group-hover:text-accent-text transition-colors">
-                            <Link to={itemPath(subArticleA.type, subArticleA.slug)}>
-                              {subArticleA.title}
-                            </Link>
-                          </h3>
-                        </div>
-                        <time dateTime={subArticleA.date} className="mt-2.5 text-[10px] text-muted block">
-                          {formatDateShort(subArticleA.date)}
-                        </time>
-                      </article>
-                    )}
-
-                    {/* Sub-Card B: Signature Deep Dark Navy Contrast Card */}
-                    {subArticleB && (
-                      <article className="group flex flex-col justify-between rounded-md bg-[#182541] dark:bg-[#111A2E] p-4 text-white shadow-xs border border-line/10 hover:border-accent/40 transition-all">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="rounded bg-[#D9A62E]/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#D9A62E]">
-                              Pastoral Counsel
-                            </span>
-                            <span className="text-[10px] text-white/50">EIC</span>
-                          </div>
-                          <h3 className="font-serif text-sm sm:text-base font-bold leading-snug text-white line-clamp-3 group-hover:text-[#F3E6BE] transition-colors">
-                            <Link to={itemPath(subArticleB.type, subArticleB.slug)}>
-                              {subArticleB.title}
-                            </Link>
-                          </h3>
-                          {subArticleB.excerpt && (
-                            <p className="mt-2 text-xs text-white/70 line-clamp-2 leading-relaxed">
-                              {subArticleB.excerpt}
-                            </p>
-                          )}
-                        </div>
-                        <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/60">
-                          <span className="truncate">{subArticleB.author?.name || 'Staff Pastor'}</span>
-                          <span className="text-[#D9A62E] font-semibold">Read →</span>
-                        </div>
-                      </article>
-                    )}
-                  </div>
+                  {/* Down Block: Second Playable Sermon */}
+                  <PlayableSermonBlock
+                    sermon={heroSermonBottom}
+                    badgeText="Conference Exposition"
+                  />
                 </div>
 
                 {/* ------------------------------------------------------ */}
