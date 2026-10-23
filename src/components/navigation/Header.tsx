@@ -4,10 +4,12 @@ import { navItems, site } from '@/config/site';
 import type { MegaColumn, NavItem } from '@/config/site';
 import { useTheme } from '@/hooks/useTheme';
 import { useTerms, useFilterTerms } from '@/hooks/queries';
+import { useBookmarks } from '@/lib/bookmarks';
 import {
   ChevronDownIcon,
   CloseIcon,
   ExternalLinkIcon,
+  LibraryBookIcon,
   MenuIcon,
   MoonIcon,
   SearchIcon,
@@ -17,6 +19,7 @@ import { cn } from '@/lib/format';
 
 export function Header() {
   const { theme, toggle } = useTheme();
+  const { count: savedCount } = useBookmarks();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
@@ -82,137 +85,57 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-line/80 bg-surface/98 backdrop-blur-md transition-colors">
-      <div className="container-page flex h-20 items-center justify-between gap-6">
-        {/* Brand Logo (Left) */}
-        <Link
-          to="/"
-          className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm shrink-0"
-        >
-          <img
-            src={site.logoUrl}
-            alt={site.name}
-            className="h-10 sm:h-11 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = site.logoFallback;
-            }}
-          />
-          <span className="sr-only">{site.name} - Equipping the Church</span>
-        </Link>
+    <header className="sticky top-0 z-40 w-full border-b border-line/80 bg-surface/98 backdrop-blur-md transition-colors shadow-xs">
+      {/* 1. Main Masthead Deck: Logo Centered + Edition & Action Controls */}
+      <div className="container-page max-w-[1400px] flex h-16 lg:h-20 items-center justify-between gap-4">
+        {/* Left: Edition Info (Desktop Broadsheet Ticker) */}
+        <div className="hidden xl:flex items-center gap-2 text-xs text-muted font-medium w-1/3">
+          <span className="font-serif italic text-ink font-semibold">Equip Indian Churches</span>
+          <span>•</span>
+          <span className="truncate">Equipping the Church, Uniting the Saints</span>
+        </div>
 
-        {/* Desktop Navigation (Center - 4 Consolidated Pillars) */}
-        <nav
-          ref={megaRef}
-          aria-label="Main Navigation"
-          className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1"
-          onMouseLeave={handleMouseLeave}
-        >
-          {navItems.map((item) => {
-            const isMegaOpen = activeMega === item.label;
-            const hasMega = !!item.mega;
-            const isActive = checkIsActive(item.label, item.to);
+        {/* Center: Brand Logo / Wordmark */}
+        <div className="flex items-center justify-start lg:justify-center flex-1 xl:w-1/3">
+          <Link
+            to="/"
+            className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm shrink-0"
+          >
+            <img
+              src={site.logoUrl}
+              alt={site.name}
+              className="h-9 sm:h-11 lg:h-12 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = site.logoFallback;
+              }}
+            />
+            <span className="sr-only">{site.name} - Equipping the Church</span>
+          </Link>
+        </div>
 
-            if (!hasMega && item.to) {
-              return (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className={cn(
-                    'relative py-2.5 px-4 text-sm font-medium tracking-normal transition-colors',
-                    isActive
-                      ? 'text-ink font-semibold after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:bg-accent after:rounded-full'
-                      : 'text-ink/80 hover:text-ink',
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            }
-
-            const colCount = item.mega ? item.mega.columns.length : 2;
-            const widthClass = colCount >= 3 ? 'w-[780px] max-w-[92vw]' : 'w-[560px] max-w-[92vw]';
-            const gridClass = colCount >= 3 ? 'grid-cols-3' : 'grid-cols-2';
-
-            return (
-              <div
-                key={item.label}
-                className="relative"
-                onMouseEnter={() => handleMouseEnter(item.label)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setActiveMega(isMegaOpen ? null : item.label)}
-                  aria-expanded={isMegaOpen}
-                  aria-haspopup="true"
-                  className={cn(
-                    'relative inline-flex items-center gap-1.5 py-2.5 px-4 text-sm font-medium tracking-normal transition-colors cursor-pointer',
-                    isMegaOpen || isActive
-                      ? 'text-ink font-semibold after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:bg-accent after:rounded-full'
-                      : 'text-ink/80 hover:text-ink',
-                  )}
-                >
-                  <span>{item.label}</span>
-                  <ChevronDownIcon
-                    size={14}
-                    className={cn('transition-transform duration-200 text-muted', isMegaOpen && 'rotate-180 text-ink')}
-                  />
-                </button>
-
-                {/* Mega Menu Dropdown */}
-                {isMegaOpen && item.mega && (
-                  <div
-                    onMouseEnter={() => handleMouseEnter(item.label)}
-                    className={cn(
-                      'absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded-xl border border-line bg-surface p-6 sm:p-7 shadow-xl animate-in fade-in zoom-in-95 duration-200 z-50',
-                      widthClass,
-                    )}
-                  >
-                    {/* Top blurb banner */}
-                    <div className="mb-5 rounded-lg border border-line/60 bg-surface-2 px-4 py-2.5 flex items-center justify-between">
-                      <p className="text-xs text-muted leading-relaxed">{item.mega.blurb}</p>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-accent-text hidden sm:inline shrink-0 ml-3">
-                        Equip Indian Churches
-                      </span>
-                    </div>
-
-                    {/* Columns grid */}
-                    <div className={cn('grid gap-7', gridClass)}>
-                      {item.mega.columns.map((col, idx) => (
-                        <MegaColumnRenderer key={idx} column={col} />
-                      ))}
-                    </div>
-
-                    {/* Bottom CTA bar */}
-                    {item.mega.cta && (
-                      <div className="mt-6 border-t border-line/80 pt-3.5 flex items-center justify-between text-xs">
-                        <span className="text-muted hidden sm:inline">
-                          Sound biblical resources freely available
-                        </span>
-                        <Link
-                          to={item.mega.cta.to}
-                          className="font-semibold text-ink hover:text-accent-text hover:underline transition-colors ml-auto inline-flex items-center gap-1"
-                        >
-                          <span>{item.mega.cta.label}</span>
-                          <span>→</span>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>
-
-        {/* Right Action Icons (Right) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Search Button */}
+        {/* Right Action Icons: Search, Ministry Library & Bookmarks, Theme, Mobile toggle */}
+        <div className="flex items-center justify-end gap-1.5 sm:gap-2 xl:w-1/3 shrink-0">
+          {/* Global Search */}
           <Link
             to="/search"
             aria-label="Search all resources"
-            className="flex h-10 w-10 items-center justify-center rounded-md text-ink/80 hover:bg-surface-2 hover:text-ink transition-colors border border-transparent hover:border-line"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink/80 hover:bg-surface-2 hover:text-ink transition-colors border border-line/70"
           >
-            <SearchIcon size={19} />
+            <SearchIcon size={17} />
+          </Link>
+
+          {/* Ministry Library & Saved Bookmarks */}
+          <Link
+            to="/library"
+            aria-label="Saved resources and library"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full text-ink/80 hover:bg-surface-2 hover:text-ink transition-colors border border-line/70"
+          >
+            <LibraryBookIcon size={17} />
+            {savedCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-accent-ink text-[9px] font-bold shadow-xs">
+                {savedCount > 9 ? '9+' : savedCount}
+              </span>
+            )}
           </Link>
 
           {/* Theme Toggle */}
@@ -220,20 +143,128 @@ export function Header() {
             type="button"
             onClick={toggle}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="flex h-10 w-10 items-center justify-center rounded-md text-ink/80 hover:bg-surface-2 hover:text-ink transition-colors border border-transparent hover:border-line cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink/80 hover:bg-surface-2 hover:text-ink transition-colors border border-line/70 cursor-pointer"
           >
-            {theme === 'dark' ? <SunIcon size={19} /> : <MoonIcon size={19} />}
+            {theme === 'dark' ? <SunIcon size={17} /> : <MoonIcon size={17} />}
           </button>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Tablet Menu Toggle Button (lg:hidden) */}
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            className="flex h-10 w-10 items-center justify-center rounded-md text-ink lg:hidden hover:bg-surface-2 transition-colors cursor-pointer border border-transparent hover:border-line"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-ink lg:hidden hover:bg-surface-2 transition-colors cursor-pointer border border-line/70 ml-1"
           >
-            {mobileOpen ? <CloseIcon size={22} /> : <MenuIcon size={22} />}
+            {mobileOpen ? <CloseIcon size={20} /> : <MenuIcon size={20} />}
           </button>
+        </div>
+      </div>
+
+      {/* 2. Sub-Navigation Deck: Hairline Bordered Broadsheet Section Bar */}
+      <div className="hidden lg:block border-t border-line/70 bg-surface/90">
+        <div className="container-page max-w-[1400px]">
+          <nav
+            ref={megaRef}
+            aria-label="Main Navigation"
+            className="flex items-center justify-center gap-1 xl:gap-2 py-1"
+            onMouseLeave={handleMouseLeave}
+          >
+            {navItems.map((item) => {
+              const isMegaOpen = activeMega === item.label;
+              const hasMega = !!item.mega;
+              const isActive = checkIsActive(item.label, item.to);
+
+              if (!hasMega && item.to) {
+                return (
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    className={cn(
+                      'relative py-2 px-3.5 text-xs font-semibold uppercase tracking-wider transition-colors',
+                      isActive
+                        ? 'text-ink after:absolute after:bottom-0 after:left-3.5 after:right-3.5 after:h-[2px] after:bg-accent after:rounded-full'
+                        : 'text-ink/80 hover:text-ink hover:text-accent-text',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              }
+
+              const colCount = item.mega ? item.mega.columns.length : 2;
+              const widthClass = colCount >= 3 ? 'w-[780px] max-w-[92vw]' : 'w-[560px] max-w-[92vw]';
+              const gridClass = colCount >= 3 ? 'grid-cols-3' : 'grid-cols-2';
+
+              return (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => handleMouseEnter(item.label)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveMega(isMegaOpen ? null : item.label)}
+                    aria-expanded={isMegaOpen}
+                    aria-haspopup="true"
+                    className={cn(
+                      'relative inline-flex items-center gap-1 py-2 px-3.5 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer',
+                      isMegaOpen || isActive
+                        ? 'text-ink after:absolute after:bottom-0 after:left-3.5 after:right-3.5 after:h-[2px] after:bg-accent after:rounded-full'
+                        : 'text-ink/80 hover:text-ink hover:text-accent-text',
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDownIcon
+                      size={12}
+                      className={cn('transition-transform duration-200 text-muted', isMegaOpen && 'rotate-180 text-ink')}
+                    />
+                  </button>
+
+                  {/* Mega Menu Dropdown */}
+                  {isMegaOpen && item.mega && (
+                    <div
+                      onMouseEnter={() => handleMouseEnter(item.label)}
+                      className={cn(
+                        'absolute left-1/2 top-full mt-1 -translate-x-1/2 rounded-xl border border-line bg-surface p-6 sm:p-7 shadow-xl animate-in fade-in zoom-in-95 duration-200 z-50 text-left normal-case',
+                        widthClass,
+                      )}
+                    >
+                      {/* Top blurb banner */}
+                      <div className="mb-5 rounded-lg border border-line/60 bg-surface-2 px-4 py-2.5 flex items-center justify-between">
+                        <p className="text-xs text-muted leading-relaxed">{item.mega.blurb}</p>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-accent-text hidden sm:inline shrink-0 ml-3">
+                          Equip Indian Churches
+                        </span>
+                      </div>
+
+                      {/* Columns grid */}
+                      <div className={cn('grid gap-7', gridClass)}>
+                        {item.mega.columns.map((col, idx) => (
+                          <MegaColumnRenderer key={idx} column={col} />
+                        ))}
+                      </div>
+
+                      {/* Bottom CTA bar */}
+                      {item.mega.cta && (
+                        <div className="mt-6 border-t border-line/80 pt-3.5 flex items-center justify-between text-xs">
+                          <span className="text-muted hidden sm:inline">
+                            Sound biblical resources freely available
+                          </span>
+                          <Link
+                            to={item.mega.cta.to}
+                            className="font-semibold text-ink hover:text-accent-text hover:underline transition-colors ml-auto inline-flex items-center gap-1"
+                          >
+                            <span>{item.mega.cta.label}</span>
+                            <span>→</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
         </div>
       </div>
 
