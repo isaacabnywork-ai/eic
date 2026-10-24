@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { contentTypes, homeConfig } from '@/config/content';
+import { contentTypes, homeConfig, type ContentKey } from '@/config/content';
 import { site } from '@/config/site';
 import {
   useContentList,
@@ -646,69 +646,131 @@ interface ExpositoryVideoItem {
   thumbnail: string;
   badge?: string;
   slug?: string;
+  type?: ContentKey;
 }
 
 const INITIAL_EXPOSITORY_VIDEOS: ExpositoryVideoItem[] = [
   {
-    id: 'exp-video-1',
-    title: 'Finding Meaning in Our Daily Work (with Denise Daniels)',
-    speaker: 'Dan Doriani • Mark Vroegop • Denise Daniels',
+    id: 'eic-video-1',
+    title: 'Stay Vigilant and Be Ready',
+    speaker: 'Equip Indian Churches',
     excerpt:
-      'Wheaton College’s Denise Daniels draws on research with thousands of American workers to help us have a more holistic vision of how our work matters to us, our neighbors, our families, and God.',
-    youtubeId: 'wX_9w0jLq7E',
-    thumbnail: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-    badge: 'Podcast',
+      'A faithful message from 1 Peter 5 expounding the biblical call to spiritual vigilance, standing firm in faith against the adversary, and resting in the eternal grace of Jesus Christ.',
+    youtubeId: 'TbustDjFSyU',
+    thumbnail: 'https://i.ytimg.com/vi/TbustDjFSyU/hqdefault.jpg',
+    badge: 'Video',
+    slug: 'stay-vigilant-and-be-ready',
+    type: 'sermon',
   },
   {
-    id: 'exp-video-2',
-    title: 'Gospel Hope for Gen-Z Ministry',
-    speaker: 'Rachel Gilson • Alex Harris • Kori Porter • Derek Rishmawy',
+    id: 'eic-video-2',
+    title: 'Be Zealous and Committed',
+    speaker: 'Equip Indian Churches',
     excerpt:
-      'Ministry leaders discuss reaching and discipling the next generation with gospel clarity, doctrinal fidelity, authentic community, and biblical hope in a shifting culture.',
-    youtubeId: 'jNQXAC9IVRw',
-    thumbnail: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-    badge: 'Podcast',
+      'Examining what it means to serve the Lord with spiritual fervor, steadfast faith, and persevering commitment in the ministry of the local church.',
+    youtubeId: 'SgnazuAEO04',
+    thumbnail: 'https://i.ytimg.com/vi/SgnazuAEO04/hqdefault.jpg',
+    badge: 'Sermon',
+    slug: 'be-zealous-and-committed',
+    type: 'sermon',
   },
   {
-    id: 'exp-video-3',
-    title: 'The 2000s So Far in Four Eras',
-    speaker: 'Collin Hansen',
+    id: 'eic-video-3',
+    title: 'Persevere in Weakness',
+    speaker: 'Equip Indian Churches',
     excerpt:
-      'A thoughtful retrospective exploring the major theological recoveries, cultural flashpoints, and ministry transitions shaping evangelical church life over the past twenty years.',
-    youtubeId: 'ZbZSe6N_BXs',
-    thumbnail: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80',
-    badge: 'Podcast',
+      'Understanding God’s sufficient grace in seasons of affliction, limitation, and trials as expounded from divine power made perfect in human weakness.',
+    youtubeId: 'cOb9YR3-ozU',
+    thumbnail: 'https://i.ytimg.com/vi/cOb9YR3-ozU/hqdefault.jpg',
+    badge: 'Sermon',
+    slug: 'persevere-in-weakness',
+    type: 'sermon',
   },
   {
-    id: 'exp-video-4',
-    title: 'The Impact of Influencers on the Church',
-    speaker: 'Collin Hansen • Ruth Chou Simons • Laura Wifler • Kyle Worley',
+    id: 'eic-video-4',
+    title: 'Remain Faithful unto Death',
+    speaker: 'Equip Indian Churches',
     excerpt:
-      'Pastors and authors discuss online platforms, celebrity culture, and how leaders can shepherd believers toward biblical discernment and local church commitment.',
-    youtubeId: 'ScMzIvxBSi4',
-    thumbnail: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
-    badge: 'Podcast',
+      'An exposition on Christ’s exhortation to the suffering church in Smyrna: holding fast to truth, enduring persecution, and trusting the promise of the crown of life.',
+    youtubeId: 'fDbIRcyrbCA',
+    thumbnail: 'https://i.ytimg.com/vi/fDbIRcyrbCA/hqdefault.jpg',
+    badge: 'Video',
+    slug: 'aipc-2024-ramain-faithful',
+    type: 'video',
   },
   {
-    id: 'exp-video-5',
-    title: 'Heaven: Do We Know Enough to Want to Go? (with Randy Alcorn)',
-    speaker: 'Courtney Doctor • Melissa Kruger • Randy Alcorn',
+    id: 'eic-video-5',
+    title: 'Rekindle Your First Love',
+    speaker: 'Equip Indian Churches',
     excerpt:
-      'Melissa Kruger and Courtney Doctor talk with author Randy Alcorn about common misconceptions about heaven, the physical resurrection of believers, and our eternal hope in Christ.',
-    youtubeId: 'M7lc1UVf-VE',
-    thumbnail: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&q=80',
-    badge: 'Podcast',
+      'A vital pastoral call from Revelation 2 to remember our first love for Christ, evaluate our spiritual devotion, and pursue genuine affection for the Lord.',
+    youtubeId: 'QYsbSHoAQAM',
+    thumbnail: 'https://i.ytimg.com/vi/QYsbSHoAQAM/hqdefault.jpg',
+    badge: 'Video',
+    slug: 'aipc-2024-rekindle',
+    type: 'video',
+  },
+  {
+    id: 'eic-video-6',
+    title: 'Trusting God for Growth',
+    speaker: 'Equip Indian Churches',
+    excerpt:
+      'Looking to the sovereign Lord who produces spiritual fruit and gospel advance in local church planting, pastoral labors, and church revitalisation.',
+    youtubeId: 'haGn3KOYm04',
+    thumbnail: 'https://i.ytimg.com/vi/haGn3KOYm04/hqdefault.jpg',
+    badge: 'Sermon',
+    slug: 'trusting-god-for-growth',
+    type: 'sermon',
+  },
+  {
+    id: 'eic-video-7',
+    title: 'Evangelism and Missions',
+    speaker: 'Equip Indian Churches',
+    excerpt:
+      'Proclaiming the unsearchable riches of Christ across unreached regions and equipping local assemblies for intentional cross-cultural gospel mission.',
+    youtubeId: 'IJFAUpQds78',
+    thumbnail: 'https://i.ytimg.com/vi/IJFAUpQds78/hqdefault.jpg',
+    badge: 'Sermon',
+    slug: 'evangelism-and-missions',
+    type: 'sermon',
+  },
+  {
+    id: 'eic-video-8',
+    title: 'What the Bible Teaches About Worship',
+    speaker: 'Equip Indian Churches',
+    excerpt:
+      'Examining the biblical pattern of true worship: honoring the triune God in spirit and truth according to the clear directives of Holy Scripture.',
+    youtubeId: '1hMsV4kC6OE',
+    thumbnail: 'https://i.ytimg.com/vi/1hMsV4kC6OE/hqdefault.jpg',
+    badge: 'Video',
+    slug: 'what-the-bible-teaches-about-worship',
+    type: 'video',
   },
 ];
 
-function ExpositoryVideosPlayer({ initialVideos }: { initialVideos: ExpositoryVideoItem[] }) {
-  const [videoPool, setVideoPool] = useState<ExpositoryVideoItem[]>(initialVideos);
+function ExpositoryVideosPlayer({ videos }: { videos: ExpositoryVideoItem[] }) {
+  const [videoPool, setVideoPool] = useState<ExpositoryVideoItem[]>(videos);
   const [isSwapping, setIsSwapping] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  const mainVideo = videoPool[0];
-  const queueVideos = videoPool.slice(1, 5);
+  // Synchronize with fresh WordPress video data as soon as query completes
+  useEffect(() => {
+    if (videos && videos.length >= 5) {
+      setVideoPool((prev) => {
+        if (hasInteracted && prev[0]) {
+          const currentMain = prev[0];
+          const remaining = videos.filter((v) => v.id !== currentMain.id);
+          return [currentMain, ...remaining];
+        }
+        return videos;
+      });
+    }
+  }, [videos, hasInteracted]);
+
+  const pool = videoPool.length >= 5 ? videoPool : videos.length >= 5 ? videos : INITIAL_EXPOSITORY_VIDEOS;
+  const mainVideo = pool[0];
+  const queueVideos = pool.slice(1, 5);
 
   const handleSwap = (queueIndex: number) => {
     if (isSwapping) return;
@@ -760,7 +822,16 @@ function ExpositoryVideosPlayer({ initialVideos }: { initialVideos: ExpositoryVi
           }`}
         >
           <h3 className="font-serif text-2xl lg:text-3xl font-black text-ink leading-tight mt-4">
-            {mainVideo.title}
+            {mainVideo.slug ? (
+              <Link
+                to={itemPath(mainVideo.type || 'video', mainVideo.slug)}
+                className="hover:text-accent-text transition-colors"
+              >
+                {mainVideo.title}
+              </Link>
+            ) : (
+              mainVideo.title
+            )}
           </h3>
 
           <p className="text-xs font-bold uppercase tracking-wider text-muted mt-2">
@@ -868,6 +939,48 @@ export function HomePage() {
     }
     return videosList.slice(0, 4);
   }, [answersList, videosList]);
+
+  // 3d. WordPress Expository Videos from Equip Indian Churches
+  const { data: expositoryMediaData } = useContentList('media', {
+    perPage: 16,
+  });
+  const expositoryMediaList = expositoryMediaData?.items || [];
+
+  const expositoryVideosList = useMemo<ExpositoryVideoItem[]>(() => {
+    const RESTRICTED_YOUTUBE_IDS = new Set(['wlMTtlv85_M', 'jTBBXt_cB1c']);
+    const wpVideos: ExpositoryVideoItem[] = [];
+
+    for (const item of expositoryMediaList) {
+      const yId = item.video?.id;
+      if (yId && yId.length === 11 && !RESTRICTED_YOUTUBE_IDS.has(yId)) {
+        wpVideos.push({
+          id: item.id,
+          title: item.title,
+          speaker: item.speaker || item.author?.name || 'Equip Indian Churches',
+          excerpt:
+            item.excerpt ||
+            'A faithful exposition of God’s Word from Equip Indian Churches pastoral leadership, national assemblies, and church planting networks across India.',
+          youtubeId: yId,
+          thumbnail:
+            item.image?.src ||
+            item.video?.thumbnailLarge ||
+            item.video?.thumbnail ||
+            `https://i.ytimg.com/vi/${yId}/hqdefault.jpg`,
+          badge: item.terms.videoCategory?.[0]?.name || (item.type === 'sermon' ? 'Sermon' : 'Video'),
+          slug: item.slug,
+          type: item.type,
+        });
+      }
+    }
+
+    if (wpVideos.length >= 5) {
+      return wpVideos.slice(0, 10);
+    }
+
+    const existingIds = new Set(wpVideos.map((v) => v.youtubeId));
+    const fallbackFill = INITIAL_EXPOSITORY_VIDEOS.filter((v) => !existingIds.has(v.youtubeId));
+    return [...wpVideos, ...fallbackFill].slice(0, 8);
+  }, [expositoryMediaList]);
 
   // 4. Book Reviews (fetch up to 12)
   const { data: books } = useContentList('bookReview', {
@@ -1685,7 +1798,7 @@ export function HomePage() {
             </div>
 
             {/* Interactive Player with 4-video Swap Grid */}
-            <ExpositoryVideosPlayer initialVideos={INITIAL_EXPOSITORY_VIDEOS} />
+            <ExpositoryVideosPlayer videos={expositoryVideosList} />
           </div>
         </section>
 
