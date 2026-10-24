@@ -14,8 +14,9 @@ export interface SeriesCard {
  * from the newest item inside each series. Terms themselves have no image in WordPress.
  */
 export async function fetchSeriesCards(
-  opts: { count: number; hiddenSlugs?: string[]; onlySlugs?: string[]; coverType: ContentKey },
+  opts: { count: number; hiddenSlugs?: string[]; onlySlugs?: string[]; coverType?: ContentKey },
 ): Promise<SeriesCard[]> {
+  const coverType = opts.coverType ?? 'article';
   const hidden = new Set(opts.hiddenSlugs ?? []);
   let terms: Term[];
   if (opts.onlySlugs?.length) {
@@ -32,8 +33,9 @@ export async function fetchSeriesCards(
   return Promise.all(
     terms.map(async (term): Promise<SeriesCard> => {
       try {
-        const { items } = await fetchPosts(opts.coverType, { perPage: 1, terms: { series: [term.id] } });
-        return { term, latest: items[0], cover: items[0]?.image };
+        const { items } = await fetchPosts(coverType, { perPage: 3, terms: { series: [term.id] } });
+        const itemWithImg = items.find((it) => it.image?.src);
+        return { term, latest: items[0], cover: itemWithImg?.image || items[0]?.image };
       } catch {
         return { term };
       }

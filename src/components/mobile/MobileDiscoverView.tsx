@@ -21,7 +21,7 @@ export function MobileDiscoverView() {
   const { data: watchThisWeek } = useContentList('video', { perPage: 8 });
 
   // Start a Series / Shows (2:3 Vertical Poster Cards)
-  const { data: seriesList } = useSeriesCards({ count: 6, coverType: 'video' });
+  const { data: seriesList } = useSeriesCards({ count: 6, coverType: 'article' });
 
   // Recent Articles
   const { data: articles } = useContentList('article', { perPage: 6 });

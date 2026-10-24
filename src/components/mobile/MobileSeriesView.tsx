@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRightIcon } from '@/components/ui/Icons';
 
 export function MobileSeriesView() {
-  const { data: seriesList } = useSeriesCards({ count: 12, coverType: 'video' });
+  const { data: seriesList } = useSeriesCards({ count: 12, coverType: 'article' });
   const { data: categories } = useTerms('category', { perPage: 8 });
   const { data: featuredArticles } = useContentList('article', { perPage: 4 });
 

@@ -125,7 +125,7 @@ export const useSeriesCards = (opts: {
   count: number;
   hiddenSlugs?: string[];
   onlySlugs?: string[];
-  coverType: ContentKey;
+  coverType?: ContentKey;
 }) =>
   useQuery({
     queryKey: ['series-cards', opts],
