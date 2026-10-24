@@ -7,7 +7,7 @@ import {
   useFeatured,
   useSeriesCards,
 } from '@/hooks/queries';
-import type { ContentItem } from '@/api/types';
+import type { ContentItem, ImageInfo } from '@/api/types';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import {
@@ -23,12 +23,10 @@ import {
   StarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ExternalLinkIcon,
 } from '@/components/ui/Icons';
 import { itemPath } from '@/lib/routes';
 import { formatDateShort } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
-import { seminariesData, bookstoresData } from '@/data/recommendations';
 
 interface HeroNotificationSlide {
   id: string;
@@ -250,6 +248,395 @@ function HeroAutoSlider({ slides }: { slides: HeroNotificationSlide[] }) {
   );
 }
 
+/* ==================================================================== */
+/* BOOK REVIEWS 3D COVERFLOW AUTO-SLIDER                                */
+/* ==================================================================== */
+
+interface BookSlideItem {
+  id: string | number;
+  title: string;
+  bookTitle?: string;
+  bookAuthor?: string;
+  slug: string;
+  rating?: number;
+  tag?: string;
+  image?: ImageInfo;
+}
+
+const BOOK_CARD_THEMES = [
+  {
+    bg: '#9E2A2B', // Terracotta Crimson Red (Center active color in reference image)
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#D4C157', // Buttercup Mustard Yellow (Right color in reference image)
+    textColor: 'text-slate-900',
+    authorColor: 'text-slate-800/80',
+    badgeBg: 'bg-black/15 hover:bg-black/25',
+    badgeText: 'text-slate-900',
+  },
+  {
+    bg: '#C88A7A', // Dusty Coral / Salmon Pink (Far-right color in reference image)
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#7E8F83', // Sage / Olive Green (Left color in reference image)
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#7E8F9F', // Slate Blue (Far-left color in reference image)
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#253549', // Midnight Navy
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-white/20 hover:bg-white/30',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#A26742', // Warm Cinnamon
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+  {
+    bg: '#5E6D59', // Herb Green
+    textColor: 'text-white',
+    authorColor: 'text-white/80',
+    badgeBg: 'bg-black/25 hover:bg-black/40',
+    badgeText: 'text-white',
+  },
+];
+
+const FALLBACK_BOOKS: BookSlideItem[] = [
+  {
+    id: 'fb-1',
+    title: 'How to Read the Bible for All Its Worth',
+    bookTitle: 'How to Read the Bible',
+    bookAuthor: 'David Platt',
+    slug: 'how-to-read-the-bible',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'How to Read the Bible',
+    },
+  },
+  {
+    id: 'fb-2',
+    title: 'Pray the World: A Scripture Guide for Global Engagement',
+    bookTitle: 'Pray the World',
+    bookAuthor: 'Steven Morales, David Platt',
+    slug: 'pray-the-world',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'Pray the World',
+    },
+  },
+  {
+    id: 'fb-3',
+    title: 'Faith Foundations: Building Your Life on Truth',
+    bookTitle: 'Faith Foundations',
+    bookAuthor: 'David Platt',
+    slug: 'faith-foundations',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'Faith Foundations',
+    },
+  },
+  {
+    id: 'fb-4',
+    title: 'Something Needs to Change: A Call to Make Your Life Count',
+    bookTitle: 'Something Needs to Change',
+    bookAuthor: 'David Platt',
+    slug: 'something-needs-to-change',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'Something Needs to Change',
+    },
+  },
+  {
+    id: 'fb-5',
+    title: 'Don’t Hold Back: Leaving Behind the Religion of Power, Politics, and Prosperity',
+    bookTitle: 'Don’t Hold Back',
+    bookAuthor: 'David Platt',
+    slug: 'dont-hold-back',
+    rating: 4.5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'Don’t Hold Back',
+    },
+  },
+  {
+    id: 'fb-6',
+    title: 'The Cross of Christ: The Heart of the Atonement',
+    bookTitle: 'The Cross of Christ',
+    bookAuthor: 'John Stott',
+    slug: 'the-cross-of-christ',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'The Cross of Christ',
+    },
+  },
+  {
+    id: 'fb-7',
+    title: 'The Pastor’s Heart: Shepherding with Grace and Humility',
+    bookTitle: 'The Pastor’s Heart',
+    bookAuthor: 'Alexander Strauch',
+    slug: 'the-pastors-heart',
+    rating: 5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1491841573634-28140fc7ced7?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'The Pastor’s Heart',
+    },
+  },
+  {
+    id: 'fb-8',
+    title: 'Expositional Preaching: How We Speak God’s Word Today',
+    bookTitle: 'Expositional Preaching',
+    bookAuthor: 'David R. Helm',
+    slug: 'expositional-preaching',
+    rating: 4.5,
+    tag: 'Read Review',
+    image: {
+      src: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=600&h=900&q=80',
+      alt: 'Expositional Preaching',
+    },
+  },
+];
+
+function BookReviewsCoverflowSlider({ books }: { books: BookSlideItem[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const slides = books;
+  const N = slides.length;
+
+  useEffect(() => {
+    if (N <= 1 || isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % N);
+    }, 3800);
+    return () => clearInterval(interval);
+  }, [N, isPaused]);
+
+  if (!N) return null;
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + N) % N);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % N);
+  };
+
+  return (
+    <div
+      className="relative w-full py-4"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Edge gradient masks matching reference image */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-32 lg:w-44 bg-gradient-to-r from-surface via-surface/85 to-transparent z-40" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-32 lg:w-44 bg-gradient-to-l from-surface via-surface/85 to-transparent z-40" />
+
+      {/* Prev / Next Buttons */}
+      <button
+        type="button"
+        onClick={handlePrev}
+        aria-label="Previous book"
+        className="absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/95 dark:bg-[#182541]/95 text-ink shadow-xl backdrop-blur-md border border-line/70 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+      >
+        <ChevronLeftIcon size={20} />
+      </button>
+
+      <button
+        type="button"
+        onClick={handleNext}
+        aria-label="Next book"
+        className="absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/95 dark:bg-[#182541]/95 text-ink shadow-xl backdrop-blur-md border border-line/70 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+      >
+        <ChevronRightIcon size={20} />
+      </button>
+
+      {/* 3D Coverflow Container */}
+      <div className="relative h-[490px] sm:h-[510px] w-full overflow-hidden flex items-center justify-center">
+        {slides.map((slide, idx) => {
+          let diff = idx - currentIndex;
+          if (diff < -Math.floor(N / 2)) diff += N;
+          if (diff > Math.floor(N / 2)) diff -= N;
+
+          const theme = BOOK_CARD_THEMES[idx % BOOK_CARD_THEMES.length];
+          const isActive = diff === 0;
+
+          // Position, scale, opacity based on diff
+          let transformStyle = '';
+          let leftStyle = '';
+          let zIndex = 0;
+          let opacity = 0;
+          let pointerEvents: 'auto' | 'none' = 'none';
+
+          if (diff === 0) {
+            transformStyle = 'translate(-50%, -50%) scale(1.08) translateY(-10px)';
+            leftStyle = '50%';
+            zIndex = 30;
+            opacity = 1;
+            pointerEvents = 'auto';
+          } else if (diff === 1) {
+            transformStyle = 'translate(-50%, -50%) scale(0.92) translateY(0px)';
+            leftStyle = 'calc(50% + 205px)';
+            zIndex = 20;
+            opacity = 0.9;
+            pointerEvents = 'auto';
+          } else if (diff === -1) {
+            transformStyle = 'translate(-50%, -50%) scale(0.92) translateY(0px)';
+            leftStyle = 'calc(50% - 205px)';
+            zIndex = 20;
+            opacity = 0.9;
+            pointerEvents = 'auto';
+          } else if (diff === 2) {
+            transformStyle = 'translate(-50%, -50%) scale(0.80) translateY(8px)';
+            leftStyle = 'calc(50% + 380px)';
+            zIndex = 10;
+            opacity = 0.55;
+            pointerEvents = 'auto';
+          } else if (diff === -2) {
+            transformStyle = 'translate(-50%, -50%) scale(0.80) translateY(8px)';
+            leftStyle = 'calc(50% - 380px)';
+            zIndex = 10;
+            opacity = 0.55;
+            pointerEvents = 'auto';
+          } else {
+            transformStyle = 'translate(-50%, -50%) scale(0.68) translateY(16px)';
+            leftStyle = `calc(50% + ${Math.sign(diff) * 540}px)`;
+            zIndex = 0;
+            opacity = 0;
+            pointerEvents = 'none';
+          }
+
+          const card = (
+            <div
+              style={{
+                backgroundColor: theme.bg,
+                left: leftStyle,
+                transform: transformStyle,
+                zIndex,
+                opacity,
+                pointerEvents,
+              }}
+              onClick={() => {
+                if (!isActive) {
+                  setCurrentIndex(idx);
+                }
+              }}
+              className={`absolute top-1/2 w-[230px] sm:w-[250px] h-[380px] sm:h-[400px] rounded-[28px] p-5 sm:p-6 flex flex-col justify-between select-none transition-all duration-700 ease-out cursor-pointer ${
+                isActive
+                  ? 'shadow-[0_24px_50px_rgba(0,0,0,0.5)] ring-2 ring-white/25'
+                  : 'shadow-lg hover:opacity-100'
+              }`}
+            >
+              {/* 3D Book Cover on Top with realistic spine shadow */}
+              <div className="relative aspect-[2/3] w-[130px] sm:w-[140px] mx-auto overflow-hidden rounded-r-md rounded-l-xs shadow-[0_16px_28px_rgba(0,0,0,0.45)] border border-black/15 bg-black/40 group-hover:scale-105 transition-transform duration-500">
+                {/* Book spine highlight */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-white/30 via-white/10 to-transparent z-10" />
+                <div className="pointer-events-none absolute inset-y-0 left-1 w-0.5 bg-black/25 z-10" />
+
+                <Img
+                  image={slide.image}
+                  alt={slide.title}
+                  thumb
+                  wrapperClassName="h-full w-full"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* Book Details on Bottom */}
+              <div className="pt-2">
+                <p className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-widest ${theme.authorColor} truncate`}>
+                  {slide.bookAuthor || 'David Platt'}
+                </p>
+
+                <h3 className={`font-serif text-base sm:text-lg font-bold leading-tight ${theme.textColor} line-clamp-2 mt-1 group-hover:underline`}>
+                  {slide.bookTitle || slide.title}
+                </h3>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-xs transition ${theme.badgeBg} ${theme.badgeText}`}
+                  >
+                    <span>{slide.tag || 'Read Review'}</span>
+                    <ArrowRightIcon size={10} />
+                  </span>
+
+                  {slide.rating && (
+                    <div className="flex items-center gap-1 text-amber-300">
+                      <StarIcon size={12} className="fill-amber-300 text-amber-300" />
+                      <span className={`text-[11px] font-bold ${theme.textColor}`}>{slide.rating}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+
+          return isActive ? (
+            <Link
+              key={slide.id}
+              to={itemPath('bookReview', slide.slug)}
+              className="contents"
+            >
+              {card}
+            </Link>
+          ) : (
+            <div key={slide.id} className="contents">
+              {card}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Pagination Indicator Dots */}
+      <div className="flex items-center justify-center gap-2 mt-3">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Go to book ${i + 1}`}
+            onClick={() => setCurrentIndex(i)}
+            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+              i === currentIndex ? 'w-8 bg-accent shadow-sm' : 'w-2 bg-line hover:bg-muted'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function HomePage() {
   // 1. Hero / Featured Lead Article
   const { data: featuredHero, isLoading: heroLoading } = useFeatured(homeConfig.heroSource, 1);
@@ -295,11 +682,31 @@ export function HomePage() {
     coverType: 'article',
   });
 
-  // 5. Book Reviews
+  // 5. Book Reviews (fetch up to 12)
   const { data: books } = useContentList('bookReview', {
-    perPage: 6,
+    perPage: 12,
   });
   const bookList = books?.items || [];
+
+  // Book review items for the 3D coverflow auto-slider
+  const bookReviewSlides = useMemo<BookSlideItem[]>(() => {
+    const apiSlides: BookSlideItem[] = bookList.map((item, idx) => ({
+      id: item.id,
+      title: item.title,
+      bookTitle: item.bookTitle || item.title,
+      bookAuthor: item.bookAuthor || 'Staff Review',
+      slug: item.slug,
+      rating: item.rating || 5,
+      tag: 'Read Review',
+      image: item.image || FALLBACK_BOOKS[idx % FALLBACK_BOOKS.length].image,
+    }));
+
+    if (apiSlides.length >= 8) return apiSlides;
+
+    const existingSlugs = new Set(apiSlides.map((s) => s.slug));
+    const extra = FALLBACK_BOOKS.filter((fb) => !existingSlugs.has(fb.slug));
+    return [...apiSlides, ...extra].slice(0, 8);
+  }, [bookList]);
 
   // 6. Upcoming Events
   const { data: events, isLoading: eventsLoading } = useContentList('event', {
@@ -623,9 +1030,6 @@ export function HomePage() {
     ];
   }, [events]);
 
-  // Curated Recommendation item
-  const featuredSeminary = seminariesData[0];
-  const featuredBookstore = bookstoresData[0];
 
   return (
     <>
@@ -1207,202 +1611,35 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 5: LITERATURE & STUDY RESOURCES (4-Column Asymmetric)*/}
-        {/* Matches the 'ARTS / TRAVEL & TOURISM' layout in image        */}
+        {/* SECTION 5: FAITHFUL BOOK REVIEWS (3D Automatic Coverflow)    */}
         {/* ------------------------------------------------------------ */}
-        <section className="border-b border-line/80 py-12 bg-surface">
+        <section className="border-b border-line/80 py-16 bg-surface overflow-hidden">
           <div className="container-page max-w-[1400px]">
+            {/* Header + View All Link */}
             <div className="flex items-center justify-between pb-4 mb-8 border-b border-line/80">
               <div>
-                <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
-                  Literature & Study Resources
-                </h2>
-                <p className="text-xs text-muted mt-0.5">Faithful book reviews, recommended seminaries, and Christian distributors</p>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
+                    Faithful Book Reviews
+                  </h2>
+                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
+                    Staff Recommendations
+                  </span>
+                </div>
+                <p className="text-xs text-muted mt-1">
+                  Biblical assessments and evaluations of essential theological, pastoral, and devotional books
+                </p>
               </div>
               <Link
                 to={`/${contentTypes.bookReview.route}`}
                 className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
               >
-                ( All Literature → )
+                ( All Book Reviews → )
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Card 1: Book Review */}
-              {bookList[0] && (
-                <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-4 shadow-xs transition-all hover:border-accent">
-                  <div>
-                    <div className="aspect-[3/4] w-full rounded-md overflow-hidden bg-surface-2 mb-3">
-                      <Link to={itemPath('bookReview', bookList[0].slug)}>
-                        <Img
-                          image={bookList[0].image}
-                          alt={bookList[0].title}
-                          wrapperClassName="w-full h-full"
-                          className="transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </Link>
-                    </div>
-                    <div className="flex items-center gap-1 text-accent mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon key={i} size={12} className={i < (bookList[0].rating || 5) ? 'text-accent' : 'text-line'} />
-                      ))}
-                    </div>
-                    <h3 className="font-serif text-sm font-bold text-ink line-clamp-2 group-hover:text-accent-text">
-                      <Link to={itemPath('bookReview', bookList[0].slug)}>{bookList[0].title}</Link>
-                    </h3>
-                    {bookList[0].bookAuthor && (
-                      <p className="mt-1 text-xs text-muted">by {bookList[0].bookAuthor}</p>
-                    )}
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-line/60 text-xs">
-                    <Link to={itemPath('bookReview', bookList[0].slug)} className="text-accent-text font-semibold hover:underline">
-                      Read Review →
-                    </Link>
-                  </div>
-                </article>
-              )}
-
-              {/* Card 2: Signature Deep Navy Contrast Card with Book Inset */}
-              {bookList[1] && (
-                <article className="group flex flex-col justify-between rounded-xl bg-[#182541] dark:bg-[#111A2E] text-white p-5 shadow-xs border border-line/10 hover:border-accent/40 transition-all">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="rounded bg-[#D9A62E]/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#D9A62E]">
-                        Staff Pick
-                      </span>
-                      <span className="text-[10px] text-white/50">Must Read</span>
-                    </div>
-
-                    <h3 className="font-serif text-base font-bold text-white line-clamp-2 group-hover:text-[#F3E6BE]">
-                      <Link to={itemPath('bookReview', bookList[1].slug)}>{bookList[1].title}</Link>
-                    </h3>
-
-                    {bookList[1].excerpt && (
-                      <p className="mt-2 text-xs text-white/70 line-clamp-3 leading-relaxed">
-                        {bookList[1].excerpt}
-                      </p>
-                    )}
-
-                    {bookList[1].image && (
-                      <div className="mt-4 aspect-[4/3] rounded-md overflow-hidden bg-black/30 border border-white/10">
-                        <Link to={itemPath('bookReview', bookList[1].slug)}>
-                          <Img
-                            image={bookList[1].image}
-                            alt={bookList[1].title}
-                            thumb
-                            wrapperClassName="w-full h-full"
-                            className="transition-transform duration-500 group-hover:scale-105"
-                          />
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
-                    <span>{bookList[1].bookAuthor || 'Literature'}</span>
-                    <Link to={itemPath('bookReview', bookList[1].slug)} className="text-[#D9A62E] font-semibold hover:underline">
-                      Review →
-                    </Link>
-                  </div>
-                </article>
-              )}
-
-              {/* Card 3: Featured Seminary Recommendation */}
-              {featuredSeminary && (
-                <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent-text border border-line">
-                        Theological Seminary
-                      </span>
-                      <span className="text-[10px] text-muted">{featuredSeminary.established || 'India'}</span>
-                    </div>
-
-                    <h3 className="font-serif text-base font-bold text-ink group-hover:text-accent-text transition-colors">
-                      <Link to={`/seminaries/${featuredSeminary.slug}`}>{featuredSeminary.title}</Link>
-                    </h3>
-
-                    <p className="mt-1 text-xs text-accent-text font-medium">{featuredSeminary.location}</p>
-
-                    <p className="mt-2 text-xs text-body line-clamp-3 leading-relaxed">
-                      {featuredSeminary.description}
-                    </p>
-
-                    {featuredSeminary.focusAreas && (
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {featuredSeminary.focusAreas.slice(0, 2).map((area) => (
-                          <span key={area} className="rounded bg-surface-2 px-2 py-0.5 text-[10px] text-muted border border-line/50">
-                            {area}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs">
-                    <Link to={`/seminaries/${featuredSeminary.slug}`} className="font-semibold text-ink hover:text-accent-text">
-                      Seminary Details →
-                    </Link>
-                    <a
-                      href={featuredSeminary.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted hover:text-ink inline-flex items-center gap-1"
-                    >
-                      <ExternalLinkIcon size={12} />
-                    </a>
-                  </div>
-                </article>
-              )}
-
-              {/* Card 4: Featured Christian Bookstore */}
-              {featuredBookstore && (
-                <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent-text border border-line">
-                        Bookstore & Literature
-                      </span>
-                      <span className="text-[10px] text-muted">India Delivery</span>
-                    </div>
-
-                    <h3 className="font-serif text-base font-bold text-ink group-hover:text-accent-text transition-colors">
-                      <Link to={`/bookstores/${featuredBookstore.slug}`}>{featuredBookstore.title}</Link>
-                    </h3>
-
-                    <p className="mt-1 text-xs text-muted">{featuredBookstore.subtitle}</p>
-
-                    <p className="mt-2 text-xs text-body line-clamp-3 leading-relaxed">
-                      {featuredBookstore.description}
-                    </p>
-
-                    {featuredBookstore.focusAreas && (
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {featuredBookstore.focusAreas.slice(0, 2).map((area) => (
-                          <span key={area} className="rounded bg-surface-2 px-2 py-0.5 text-[10px] text-muted border border-line/50">
-                            {area}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs">
-                    <Link to={`/bookstores/${featuredBookstore.slug}`} className="font-semibold text-ink hover:text-accent-text">
-                      View Bookstore →
-                    </Link>
-                    <a
-                      href={featuredBookstore.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted hover:text-ink inline-flex items-center gap-1"
-                    >
-                      <ExternalLinkIcon size={12} />
-                    </a>
-                  </div>
-                </article>
-              )}
-            </div>
+            {/* 3D Auto Coverflow Book Slider */}
+            <BookReviewsCoverflowSlider books={bookReviewSlides} />
           </div>
         </section>
 
