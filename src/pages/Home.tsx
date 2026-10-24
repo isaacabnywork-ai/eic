@@ -11,13 +11,13 @@ import type { ContentItem } from '@/api/types';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import {
-  EventCard,
   SeriesCard,
 } from '@/components/cards';
 import { Img } from '@/components/ui/Img';
 import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
 import {
   ArrowRightIcon,
+  CalendarIcon,
   MapPinIcon,
   PlayIcon,
   StarIcon,
@@ -451,14 +451,135 @@ export function HomePage() {
     return pageItems.length ? pageItems : filteredArticles.slice(0, 3);
   }, [filteredArticles, articlePage]);
 
-  // Items for Latest Teaching 3-card top row
-  const latestRowTop1 = articlesList[4] || articlesList[0];
-  const latestRowTop2 = articlesList[5] || articlesList[1]; // Dark Accent Card
-  const latestRowTop3 = articlesList[6] || articlesList[2];
+  // Events tab switcher state (Upcoming vs Past)
+  const [eventsTab, setEventsTab] = useState<'upcoming' | 'past'>('upcoming');
 
-  // Items for Latest Teaching 2-card bottom wide row
-  const latestRowBottom1 = articlesList[7] || articlesList[0];
-  const latestRowBottom2 = articlesList[8] || articlesList[1];
+  // Main featured latest event for the left column
+  const mainLatestEvent = useMemo(() => {
+    const liveFirst = events?.items?.[0];
+    return {
+      id: liveFirst?.id || 'aipc-2026-main',
+      title: 'All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully',
+      formattedDate: 'November 12 – 14, 2026',
+      date: '2026-11-12',
+      venue: 'New Delhi, India',
+      badge: 'Latest Main Event',
+      excerpt:
+        liveFirst?.excerpt ||
+        'Gathering pastors, church planters, elders, and ministry leaders from across India for three days of rigorous expository preaching, theological grounding, and pastoral fellowship.',
+      image: liveFirst?.image || {
+        src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80',
+        alt: 'All India Pastors Conference 2026',
+      },
+      registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events',
+      isUpcoming: true,
+    };
+  }, [events]);
+
+  // Upcoming events list for the right column
+  const upcomingEventsList = useMemo(() => {
+    return [
+      {
+        id: 'upcoming-1',
+        title: 'All India Pastors Conference 2026',
+        formattedDate: 'Nov 12 – 14, 2026',
+        date: '2026-11-12',
+        venue: 'New Delhi, National Summit',
+        image: {
+          src: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=600&q=80',
+          alt: 'AIPC 2026',
+        },
+        registrationUrl: '/events',
+        isUpcoming: true,
+      },
+      {
+        id: 'upcoming-2',
+        title: 'Regional Pastors Roundtable: South India',
+        formattedDate: 'August 22, 2026',
+        date: '2026-08-22',
+        venue: 'Bangalore, Karnataka',
+        image: {
+          src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80',
+          alt: 'Regional Pastors Roundtable',
+        },
+        registrationUrl: '/events',
+        isUpcoming: true,
+      },
+      {
+        id: 'upcoming-3',
+        title: 'Expository Preaching Seminar & Workshop',
+        formattedDate: 'October 5 – 7, 2026',
+        date: '2026-10-05',
+        venue: 'Mumbai, Maharashtra',
+        image: {
+          src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+          alt: 'Expository Preaching Seminar',
+        },
+        registrationUrl: '/events',
+        isUpcoming: true,
+      },
+    ];
+  }, []);
+
+  // Past events list from live API data
+  const pastEventsList = useMemo(() => {
+    if (events?.items && events.items.length > 0) {
+      return events.items.slice(0, 3).map((item) => ({
+        id: item.id,
+        title: item.title,
+        formattedDate: formatDateShort(item.eventDate || item.date),
+        date: item.eventDate || item.date,
+        venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'AIPC Gathering',
+        image: item.image || {
+          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+          alt: item.title,
+        },
+        registrationUrl: itemPath('event', item.slug),
+        isUpcoming: false,
+      }));
+    }
+    return [
+      {
+        id: 'past-1',
+        title: 'Day 2 at AIPC 2023: Faithful Shepherding',
+        formattedDate: 'Sep 28, 2023',
+        date: '2023-09-28',
+        venue: 'National Conference Assembly',
+        image: {
+          src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80',
+          alt: 'AIPC 2023',
+        },
+        registrationUrl: '/events',
+        isUpcoming: false,
+      },
+      {
+        id: 'past-2',
+        title: 'Day 1 at AIPC 2023: The Sufficiency of Scripture',
+        formattedDate: 'Sep 27, 2023',
+        date: '2023-09-27',
+        venue: 'National Conference Assembly',
+        image: {
+          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
+          alt: 'AIPC 2023',
+        },
+        registrationUrl: '/events',
+        isUpcoming: false,
+      },
+      {
+        id: 'past-3',
+        title: 'AIPC 2021: Suffering and Sovereignty of God',
+        formattedDate: 'Oct 25, 2021',
+        date: '2021-10-25',
+        venue: 'Pastoral Exposition',
+        image: {
+          src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80',
+          alt: 'AIPC 2021',
+        },
+        registrationUrl: '/events',
+        isUpcoming: false,
+      },
+    ];
+  }, [events]);
 
   // Curated Recommendation item
   const featuredSeminary = seminariesData[0];
@@ -686,181 +807,203 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 3: LATEST NEWS (3-Card Row + 2 Wide Photo Cards)     */}
+        {/* SECTION 3: EVENTS & CONFERENCES (Assemblies in India)        */}
         {/* ------------------------------------------------------------ */}
         <section className="border-b border-line/80 py-12 bg-surface">
           <div className="container-page max-w-[1400px]">
-            {/* Header + View More Pill */}
+            {/* Header + View All Pill */}
             <div className="flex items-center justify-between pb-4 mb-8 border-b border-line/80">
               <div>
-                <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
-                  Latest Teaching
-                </h2>
-                <p className="text-xs text-muted mt-0.5">Fresh biblical articles, pastoral reflections, and expositions</p>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
+                    Events & Conferences
+                  </h2>
+                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
+                    Assemblies in India
+                  </span>
+                </div>
+                <p className="text-xs text-muted mt-1">
+                  National pastors conferences, regional ministerial roundtables, and expository training workshops
+                </p>
               </div>
               <Link
-                to={`/${contentTypes.article.route}`}
+                to={`/${contentTypes.event.route}`}
                 className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
               >
-                ( View More → )
+                ( View All Events → )
               </Link>
             </div>
 
-            {/* Row 1: 3 Cards Side-by-Side (Middle is Signature Deep Dark Accent Card) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {/* Card 1: Clean Light */}
-              {latestRowTop1 && (
-                <article className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                      {latestRowTop1.terms.category?.[0]?.name || 'Pastoral Theology'}
-                    </span>
-                    <h3 className="font-serif text-lg font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-                      <Link to={itemPath(latestRowTop1.type, latestRowTop1.slug)}>
-                        {latestRowTop1.title}
-                      </Link>
-                    </h3>
-                    {latestRowTop1.excerpt && (
-                      <p className="mt-2.5 text-xs text-body line-clamp-3 leading-relaxed">
-                        {latestRowTop1.excerpt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-line/50 flex items-center justify-between text-xs text-muted">
-                    <span className="font-medium text-ink">{latestRowTop1.author?.name || 'Author'}</span>
-                    <time dateTime={latestRowTop1.date}>{formatDateShort(latestRowTop1.date)}</time>
-                  </div>
-                </article>
-              )}
+            {eventsLoading ? (
+              <CardGridSkeleton variant="event" count={3} />
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                {/* ---------------------------------------------------- */}
+                {/* LEFT BIG SECTION (7 cols): Latest Main Event         */}
+                {/* ---------------------------------------------------- */}
+                <div className="lg:col-span-7 xl:col-span-7 flex flex-col">
+                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg overflow-hidden shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
+                    <div>
+                      {/* Event Main Banner Image */}
+                      <div className="relative h-64 sm:h-72 lg:h-80 w-full overflow-hidden bg-black/60">
+                        <Link to={mainLatestEvent.registrationUrl}>
+                          <Img
+                            image={mainLatestEvent.image}
+                            alt={mainLatestEvent.title}
+                            wrapperClassName="h-full w-full"
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </Link>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-              {/* Card 2: Signature Deep Dark Navy Contrast Card */}
-              {latestRowTop2 && (
-                <article className="group flex flex-col justify-between rounded-lg bg-[#182541] dark:bg-[#111A2E] p-5 text-white shadow-xs border border-line/10 hover:border-accent/40 transition-all">
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="rounded bg-[#D9A62E]/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#D9A62E]">
-                        {latestRowTop2.terms.category?.[0]?.name || 'Featured Study'}
-                      </span>
-                      <span className="text-[10px] text-white/50">EIC Essay</span>
+                        {/* Top Badge */}
+                        <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-black/75 backdrop-blur-md px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/20">
+                          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                          <span>{mainLatestEvent.badge}</span>
+                        </div>
+
+                        {/* Bottom Date Pill */}
+                        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg bg-black/80 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white/95 border border-white/15">
+                          <CalendarIcon size={14} className="text-amber-400" />
+                          <span>{mainLatestEvent.formattedDate}</span>
+                        </div>
+                      </div>
+
+                      {/* Event Details */}
+                      <div className="p-6 sm:p-7">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-2">
+                          <MapPinIcon size={14} />
+                          <span>{mainLatestEvent.venue}</span>
+                        </div>
+
+                        <h3 className="font-serif text-2xl sm:text-3xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
+                          <Link to={mainLatestEvent.registrationUrl}>
+                            {mainLatestEvent.title}
+                          </Link>
+                        </h3>
+
+                        {mainLatestEvent.excerpt && (
+                          <p className="mt-3 text-sm text-body line-clamp-3 leading-relaxed">
+                            {mainLatestEvent.excerpt}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <h3 className="font-serif text-lg font-bold leading-snug text-white group-hover:text-[#F3E6BE] transition-colors">
-                      <Link to={itemPath(latestRowTop2.type, latestRowTop2.slug)}>
-                        {latestRowTop2.title}
+
+                    {/* Registration CTA Button */}
+                    <div className="px-6 pb-6 sm:px-7 sm:pb-7 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-4">
+                      <Link
+                        to={mainLatestEvent.registrationUrl}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                      >
+                        <span>Register for Conference</span>
+                        <ArrowRightIcon size={14} />
                       </Link>
-                    </h3>
-                    {latestRowTop2.excerpt && (
-                      <p className="mt-2.5 text-xs text-white/70 line-clamp-3 leading-relaxed">
-                        {latestRowTop2.excerpt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
-                    <span className="font-medium text-white">{latestRowTop2.author?.name || 'Equip Indian Churches'}</span>
-                    <time dateTime={latestRowTop2.date}>{formatDateShort(latestRowTop2.date)}</time>
-                  </div>
-                </article>
-              )}
 
-              {/* Card 3: Clean Light */}
-              {latestRowTop3 && (
-                <article className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                      {latestRowTop3.terms.category?.[0]?.name || 'Church Doctrine'}
-                    </span>
-                    <h3 className="font-serif text-lg font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-                      <Link to={itemPath(latestRowTop3.type, latestRowTop3.slug)}>
-                        {latestRowTop3.title}
+                      <Link
+                        to="/events"
+                        className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
+                      >
+                        <span>Conference Info</span>
+                        <ArrowRightIcon size={12} />
                       </Link>
-                    </h3>
-                    {latestRowTop3.excerpt && (
-                      <p className="mt-2.5 text-xs text-body line-clamp-3 leading-relaxed">
-                        {latestRowTop3.excerpt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-line/50 flex items-center justify-between text-xs text-muted">
-                    <span className="font-medium text-ink">{latestRowTop3.author?.name || 'Author'}</span>
-                    <time dateTime={latestRowTop3.date}>{formatDateShort(latestRowTop3.date)}</time>
-                  </div>
-                </article>
-              )}
-            </div>
+                    </div>
+                  </article>
+                </div>
 
-            {/* Row 2: 2 Large Photo Cards Side-by-Side (50/50 Split) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {latestRowBottom1 && (
-                <article className="group flex flex-col rounded-xl border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent hover:shadow-md">
-                  <div className="overflow-hidden rounded-lg aspect-[16/10] bg-surface-2 mb-4">
-                    <Link to={itemPath(latestRowBottom1.type, latestRowBottom1.slug)}>
-                      <Img
-                        image={latestRowBottom1.image}
-                        alt={latestRowBottom1.title}
-                        wrapperClassName="w-full h-full"
-                        className="transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </Link>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2 text-xs">
-                    <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                      {latestRowBottom1.terms.category?.[0]?.name || 'Biblical Study'}
-                    </span>
-                    <span className="text-muted">•</span>
-                    <span className="text-muted">{readingTimeMinutes(latestRowBottom1.html || latestRowBottom1.excerpt)} min read</span>
-                  </div>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink leading-snug group-hover:text-accent-text transition-colors">
-                    <Link to={itemPath(latestRowBottom1.type, latestRowBottom1.slug)}>
-                      {latestRowBottom1.title}
-                    </Link>
-                  </h3>
-                  {latestRowBottom1.excerpt && (
-                    <p className="mt-2 text-sm text-body line-clamp-2 leading-relaxed">
-                      {latestRowBottom1.excerpt}
-                    </p>
-                  )}
-                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs text-muted">
-                    <span className="font-semibold text-ink">{latestRowBottom1.author?.name}</span>
-                    <time dateTime={latestRowBottom1.date}>{formatDateShort(latestRowBottom1.date)}</time>
-                  </div>
-                </article>
-              )}
+                {/* ---------------------------------------------------- */}
+                {/* RIGHT SIDEBAR (5 cols): Upcoming & Past Events       */}
+                {/* ---------------------------------------------------- */}
+                <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-between h-full">
+                  {/* Switcher Tabs: Upcoming vs Past */}
+                  <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-line/80">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEventsTab('upcoming')}
+                        className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
+                          eventsTab === 'upcoming'
+                            ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
+                            : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
+                        }`}
+                      >
+                        Upcoming Events
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEventsTab('past')}
+                        className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
+                          eventsTab === 'past'
+                            ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
+                            : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
+                        }`}
+                      >
+                        Past Events
+                      </button>
+                    </div>
 
-              {latestRowBottom2 && (
-                <article className="group flex flex-col rounded-xl border border-line bg-surface p-5 shadow-xs transition-all hover:border-accent hover:shadow-md">
-                  <div className="overflow-hidden rounded-lg aspect-[16/10] bg-surface-2 mb-4">
-                    <Link to={itemPath(latestRowBottom2.type, latestRowBottom2.slug)}>
-                      <Img
-                        image={latestRowBottom2.image}
-                        alt={latestRowBottom2.title}
-                        wrapperClassName="w-full h-full"
-                        className="transition-transform duration-700 group-hover:scale-105"
-                      />
+                    <Link
+                      to="/events"
+                      className="text-xs font-semibold text-accent-text hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>All Events</span>
+                      <ArrowRightIcon size={12} />
                     </Link>
                   </div>
-                  <div className="flex items-center gap-2 mb-2 text-xs">
-                    <span className="rounded bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                      {latestRowBottom2.terms.category?.[0]?.name || 'Pastoral Ministry'}
-                    </span>
-                    <span className="text-muted">•</span>
-                    <span className="text-muted">{readingTimeMinutes(latestRowBottom2.html || latestRowBottom2.excerpt)} min read</span>
+
+                  {/* Event Boxes List */}
+                  <div className="flex flex-col justify-between flex-1 space-y-3.5">
+                    {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
+                      <article
+                        key={ev.id}
+                        className="group flex items-center gap-3.5 sm:gap-4 p-3 rounded-2xl border border-line/80 bg-bg hover:border-accent hover:shadow-md transition-all duration-200"
+                      >
+                        {/* 1. Image */}
+                        <div className="relative h-22 w-22 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-surface-2 shadow-xs border border-line/60">
+                          <Link to={ev.registrationUrl}>
+                            <Img
+                              image={ev.image}
+                              alt={ev.title}
+                              thumb
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          </Link>
+                        </div>
+
+                        {/* 2. Details: Date, Title, Registration Button */}
+                        <div className="flex flex-col justify-center flex-1 min-w-0">
+                          {/* Date of the Event */}
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-accent-text mb-1">
+                            <CalendarIcon size={12} className="shrink-0 text-accent-text" />
+                            <time dateTime={ev.date}>{ev.formattedDate}</time>
+                          </div>
+
+                          {/* Title of the Event */}
+                          <h4 className="font-serif text-sm sm:text-base font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
+                            <Link to={ev.registrationUrl}>
+                              {ev.title}
+                            </Link>
+                          </h4>
+
+                          {/* Registration Button */}
+                          <div className="mt-2.5">
+                            <Link
+                              to={ev.registrationUrl}
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
+                            >
+                              <span>{ev.isUpcoming ? 'Register' : 'View Details'}</span>
+                              <ArrowRightIcon size={10} />
+                            </Link>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink leading-snug group-hover:text-accent-text transition-colors">
-                    <Link to={itemPath(latestRowBottom2.type, latestRowBottom2.slug)}>
-                      {latestRowBottom2.title}
-                    </Link>
-                  </h3>
-                  {latestRowBottom2.excerpt && (
-                    <p className="mt-2 text-sm text-body line-clamp-2 leading-relaxed">
-                      {latestRowBottom2.excerpt}
-                    </p>
-                  )}
-                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs text-muted">
-                    <span className="font-semibold text-ink">{latestRowBottom2.author?.name}</span>
-                    <time dateTime={latestRowBottom2.date}>{formatDateShort(latestRowBottom2.date)}</time>
-                  </div>
-                </article>
-              )}
-            </div>
+                </div>
+
+              </div>
+            )}
           </div>
         </section>
 
@@ -1206,158 +1349,7 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 6: UPCOMING EVENTS & CONFERENCES (Assemblies in India)*/}
-        {/* ------------------------------------------------------------ */}
-        <section className="border-b border-line/80 py-12 bg-bg">
-          <div className="container-page max-w-[1400px]">
-            <div className="flex items-center justify-between pb-4 mb-8 border-b border-line/80">
-              <div>
-                <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
-                  Upcoming Events & Gatherings
-                </h2>
-                <p className="text-xs text-muted mt-0.5">National pastors conferences, regional roundtables, and preaching workshops</p>
-              </div>
-              <Link
-                to={`/${contentTypes.event.route}`}
-                className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
-              >
-                ( View All Gatherings → )
-              </Link>
-            </div>
-
-            {eventsLoading ? (
-              <CardGridSkeleton variant="event" count={3} />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events?.items && events.items.length > 0 ? (
-                  events.items.map((ev) => <EventCard key={ev.id} item={ev} />)
-                ) : (
-                  <>
-                    {/* Event 1: AIPC */}
-                    <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-accent hover:shadow-md">
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
-                            <span className="text-[10px] uppercase tracking-wider text-accent-text font-semibold">Annual</span>
-                            <span className="text-lg font-black leading-none mt-0.5">AIPC</span>
-                          </div>
-                          <span className="rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                            National Summit
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
-                          <MapPinIcon size={13} />
-                          <span>All India Pastoral Assembly</span>
-                        </div>
-
-                        <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-                          <Link to="/events">All India Pastors Conference</Link>
-                        </h3>
-
-                        <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
-                          Gathering pastors, elders, and church leaders from across India for faithful expository preaching, mutual encouragement, and biblical fellowship.
-                        </p>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
-                        <span className="text-muted font-medium">Equipping Local Pastors</span>
-                        <Link
-                          to="/events"
-                          className="inline-flex items-center gap-1 font-semibold text-ink hover:text-accent-text transition-colors"
-                        >
-                          <span>Conference Details</span>
-                          <ArrowRightIcon size={13} />
-                        </Link>
-                      </div>
-                    </article>
-
-                    {/* Event 2: Regional Roundtables */}
-                    <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-accent hover:shadow-md">
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
-                            <span className="text-[10px] uppercase tracking-wider text-accent-text font-semibold">Regional</span>
-                            <span className="text-sm font-bold leading-none mt-0.5">Hubs</span>
-                          </div>
-                          <span className="rounded-full bg-surface-2 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted border border-line/60">
-                            Fellowship
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
-                          <MapPinIcon size={13} />
-                          <span>Delhi • Bangalore • Mumbai • Northeast</span>
-                        </div>
-
-                        <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-                          <Link to="/events">Regional Pastors Roundtables</Link>
-                        </h3>
-
-                        <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
-                          Regional ministerial fellowships and roundtables connecting local church shepherds for prayer, theological study, and mutual accountability.
-                        </p>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
-                        <span className="text-muted font-medium">Regional Gatherings</span>
-                        <Link
-                          to="/events"
-                          className="inline-flex items-center gap-1 font-semibold text-ink hover:text-accent-text transition-colors"
-                        >
-                          <span>Learn More</span>
-                          <ArrowRightIcon size={13} />
-                        </Link>
-                      </div>
-                    </article>
-
-                    {/* Event 3: Preaching Seminars */}
-                    <article className="group flex flex-col justify-between rounded-xl border border-line bg-surface p-6 shadow-xs transition-all duration-300 hover:border-accent hover:shadow-md">
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex flex-col items-center justify-center h-16 w-16 rounded-lg border border-line/80 bg-surface-2 text-ink font-bold">
-                            <span className="text-[10px] uppercase tracking-wider text-accent-text font-semibold">Training</span>
-                            <span className="text-sm font-bold leading-none mt-0.5">Seminars</span>
-                          </div>
-                          <span className="rounded-full bg-surface-2 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted border border-line/60">
-                            Training
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-1.5">
-                          <MapPinIcon size={13} />
-                          <span>Preaching & Shepherding</span>
-                        </div>
-
-                        <h3 className="font-serif text-xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-                          <Link to="/events">Expository Preaching Workshops</Link>
-                        </h3>
-
-                        <p className="mt-2.5 line-clamp-3 text-sm text-body leading-relaxed">
-                          Intensive hands-on preaching seminars equipping preachers to faithfully handle, study, and expound God's Word in local church pulpits.
-                        </p>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
-                        <span className="text-muted font-medium">Workshops</span>
-                        <Link
-                          to="/events"
-                          className="inline-flex items-center gap-1 font-semibold text-ink hover:text-accent-text transition-colors"
-                        >
-                          <span>View Workshops</span>
-                          <ArrowRightIcon size={13} />
-                        </Link>
-                      </div>
-                    </article>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------ */}
-        {/* SECTION 7: TEACHING SERIES & THEOLOGICAL TOPICS DIRECTORY    */}
+        {/* SECTION 6: TEACHING SERIES & THEOLOGICAL TOPICS DIRECTORY    */}
         {/* ------------------------------------------------------------ */}
         <section className="py-12 bg-surface">
           <div className="container-page max-w-[1400px]">
