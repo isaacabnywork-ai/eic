@@ -633,6 +633,207 @@ function BookReviewsCoverflowSlider({ books }: { books: BookSlideItem[] }) {
   );
 }
 
+/* ==================================================================== */
+/* EXPOSITORY VIDEOS INTERACTIVE PLAYER & SWAP GRID (TGC STYLE)         */
+/* ==================================================================== */
+
+interface ExpositoryVideoItem {
+  id: string | number;
+  title: string;
+  speaker: string;
+  excerpt: string;
+  youtubeId: string;
+  thumbnail: string;
+  badge?: string;
+  slug?: string;
+}
+
+const INITIAL_EXPOSITORY_VIDEOS: ExpositoryVideoItem[] = [
+  {
+    id: 'exp-video-1',
+    title: 'Finding Meaning in Our Daily Work (with Denise Daniels)',
+    speaker: 'Dan Doriani • Mark Vroegop • Denise Daniels',
+    excerpt:
+      'Wheaton College’s Denise Daniels draws on research with thousands of American workers to help us have a more holistic vision of how our work matters to us, our neighbors, our families, and God.',
+    youtubeId: 'wX_9w0jLq7E',
+    thumbnail: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    badge: 'Podcast',
+  },
+  {
+    id: 'exp-video-2',
+    title: 'Gospel Hope for Gen-Z Ministry',
+    speaker: 'Rachel Gilson • Alex Harris • Kori Porter • Derek Rishmawy',
+    excerpt:
+      'Ministry leaders discuss reaching and discipling the next generation with gospel clarity, doctrinal fidelity, authentic community, and biblical hope in a shifting culture.',
+    youtubeId: 'jNQXAC9IVRw',
+    thumbnail: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
+    badge: 'Podcast',
+  },
+  {
+    id: 'exp-video-3',
+    title: 'The 2000s So Far in Four Eras',
+    speaker: 'Collin Hansen',
+    excerpt:
+      'A thoughtful retrospective exploring the major theological recoveries, cultural flashpoints, and ministry transitions shaping evangelical church life over the past twenty years.',
+    youtubeId: 'ZbZSe6N_BXs',
+    thumbnail: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80',
+    badge: 'Podcast',
+  },
+  {
+    id: 'exp-video-4',
+    title: 'The Impact of Influencers on the Church',
+    speaker: 'Collin Hansen • Ruth Chou Simons • Laura Wifler • Kyle Worley',
+    excerpt:
+      'Pastors and authors discuss online platforms, celebrity culture, and how leaders can shepherd believers toward biblical discernment and local church commitment.',
+    youtubeId: 'ScMzIvxBSi4',
+    thumbnail: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
+    badge: 'Podcast',
+  },
+  {
+    id: 'exp-video-5',
+    title: 'Heaven: Do We Know Enough to Want to Go? (with Randy Alcorn)',
+    speaker: 'Courtney Doctor • Melissa Kruger • Randy Alcorn',
+    excerpt:
+      'Melissa Kruger and Courtney Doctor talk with author Randy Alcorn about common misconceptions about heaven, the physical resurrection of believers, and our eternal hope in Christ.',
+    youtubeId: 'M7lc1UVf-VE',
+    thumbnail: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&q=80',
+    badge: 'Podcast',
+  },
+];
+
+function ExpositoryVideosPlayer({ initialVideos }: { initialVideos: ExpositoryVideoItem[] }) {
+  const [videoPool, setVideoPool] = useState<ExpositoryVideoItem[]>(initialVideos);
+  const [isSwapping, setIsSwapping] = useState(false);
+  const [activeSlot, setActiveSlot] = useState<number | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const mainVideo = videoPool[0];
+  const queueVideos = videoPool.slice(1, 5);
+
+  const handleSwap = (queueIndex: number) => {
+    if (isSwapping) return;
+    const poolIndex = queueIndex + 1;
+
+    setIsSwapping(true);
+    setActiveSlot(queueIndex);
+    setHasInteracted(true);
+
+    setTimeout(() => {
+      setVideoPool((prev) => {
+        const next = [...prev];
+        const temp = next[0];
+        next[0] = next[poolIndex];
+        next[poolIndex] = temp;
+        return next;
+      });
+      setIsSwapping(false);
+      setActiveSlot(null);
+    }, 280);
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* -------------------------------------------------------- */}
+      {/* LEFT COLUMN (7 cols): Main Video Player + Details        */}
+      {/* -------------------------------------------------------- */}
+      <div className="lg:col-span-7 xl:col-span-7 flex flex-col">
+        {/* Big Video Player Container */}
+        <div
+          className={`relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-xl border border-line/60 transition-all duration-300 ease-out ${
+            isSwapping ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
+          }`}
+        >
+          <iframe
+            key={mainVideo.id}
+            src={`https://www.youtube-nocookie.com/embed/${mainVideo.youtubeId}?autoplay=${hasInteracted ? 1 : 0}&rel=0&modestbranding=1`}
+            title={mainVideo.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="h-full w-full border-0"
+          />
+        </div>
+
+        {/* Video Title, Byline, and Excerpt */}
+        <div
+          className={`transition-all duration-300 ease-out ${
+            isSwapping ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <h3 className="font-serif text-2xl lg:text-3xl font-black text-ink leading-tight mt-4">
+            {mainVideo.title}
+          </h3>
+
+          <p className="text-xs font-bold uppercase tracking-wider text-muted mt-2">
+            {mainVideo.speaker}
+          </p>
+
+          <p className="text-sm text-body leading-relaxed mt-2.5 line-clamp-3">
+            {mainVideo.excerpt}
+          </p>
+        </div>
+      </div>
+
+      {/* -------------------------------------------------------- */}
+      {/* RIGHT COLUMN (5 cols): 4 Videos in 2x2 Grid              */}
+      {/* -------------------------------------------------------- */}
+      <div className="lg:col-span-5 xl:col-span-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          {queueVideos.map((video, qIdx) => {
+            const isThisCardSwapping = isSwapping && activeSlot === qIdx;
+            return (
+              <article
+                key={video.id}
+                onClick={() => handleSwap(qIdx)}
+                className={`group flex flex-col justify-between cursor-pointer rounded-2xl p-2.5 sm:p-3 border border-line/80 bg-surface shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 ${
+                  isThisCardSwapping
+                    ? 'opacity-30 scale-95 ring-2 ring-accent'
+                    : 'hover:-translate-y-1'
+                }`}
+              >
+                <div>
+                  {/* Thumbnail Container */}
+                  <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black/40 border border-line/60">
+                    <Img
+                      image={{ src: video.thumbnail, alt: video.title }}
+                      thumb
+                      wrapperClassName="h-full w-full"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+
+                    {/* Play Icon Overlay on Hover */}
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/90 text-accent-ink shadow-md transition-transform duration-300 group-hover:scale-110">
+                        <PlayIcon size={14} className="ml-0.5 fill-accent-ink" />
+                      </span>
+                    </div>
+
+                    {/* Badge: PODCAST / VIDEO */}
+                    <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black/80 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold text-white/95 border border-white/10 uppercase tracking-wider">
+                      <PlayIcon size={9} className="fill-white" />
+                      <span>{video.badge || 'VIDEO'}</span>
+                    </div>
+                  </div>
+
+                  {/* Title & Speaker below thumbnail */}
+                  <div className="pt-2.5">
+                    <h4 className="font-serif text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
+                      {video.title}
+                    </h4>
+                    <p className="text-[11px] font-semibold text-muted uppercase tracking-wider truncate mt-1">
+                      {video.speaker}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HomePage() {
   // 1. Hero / Featured Lead Article
   const { data: featuredHero, isLoading: heroLoading } = useFeatured(homeConfig.heroSource, 1);
@@ -644,11 +845,9 @@ export function HomePage() {
   });
   const articlesList = latestArticles?.items || [];
 
-  // 3. Featured Sermons & Media (fetch 8 for ticker and photo triplets)
+  // 3. Featured Sermons & Media
   const { data: featuredSermons } = useFeatured('sermon', 8);
   const sermonsList = featuredSermons || [];
-  const sideSermons = sermonsList.slice(1, 4);
-  const tickerSermons = sermonsList.slice(0, 6);
 
   // 3b. Featured Videos & Podcasts
   const { data: featuredVideos } = useFeatured('video', 6);
@@ -1458,143 +1657,35 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 4: EXPOSITORY SERMONS (Tabular Ticker + Photo Triple)*/}
-        {/* Matches the 'JAPAN' section layout in reference image        */}
+        {/* SECTION 4: EXPOSITORY VIDEOS (Interactive TGC Style Player)  */}
         {/* ------------------------------------------------------------ */}
         <section className="border-b border-line/80 py-12 bg-bg">
           <div className="container-page max-w-[1400px]">
-
-            {/* Asymmetric Top Row: Left Title Column (30%) + Right Tabular Ticker (70%) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10 pb-8 border-b border-line/80">
-              {/* Left Column: Title & Blurb */}
-              <div className="lg:col-span-4 space-y-3">
-                <span className="rounded-full bg-accent/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text inline-block">
-                  Pulpit Ministry
-                </span>
-                <h2 className="font-serif text-3xl lg:text-4xl font-black uppercase tracking-[0.06em] text-ink leading-tight">
-                  Expository Sermons
-                </h2>
-                <p className="text-sm text-body leading-relaxed max-w-sm">
-                  Gospel-centered messages expounding God's Word from regional assemblies, pastors conferences, and local Indian church pulpits.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    to={`/${contentTypes.sermon.route}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
-                  >
-                    <span>( Browse All Sermons → )</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right Column: Stacked Tabular Ticker List */}
-              <div className="lg:col-span-8 rounded-lg border border-line overflow-hidden bg-surface shadow-xs">
-                {tickerSermons.map((sermon, idx) => {
-                  const isFirst = idx === 0;
-                  if (isFirst) {
-                    return (
-                      <div
-                        key={sermon.id}
-                        className="bg-[#182541] dark:bg-[#111A2E] text-white px-4 sm:px-5 py-3.5 flex items-center justify-between gap-4 transition-colors border-b border-white/10"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="rounded bg-[#D9A62E] text-[#10182E] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shrink-0">
-                            Featured Message
-                          </span>
-                          <span className="font-serif text-sm sm:text-base font-bold truncate hover:text-[#F3E6BE]">
-                            <Link to={itemPath('sermon', sermon.slug)}>{sermon.title}</Link>
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                          {sermon.speaker && (
-                            <span className="text-xs text-white/60 hidden sm:inline">{sermon.speaker}</span>
-                          )}
-                          <Link
-                            to={itemPath('sermon', sermon.slug)}
-                            className="rounded-full bg-white/10 hover:bg-white/20 text-[#D9A62E] px-3 py-1 text-xs font-bold transition flex items-center gap-1"
-                          >
-                            <span>( → )</span>
-                          </Link>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={sermon.id}
-                      className="px-4 sm:px-5 py-3 flex items-center justify-between gap-4 border-b last:border-b-0 border-line/60 hover:bg-surface-2 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="rounded bg-surface-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted shrink-0 border border-line/60">
-                          {sermon.terms.videoCategory?.[0]?.name || 'Sermon'}
-                        </span>
-                        <h4 className="font-serif text-xs sm:text-sm font-semibold text-ink truncate hover:text-accent-text">
-                          <Link to={itemPath('sermon', sermon.slug)}>{sermon.title}</Link>
-                        </h4>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        {sermon.speaker && (
-                          <span className="text-xs text-muted hidden sm:inline">{sermon.speaker}</span>
-                        )}
-                        <Link
-                          to={itemPath('sermon', sermon.slug)}
-                          className="text-xs text-muted hover:text-ink font-semibold flex items-center gap-1"
-                        >
-                          <span>( → )</span>
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Bottom Triple Photo Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sideSermons.map((sermon) => (
-                <article
-                  key={sermon.id}
-                  className="group flex flex-col rounded-xl border border-line bg-surface p-4 shadow-xs transition-all hover:border-accent hover:shadow-md"
-                >
-                  <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-surface-2 mb-3.5">
-                    <Link to={itemPath('sermon', sermon.slug)}>
-                      <Img
-                        image={sermon.image}
-                        alt={sermon.title}
-                        wrapperClassName="w-full h-full"
-                        className="transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </Link>
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-ink shadow transition group-hover:scale-110">
-                        <PlayIcon size={16} className="ml-0.5" />
-                      </span>
-                    </div>
-                  </div>
-
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                    {sermon.terms.videoCategory?.[0]?.name || 'Conference Exposition'}
+            {/* Header + Link to All Videos */}
+            <div className="flex items-center justify-between pb-4 mb-8 border-b border-line/80">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
+                    Expository Videos
+                  </h2>
+                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
+                    Interactive Video Ministry
                   </span>
-                  <h3 className="font-serif text-base font-bold text-ink leading-snug line-clamp-2 group-hover:text-accent-text transition-colors">
-                    <Link to={itemPath('sermon', sermon.slug)}>
-                      {sermon.title}
-                    </Link>
-                  </h3>
-                  {sermon.speaker && (
-                    <p className="mt-1 text-xs font-medium text-body truncate">
-                      Speaker: {sermon.speaker}
-                    </p>
-                  )}
-                  <div className="mt-3 pt-2.5 border-t border-line/60 flex items-center justify-between text-xs text-muted">
-                    <time dateTime={sermon.date}>{formatDateShort(sermon.date)}</time>
-                    <Link to={itemPath('sermon', sermon.slug)} className="text-accent-text font-semibold hover:underline">
-                      Watch & Listen →
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                </div>
+                <p className="text-xs text-muted mt-1">
+                  Gospel-centered panel discussions, expositional teachings, and ministry conversations
+                </p>
+              </div>
+              <Link
+                to={`/${contentTypes.video.route}`}
+                className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
+              >
+                ( More Videos → )
+              </Link>
             </div>
+
+            {/* Interactive Player with 4-video Swap Grid */}
+            <ExpositoryVideosPlayer initialVideos={INITIAL_EXPOSITORY_VIDEOS} />
           </div>
         </section>
 
