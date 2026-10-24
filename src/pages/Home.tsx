@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { contentTypes, homeConfig } from '@/config/content';
 import { site } from '@/config/site';
@@ -9,7 +9,7 @@ import {
 } from '@/hooks/queries';
 import type { ContentItem } from '@/api/types';
 import { SeoHead } from '@/components/seo/SeoHead';
-import { CardGridSkeleton, CardSkeleton } from '@/components/ui/Skeleton';
+import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import {
   EventCard,
   SeriesCard,
@@ -30,138 +30,149 @@ import { formatDateShort } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
 import { seminariesData, bookstoresData } from '@/data/recommendations';
 
-function PlayableSermonBlock({
-  sermon,
-  badgeText = 'Featured Sermon',
-  eager = false,
-}: {
-  sermon?: ContentItem;
-  badgeText?: string;
-  eager?: boolean;
-}) {
-  const [isPlaying, setIsPlaying] = useState(false);
+interface HeroNotificationSlide {
+  id: string;
+  category: string;
+  categoryDot: string;
+  badge: string;
+  title: string;
+  excerpt?: string;
+  date: string;
+  metaExtra?: string;
+  image?: ContentItem['image'];
+  url: string;
+}
 
-  if (!sermon) {
-    return (
-      <div className="rounded-lg border border-line bg-surface p-5 shadow-xs animate-pulse">
-        <div className="aspect-video bg-surface-2 rounded-md mb-3" />
-        <div className="h-4 bg-surface-2 rounded w-3/4 mb-2" />
-        <div className="h-3 bg-surface-2 rounded w-1/2" />
-      </div>
-    );
-  }
+function HeroAutoSlider({ slides }: { slides: HeroNotificationSlide[] }) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const video = sermon.video;
-  const embedUrl = video?.embedUrl;
+  useEffect(() => {
+    if (slides.length <= 1 || isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length, isPaused]);
+
+  if (!slides.length) return null;
+
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
 
   return (
-    <article className="group flex flex-col justify-between rounded-lg border border-line bg-surface p-4 sm:p-5 shadow-xs transition-all hover:border-accent">
-      <div>
-        {/* Playable Video Player Container (16:9) */}
-        <div className="relative aspect-video w-full overflow-hidden rounded-md bg-black mb-3.5 border border-line/60">
-          {isPlaying && embedUrl ? (
-            <div className="relative h-full w-full">
-              <iframe
-                src={`${embedUrl}${embedUrl.includes('?') ? '&' : '?'}autoplay=1`}
-                title={sermon.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="h-full w-full border-0"
-              />
-              <button
-                type="button"
-                onClick={() => setIsPlaying(false)}
-                className="absolute top-2 right-2 rounded-full bg-black/85 text-white hover:bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xs border border-white/20 transition cursor-pointer z-10"
-              >
-                ✕ Close Player
-              </button>
-            </div>
-          ) : (
-            <div className="relative h-full w-full">
+    <div
+      className="group relative h-[440px] sm:h-[480px] lg:h-[510px] xl:h-[530px] w-full overflow-hidden rounded-3xl bg-black shadow-md border border-line/60"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Slides with Crossfade Transition */}
+      {slides.map((slide, idx) => {
+        const isActive = idx === currentSlide;
+        return (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+            }`}
+          >
+            {/* Background Image */}
+            <div className="absolute inset-0 h-full w-full">
               <Img
-                image={sermon.image}
-                alt={sermon.title}
+                image={slide.image}
+                alt={slide.title}
                 wrapperClassName="h-full w-full"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                eager={eager}
+                className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                eager={idx === 0}
               />
-              <div className="absolute inset-0 bg-black/35 transition-colors group-hover:bg-black/45" />
-
-              {/* Big Interactive Play Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (embedUrl) {
-                    setIsPlaying(true);
-                  }
-                }}
-                className="group/btn absolute inset-0 m-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-accent text-accent-ink shadow-2xl transition-all hover:scale-110 active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent"
-                aria-label={`Play sermon video: ${sermon.title}`}
-              >
-                <PlayIcon size={24} className="ml-1" />
-              </button>
-
-              {/* Top-left Video Badge */}
-              <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/80 backdrop-blur-xs px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white border border-white/15">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                <span>Play Sermon</span>
-              </div>
-
-              {/* Bottom-right Speaker badge */}
-              {sermon.speaker && (
-                <div className="absolute bottom-2.5 right-2.5 max-w-[70%] truncate rounded-md bg-black/75 backdrop-blur-xs px-2 py-0.5 text-[11px] font-medium text-white/90">
-                  {sermon.speaker}
-                </div>
-              )}
             </div>
-          )}
-        </div>
 
-        {/* Category & Badge */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-            {badgeText}
-          </span>
-          {sermon.terms.videoCategory?.[0] && (
-            <span className="text-[11px] font-medium text-muted">
-              {sermon.terms.videoCategory[0].name}
-            </span>
-          )}
-        </div>
+            {/* Gradient Overlays for Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20" />
 
-        {/* Sermon Title */}
-        <h3 className="font-serif text-xl sm:text-2xl font-bold leading-snug text-ink group-hover:text-accent-text transition-colors">
-          <Link to={itemPath('sermon', sermon.slug)}>
-            {sermon.title}
-          </Link>
-        </h3>
+            {/* Slide Content (Bottom Aligned) */}
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 lg:p-10 z-10">
+              <div className="max-w-2xl">
+                {/* Category Pill with Colored Indicator Dot */}
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/95 dark:bg-[#111A2E]/95 backdrop-blur-md px-3.5 py-1 text-xs font-bold text-ink shadow-sm border border-white/20">
+                  <span className={`h-2 w-2 rounded-full ${slide.categoryDot} animate-pulse`} />
+                  <span className="tracking-wide">{slide.category}</span>
+                </div>
 
-        {/* Speaker Name */}
-        {sermon.speaker && (
-          <p className="mt-1 text-xs font-semibold text-accent-text">
-            Speaker: {sermon.speaker}
-          </p>
-        )}
+                {/* Big Headline */}
+                <h2 className="mt-3.5 font-serif text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-[1.18] text-white transition-colors hover:text-[#F3E6BE]">
+                  <Link to={slide.url}>{slide.title}</Link>
+                </h2>
 
-        {/* Excerpt */}
-        {sermon.excerpt && (
-          <p className="mt-2 text-xs sm:text-sm text-body line-clamp-2 leading-relaxed">
-            {sermon.excerpt}
-          </p>
-        )}
+                {/* Excerpt */}
+                {slide.excerpt && (
+                  <p className="mt-2.5 text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed">
+                    {slide.excerpt}
+                  </p>
+                )}
+
+                {/* Metadata Line */}
+                <div className="mt-3.5 flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-white/70">
+                  <time dateTime={slide.date}>{formatDateShort(slide.date)}</time>
+                  {slide.metaExtra && (
+                    <>
+                      <span>•</span>
+                      <span className="text-white/90 font-medium">{slide.metaExtra}</span>
+                    </>
+                  )}
+                  <span>•</span>
+                  <Link
+                    to={slide.url}
+                    className="font-semibold text-[#D9A62E] hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Explore</span>
+                    <ArrowRightIcon size={12} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Prev / Next Arrows (Appear on hover) */}
+      <button
+        type="button"
+        aria-label="Previous slide"
+        onClick={handlePrev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-black/45 hover:bg-black/85 text-white backdrop-blur-md border border-white/25 transition-all opacity-0 group-hover:opacity-100 hover:scale-105 cursor-pointer shadow-lg"
+      >
+        <ChevronLeftIcon size={20} />
+      </button>
+      <button
+        type="button"
+        aria-label="Next slide"
+        onClick={handleNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-black/45 hover:bg-black/85 text-white backdrop-blur-md border border-white/25 transition-all opacity-0 group-hover:opacity-100 hover:scale-105 cursor-pointer shadow-lg"
+      >
+        <ChevronRightIcon size={20} />
+      </button>
+
+      {/* Pagination Dot Indicators (Bottom Right) */}
+      <div className="absolute bottom-5 right-6 z-20 flex items-center gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Go to slide ${i + 1}`}
+            onClick={() => setCurrentSlide(i)}
+            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+              i === currentSlide ? 'w-8 bg-white shadow-sm' : 'w-2 bg-white/45 hover:bg-white/80'
+            }`}
+          />
+        ))}
       </div>
-
-      <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs text-muted">
-        <time dateTime={sermon.date}>{formatDateShort(sermon.date)}</time>
-        <Link
-          to={itemPath('sermon', sermon.slug)}
-          className="font-semibold text-ink hover:text-accent-text inline-flex items-center gap-1 transition-colors"
-        >
-          <span>Listen & Details</span>
-          <ArrowRightIcon size={12} />
-        </Link>
-      </div>
-    </article>
+    </div>
   );
 }
 
@@ -182,6 +193,10 @@ export function HomePage() {
   const sideSermons = sermonsList.slice(1, 4);
   const tickerSermons = sermonsList.slice(0, 6);
 
+  // 3b. Featured Videos & Podcasts
+  const { data: featuredVideos } = useFeatured('video', 6);
+  const videosList = featuredVideos || [];
+
   // 4. Teaching Series
   const { data: seriesList } = useSeriesCards({
     count: 3,
@@ -200,6 +215,94 @@ export function HomePage() {
   const { data: events, isLoading: eventsLoading } = useContentList('event', {
     perPage: 3,
   });
+
+  // Compose dynamic notification slides for the Hero Auto-Slider
+  const heroSlides = useMemo<HeroNotificationSlide[]>(() => {
+    const slides: HeroNotificationSlide[] = [];
+
+    // 1. Latest Event
+    const latestEvent = events?.items?.[0];
+    if (latestEvent) {
+      slides.push({
+        id: `event-${latestEvent.id}`,
+        category: 'Latest Event',
+        categoryDot: 'bg-amber-400',
+        badge: 'National Gathering',
+        title: latestEvent.title,
+        excerpt: latestEvent.excerpt || undefined,
+        date: latestEvent.eventDate || latestEvent.date,
+        metaExtra: typeof latestEvent.meta?.venue === 'string' ? String(latestEvent.meta.venue) : 'National Gathering',
+        image: latestEvent.image,
+        url: itemPath('event', latestEvent.slug),
+      });
+    } else {
+      slides.push({
+        id: 'event-fallback',
+        category: 'Upcoming Event',
+        categoryDot: 'bg-amber-400',
+        badge: 'National Gathering',
+        title: 'AIPC National Pastors Conference: Biblical Preaching & Leadership',
+        excerpt: 'Equipping pastors and leaders with sound doctrine, expository preaching, and gospel-centered ministry across India.',
+        date: '2026-11-20',
+        metaExtra: 'New Delhi • Registration Open',
+        image: heroItem?.image,
+        url: '/events',
+      });
+    }
+
+    // 2. Latest Sermon
+    const latestSermon = sermonsList[0];
+    if (latestSermon) {
+      slides.push({
+        id: `sermon-${latestSermon.id}`,
+        category: 'Latest Sermon',
+        categoryDot: 'bg-red-500',
+        badge: 'Expository Preaching',
+        title: latestSermon.title,
+        excerpt: latestSermon.excerpt,
+        date: latestSermon.date,
+        metaExtra: latestSermon.speaker ? `Speaker: ${latestSermon.speaker}` : 'Expository Sermon',
+        image: latestSermon.image,
+        url: itemPath('sermon', latestSermon.slug),
+      });
+    }
+
+    // 3. Latest Video & Podcast
+    const latestVideo = videosList[0] || sermonsList[1];
+    if (latestVideo) {
+      slides.push({
+        id: `video-${latestVideo.id}`,
+        category: 'Latest Video & Podcast',
+        categoryDot: 'bg-sky-400',
+        badge: 'Media & Discussion',
+        title: latestVideo.title,
+        excerpt: latestVideo.excerpt,
+        date: latestVideo.date,
+        metaExtra: latestVideo.speaker || latestVideo.author?.name || 'Equip Indian Churches',
+        image: latestVideo.image,
+        url: itemPath(latestVideo.type, latestVideo.slug),
+      });
+    }
+
+    // 4. Latest Article
+    const leadArticle = heroItem || articlesList[0];
+    if (leadArticle) {
+      slides.push({
+        id: `article-${leadArticle.id}`,
+        category: 'Latest Article',
+        categoryDot: 'bg-emerald-400',
+        badge: 'Theological Essay',
+        title: leadArticle.title,
+        excerpt: leadArticle.excerpt,
+        date: leadArticle.date,
+        metaExtra: `${readingTimeMinutes(leadArticle.html || leadArticle.excerpt)} min read`,
+        image: leadArticle.image,
+        url: itemPath('article', leadArticle.slug),
+      });
+    }
+
+    return slides;
+  }, [events, sermonsList, videosList, heroItem, articlesList]);
 
   // Editor's Choice filter and pagination state
   const [editorFilter, setEditorFilter] = useState<'all' | 'theology' | 'pastoral' | 'sermons'>('all');
@@ -223,30 +326,14 @@ export function HomePage() {
     return pool.slice(start, start + 3);
   }, [articlesList, sermonsList, editorFilter, editorPage]);
 
-  // Items for the 3-Column Top Resources Mosaic:
-  // Left blocks (up & down) feature TWO playable sermons!
-  const heroSermonTop = sermonsList[0];
-  const heroSermonBottom = sermonsList[1];
-
-  // Center column features articles / digests
-  const centerCardTop = heroItem || articlesList[0];
-  const centerCardBottom = articlesList[1] || articlesList[0];
-
-  // Right column features stacked articles
-  const rightStackItems = [
-    articlesList[2] || articlesList[0],
-    articlesList[3] || articlesList[1],
-    articlesList[4] || articlesList[2],
-  ].filter(Boolean);
-
   // Items for Latest Teaching 3-card top row
-  const latestRowTop1 = articlesList[5] || articlesList[0];
-  const latestRowTop2 = articlesList[6] || articlesList[1]; // Dark Accent Card
-  const latestRowTop3 = articlesList[7] || articlesList[2];
+  const latestRowTop1 = articlesList[4] || articlesList[0];
+  const latestRowTop2 = articlesList[5] || articlesList[1]; // Dark Accent Card
+  const latestRowTop3 = articlesList[6] || articlesList[2];
 
   // Items for Latest Teaching 2-card bottom wide row
-  const latestRowBottom1 = articlesList[8] || articlesList[0];
-  const latestRowBottom2 = articlesList[9] || articlesList[1];
+  const latestRowBottom1 = articlesList[7] || articlesList[0];
+  const latestRowBottom2 = articlesList[8] || articlesList[1];
 
   // Curated Recommendation item
   const featuredSeminary = seminariesData[0];
@@ -268,207 +355,90 @@ export function HomePage() {
       <div className="hidden md:block bg-bg text-ink transition-colors pb-20">
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 1: TOP RESOURCES (The Iconic 3-Column Mosaic Grid)   */}
+        {/* SECTION 1: HERO (Auto-Slider Notifications + Latest Articles)*/}
         {/* ------------------------------------------------------------ */}
-        <section className="border-b border-line/80 pt-10 pb-12 bg-surface">
+        <section className="border-b border-line/80 pt-8 pb-10 bg-surface">
           <div className="container-page max-w-[1400px]">
 
-            {/* Prominent Broadsheet Section Headline */}
-            <div className="text-center mb-8 border-b border-line/80 pb-5">
-              <h1 className="font-serif text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-[0.06em] text-ink">
-                Top Resources
-              </h1>
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-accent-text font-semibold">
-                Sound Reformed Doctrine • Expository Sermons • Pastoral Equipping in India
-              </p>
-            </div>
-
             {heroLoading && articlesLoading ? (
-              <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-6"><CardSkeleton variant="article" /></div>
-                <div className="col-span-3"><CardSkeleton variant="article" /></div>
-                <div className="col-span-3"><CardSkeleton variant="article" /></div>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-7 xl:col-span-8 h-[480px] bg-surface-2 rounded-3xl animate-pulse" />
+                <div className="lg:col-span-5 xl:col-span-4 space-y-3">
+                  <div className="h-6 w-36 bg-surface-2 rounded mb-4" />
+                  <div className="h-24 bg-surface-2 rounded-2xl animate-pulse" />
+                  <div className="h-24 bg-surface-2 rounded-2xl animate-pulse" />
+                  <div className="h-24 bg-surface-2 rounded-2xl animate-pulse" />
+                  <div className="h-24 bg-surface-2 rounded-2xl animate-pulse" />
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
-                {/* ------------------------------------------------------ */}
-                {/* COLUMN 1 (LEFT, 5.5 cols): Two Playable Sermons (Up & Down) */}
-                {/* ------------------------------------------------------ */}
-                <div className="lg:col-span-6 xl:col-span-5 flex flex-col space-y-6 lg:border-r lg:border-line/80 lg:pr-6">
-                  {/* Up Block: First Playable Sermon */}
-                  <PlayableSermonBlock
-                    sermon={heroSermonTop}
-                    badgeText="Featured Sermon"
-                    eager
-                  />
-
-                  {/* Down Block: Second Playable Sermon */}
-                  <PlayableSermonBlock
-                    sermon={heroSermonBottom}
-                    badgeText="Conference Exposition"
-                  />
+                {/* Left Column: Auto-sliding Notifications Slider */}
+                <div className="lg:col-span-7 xl:col-span-8">
+                  <HeroAutoSlider slides={heroSlides} />
                 </div>
 
-                {/* ------------------------------------------------------ */}
-                {/* COLUMN 2 (CENTER, 3.5 cols): Dark Hero Card + Light Photo */}
-                {/* ------------------------------------------------------ */}
-                <div className="lg:col-span-3 xl:col-span-4 flex flex-col justify-between space-y-5 lg:border-r lg:border-line/80 lg:pr-6">
-                  {/* Top Card: Signature Inverted Dark Accent Box */}
-                  {centerCardTop && (
-                    <article className="group flex flex-col justify-between rounded-md bg-[#182541] dark:bg-[#111A2E] text-white p-4 sm:p-5 shadow-sm border border-line/10 hover:border-accent/40 transition-all">
-                      <div>
-                        {centerCardTop.image && (
-                          <div className="overflow-hidden rounded-sm mb-3.5 aspect-[16/10] bg-black/40">
-                            <Link to={itemPath(centerCardTop.type, centerCardTop.slug)}>
-                              <Img
-                                image={centerCardTop.image}
-                                alt={centerCardTop.title}
-                                thumb
-                                wrapperClassName="w-full h-full"
-                                className="transition-transform duration-500 group-hover:scale-105"
-                              />
-                            </Link>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="rounded bg-[#D9A62E]/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#D9A62E]">
-                            Ministry Digest
-                          </span>
-                          <time dateTime={centerCardTop.date} className="text-[10px] text-white/60">
-                            {formatDateShort(centerCardTop.date)}
-                          </time>
-                        </div>
-                        <h3 className="font-serif text-lg font-bold leading-snug text-white line-clamp-3 group-hover:text-[#F3E6BE] transition-colors">
-                          <Link to={itemPath(centerCardTop.type, centerCardTop.slug)}>
-                            {centerCardTop.title}
-                          </Link>
-                        </h3>
-                        {centerCardTop.excerpt && (
-                          <p className="mt-2 text-xs text-white/70 line-clamp-3 leading-relaxed">
-                            {centerCardTop.excerpt}
-                          </p>
-                        )}
-                      </div>
-                      <div className="mt-4 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
-                        <span className="truncate">{centerCardTop.speaker || centerCardTop.author?.name || 'Equip Indian Churches'}</span>
-                        <Link to={itemPath(centerCardTop.type, centerCardTop.slug)} className="text-[#D9A62E] font-semibold hover:underline">
-                          Explore →
-                        </Link>
-                      </div>
-                    </article>
-                  )}
+                {/* Right Column: Latest Articles (Squircle Thumbnail Cards) */}
+                <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between h-full">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-line/80">
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-serif text-xl sm:text-2xl font-bold text-ink">
+                        Latest Articles
+                      </h2>
+                      <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
+                        Fresh
+                      </span>
+                    </div>
+                    <Link
+                      to={`/${contentTypes.article.route}`}
+                      className="group text-xs font-semibold text-accent-text hover:text-ink flex items-center gap-1 transition-colors"
+                    >
+                      <span>View All</span>
+                      <ArrowRightIcon size={12} className="transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </div>
 
-                  {/* Bottom Card: Crisp Light Photo Box */}
-                  {centerCardBottom && (
-                    <article className="group flex flex-col rounded-md border border-line bg-surface p-3.5 shadow-xs transition-all hover:border-accent">
-                      {centerCardBottom.image && (
-                        <div className="overflow-hidden rounded-sm mb-2.5 aspect-[16/10] bg-surface-2">
-                          <Link to={itemPath(centerCardBottom.type, centerCardBottom.slug)}>
+                  {/* Squircle Cards List (4 items matching the slider height) */}
+                  <div className="flex flex-col justify-between flex-1 space-y-2">
+                    {articlesList.slice(0, 4).map((item) => (
+                      <article
+                        key={item.id}
+                        className="group flex items-center gap-3.5 p-2 sm:p-2.5 rounded-2xl hover:bg-surface-2 transition-all duration-200 border border-transparent hover:border-line/60"
+                      >
+                        {/* Squircle Thumbnail */}
+                        <div className="relative h-20 w-20 sm:h-22 sm:w-22 shrink-0 overflow-hidden rounded-2xl bg-surface-2 shadow-xs border border-line/40">
+                          <Link to={itemPath(item.type, item.slug)}>
                             <Img
-                              image={centerCardBottom.image}
-                              alt={centerCardBottom.title}
+                              image={item.image}
+                              alt={item.title}
                               thumb
-                              wrapperClassName="w-full h-full"
-                              className="transition-transform duration-500 group-hover:scale-105"
+                              wrapperClassName="h-full w-full"
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           </Link>
                         </div>
-                      )}
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                        {centerCardBottom.terms.category?.[0]?.name || 'Church Leadership'}
-                      </span>
-                      <h3 className="font-serif text-sm font-bold leading-snug text-ink line-clamp-2 group-hover:text-accent-text transition-colors">
-                        <Link to={itemPath(centerCardBottom.type, centerCardBottom.slug)}>
-                          {centerCardBottom.title}
-                        </Link>
-                      </h3>
-                      {centerCardBottom.excerpt && (
-                        <p className="mt-1.5 text-xs text-body line-clamp-2 leading-relaxed">
-                          {centerCardBottom.excerpt}
-                        </p>
-                      )}
-                    </article>
-                  )}
-                </div>
 
-                {/* ------------------------------------------------------ */}
-                {/* COLUMN 3 (RIGHT, 3 cols): Stack of 3 Vertical Cards    */}
-                {/* ------------------------------------------------------ */}
-                <div className="lg:col-span-3 xl:col-span-3 flex flex-col justify-between space-y-4">
-                  {rightStackItems.map((item, idx) => {
-                    const isDarkThird = idx === 2;
-                    if (isDarkThird) {
-                      return (
-                        <article
-                          key={item.id}
-                          className="group rounded-md bg-[#182541] dark:bg-[#111A2E] p-3.5 text-white shadow-xs border border-line/10 hover:border-accent/40 transition-all flex flex-col justify-between flex-1"
-                        >
-                          <div>
-                            {item.image && (
-                              <div className="overflow-hidden rounded-sm mb-2 aspect-[16/10] bg-black/40">
-                                <Link to={itemPath(item.type, item.slug)}>
-                                  <Img
-                                    image={item.image}
-                                    alt={item.title}
-                                    thumb
-                                    wrapperClassName="w-full h-full"
-                                    className="transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                </Link>
-                              </div>
-                            )}
-                            <span className="rounded bg-[#D9A62E]/25 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#D9A62E] inline-block mb-1">
-                              Special Feature
-                            </span>
-                            <h4 className="font-serif text-xs font-bold leading-snug text-white line-clamp-2 group-hover:text-[#F3E6BE] transition-colors">
-                              <Link to={itemPath(item.type, item.slug)}>
-                                {item.title}
-                              </Link>
-                            </h4>
-                          </div>
-                          <span className="mt-2 text-[10px] text-white/50 block">
-                            {formatDateShort(item.date)}
+                        {/* Content */}
+                        <div className="flex flex-col justify-center flex-1 min-w-0">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text line-clamp-1 mb-0.5">
+                            {item.terms.category?.[0]?.name || 'Church Life'}
                           </span>
-                        </article>
-                      );
-                    }
-
-                    return (
-                      <article
-                        key={item.id}
-                        className="group flex flex-col rounded-md border border-line bg-surface p-3 shadow-xs transition-all hover:border-accent flex-1 justify-between"
-                      >
-                        <div>
-                          {item.image && (
-                            <div className="overflow-hidden rounded-sm mb-2 aspect-[16/10] bg-surface-2">
-                              <Link to={itemPath(item.type, item.slug)}>
-                                <Img
-                                  image={item.image}
-                                  alt={item.title}
-                                  thumb
-                                  wrapperClassName="w-full h-full"
-                                  className="transition-transform duration-500 group-hover:scale-105"
-                                />
-                              </Link>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between text-[9px] text-accent-text font-bold uppercase tracking-wider mb-1">
-                            <span>{item.terms.category?.[0]?.name || item.type}</span>
-                            <span className="text-muted font-normal lowercase">{readingTimeMinutes(item.html || item.excerpt)}m</span>
-                          </div>
-                          <h4 className="font-serif text-xs font-bold leading-snug text-ink line-clamp-2 group-hover:text-accent-text transition-colors">
+                          <h3 className="font-serif text-sm sm:text-base font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
                             <Link to={itemPath(item.type, item.slug)}>
                               {item.title}
                             </Link>
-                          </h4>
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs text-muted mt-1.5">
+                            <time dateTime={item.date}>{formatDateShort(item.date)}</time>
+                            <span>•</span>
+                            <span>{readingTimeMinutes(item.html || item.excerpt)} min read</span>
+                          </div>
                         </div>
-                        <time dateTime={item.date} className="mt-2 text-[10px] text-muted">
-                          {formatDateShort(item.date)}
-                        </time>
                       </article>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
 
               </div>
