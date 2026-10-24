@@ -5,14 +5,10 @@ import { site } from '@/config/site';
 import {
   useContentList,
   useFeatured,
-  useSeriesCards,
 } from '@/hooks/queries';
 import type { ContentItem, ImageInfo } from '@/api/types';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { CardGridSkeleton } from '@/components/ui/Skeleton';
-import {
-  SeriesCard,
-} from '@/components/cards';
 import { Img } from '@/components/ui/Img';
 import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
 import {
@@ -674,15 +670,7 @@ export function HomePage() {
     return videosList.slice(0, 4);
   }, [answersList, videosList]);
 
-  // 4. Teaching Series
-  const { data: seriesList } = useSeriesCards({
-    count: 3,
-    hiddenSlugs: homeConfig.hiddenSeriesSlugs,
-    onlySlugs: homeConfig.featuredSeriesSlugs.length ? homeConfig.featuredSeriesSlugs : undefined,
-    coverType: 'article',
-  });
-
-  // 5. Book Reviews (fetch up to 12)
+  // 4. Book Reviews (fetch up to 12)
   const { data: books } = useContentList('bookReview', {
     perPage: 12,
   });
@@ -1640,71 +1628,6 @@ export function HomePage() {
 
             {/* 3D Auto Coverflow Book Slider */}
             <BookReviewsCoverflowSlider books={bookReviewSlides} />
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------------ */}
-        {/* SECTION 6: TEACHING SERIES & THEOLOGICAL TOPICS DIRECTORY    */}
-        {/* ------------------------------------------------------------ */}
-        <section className="py-12 bg-surface">
-          <div className="container-page max-w-[1400px]">
-            <div className="flex items-center justify-between pb-4 mb-8 border-b border-line/80">
-              <div>
-                <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
-                  Teaching Series & Core Topics
-                </h2>
-                <p className="text-xs text-muted mt-0.5">Explore systematic doctrinal studies and topical indexes</p>
-              </div>
-              <Link
-                to="/series"
-                className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs"
-              >
-                ( All Series → )
-              </Link>
-            </div>
-
-            {/* Teaching Series Row */}
-            {seriesList && seriesList.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                {seriesList.slice(0, 3).map((series) => (
-                  <SeriesCard key={series.term.id} series={series} />
-                ))}
-              </div>
-            )}
-
-            {/* 10 Theological Topic Pills / Broadsheet Index */}
-            <div className="rounded-xl border border-line/80 bg-surface-2/40 p-6">
-              <h3 className="font-serif text-sm font-bold uppercase tracking-[0.14em] text-accent-text mb-4">
-                Explore by Theological Subject
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {[
-                  { name: 'Biblical Studies', count: 'Exposition' },
-                  { name: 'Church Leadership', count: 'Pastoral' },
-                  { name: 'Discipleship', count: 'Christian Life' },
-                  { name: 'Systematic Theology', count: 'Doctrine' },
-                  { name: 'Missions & Church Planting', count: 'Evangelism' },
-                  { name: 'Marriage & Family', count: 'Sanctification' },
-                  { name: 'Youth Ministry', count: 'Next Gen' },
-                  { name: 'Pastoral Ministry', count: 'Shepherding' },
-                  { name: 'Church History', count: 'Heritage' },
-                  { name: 'Christian Living', count: 'Practical' },
-                ].map((topic) => (
-                  <Link
-                    key={topic.name}
-                    to={`/${contentTypes.article.route}?search=${encodeURIComponent(topic.name)}`}
-                    className="flex flex-col justify-between rounded-md border border-line bg-surface p-3 text-xs transition-all hover:border-accent hover:shadow-xs group"
-                  >
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-accent-text mb-0.5">
-                      {topic.count}
-                    </span>
-                    <span className="font-serif text-sm font-bold text-ink group-hover:text-accent-text transition-colors">
-                      {topic.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
 
