@@ -886,16 +886,16 @@ export function HomePage() {
             {eventsLoading ? (
               <CardGridSkeleton variant="event" count={3} />
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                 {/* ---------------------------------------------------- */}
                 {/* LEFT COLUMN (5 cols): Latest Main Event Flyer        */}
                 {/* Book / Flyer shaped with details placed below        */}
                 {/* ---------------------------------------------------- */}
                 <div className="lg:col-span-5 flex flex-col">
-                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300">
+                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
                     <div>
-                      {/* Flyer / Book Shaped Image */}
-                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl transition-shadow duration-300">
+                      {/* Flyer / Book Shaped Image (Height-controlled so whole section fits on screen) */}
+                      <div className="relative aspect-[3/4] max-h-[360px] w-auto mx-auto overflow-hidden rounded-2xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl transition-shadow duration-300">
                         <Link to={mainLatestEvent.registrationUrl} className="block h-full w-full">
                           <Img
                             image={mainLatestEvent.image}
@@ -963,11 +963,11 @@ export function HomePage() {
 
                 {/* ---------------------------------------------------- */}
                 {/* RIGHT COLUMN (7 cols): 4 Event Flyers in 2x2 Grid    */}
-                {/* Same book/flyer style in smaller size                */}
+                {/* Small flyer book style aligned with left section     */}
                 {/* ---------------------------------------------------- */}
-                <div className="lg:col-span-7 flex flex-col">
+                <div className="lg:col-span-7 flex flex-col justify-between h-full">
                   {/* Switcher Tabs: Upcoming vs Past */}
-                  <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-line/80">
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-line/80">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -1002,41 +1002,41 @@ export function HomePage() {
                     </Link>
                   </div>
 
-                  {/* 4 Events in 2x2 Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                  {/* 4 Events in 2x2 Grid: Small Book/Flyer Size */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                     {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
                       <article
                         key={ev.id}
-                        className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 sm:p-4 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
+                        className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
                       >
                         <div>
-                          {/* Flyer / Book Poster in small size */}
-                          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl shadow-xs border border-line/60 bg-black/30 group-hover:shadow-md transition-all">
+                          {/* Small Flyer / Book Poster (Height controlled to stay compact) */}
+                          <div className="relative h-32 sm:h-36 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
                             <Link to={ev.registrationUrl} className="block h-full w-full">
                               <Img
                                 image={ev.image}
                                 alt={ev.title}
                                 thumb
                                 wrapperClassName="h-full w-full"
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="h-full w-full object-cover"
                               />
                             </Link>
 
                             {/* Date Badge over poster */}
-                            <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded bg-black/80 backdrop-blur-xs px-2 py-0.5 text-[10px] font-semibold text-white/95 border border-white/10">
-                              <CalendarIcon size={11} className="text-amber-400" />
-                              <span>{ev.formattedDate}</span>
+                            <div className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1 rounded bg-black/85 backdrop-blur-xs py-0.5 px-1.5 text-[10px] font-semibold text-white/95 border border-white/10">
+                              <CalendarIcon size={10} className="text-amber-400 shrink-0" />
+                              <span className="truncate">{ev.formattedDate}</span>
                             </div>
                           </div>
 
                           {/* Event Details Below Flyer */}
-                          <div className="pt-3">
-                            <div className="flex items-center gap-1 text-[11px] text-muted mb-1 truncate">
+                          <div className="pt-2.5 text-center">
+                            <div className="flex items-center justify-center gap-1 text-[11px] text-muted mb-1 truncate">
                               <MapPinIcon size={11} className="shrink-0 text-accent-text" />
                               <span className="truncate">{ev.venue}</span>
                             </div>
 
-                            <h4 className="font-serif text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
+                            <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
                               <Link to={ev.registrationUrl}>
                                 {ev.title}
                               </Link>
@@ -1045,7 +1045,7 @@ export function HomePage() {
                         </div>
 
                         {/* Registration Button Below */}
-                        <div className="mt-3 pt-2.5 border-t border-line/50 flex items-center justify-between">
+                        <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
                           <Link
                             to={ev.registrationUrl}
                             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
