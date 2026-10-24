@@ -271,6 +271,22 @@ export function HomePage() {
   const { data: featuredVideos } = useFeatured('video', 6);
   const videosList = featuredVideos || [];
 
+  // 3c. Answers to EIC Videos (category 2268)
+  const { data: answersData } = useContentList('video', {
+    terms: { videoCategory: [2268] },
+    perPage: 6,
+  });
+  const answersList = answersData?.items || [];
+
+  const displayedAnswers = useMemo(() => {
+    if (answersList.length >= 4) return answersList.slice(0, 4);
+    if (answersList.length > 0) {
+      const fill = videosList.filter((v) => !answersList.some((a) => a.id === v.id));
+      return [...answersList, ...fill].slice(0, 4);
+    }
+    return videosList.slice(0, 4);
+  }, [answersList, videosList]);
+
   // 4. Teaching Series
   const { data: seriesList } = useSeriesCards({
     count: 3,
@@ -625,20 +641,21 @@ export function HomePage() {
                   <HeroAutoSlider slides={heroSlides} />
                 </div>
 
-                {/* Right Column: Latest Articles (Squircle Thumbnail Cards) */}
+                {/* Right Column: Answers to EIC Videos (Squircle Thumbnail Cards) */}
                 <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between h-full">
                   {/* Header */}
                   <div className="flex items-center justify-between pb-3 mb-2 border-b border-line/80">
                     <div className="flex items-center gap-2">
                       <h2 className="font-serif text-xl sm:text-2xl font-bold text-ink">
-                        Latest Posts
+                        Answers to EIC
                       </h2>
-                      <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                        Fresh
+                      <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text flex items-center gap-1">
+                        <PlayIcon size={9} />
+                        <span>Video Q&A</span>
                       </span>
                     </div>
                     <Link
-                      to={`/${contentTypes.article.route}`}
+                      to={`/${contentTypes.video.route}`}
                       className="group text-xs font-semibold text-accent-text hover:text-ink flex items-center gap-1 transition-colors"
                     >
                       <span>View All</span>
@@ -648,14 +665,14 @@ export function HomePage() {
 
                   {/* Squircle Cards List (4 items matching the slider height) */}
                   <div className="flex flex-col justify-between flex-1 space-y-2">
-                    {articlesList.slice(0, 4).map((item) => (
+                    {displayedAnswers.map((item) => (
                       <article
                         key={item.id}
                         className="group flex items-center gap-3.5 p-2 sm:p-2.5 rounded-2xl hover:bg-surface-2 transition-all duration-200 border border-transparent hover:border-line/60"
                       >
-                        {/* Squircle Thumbnail */}
-                        <div className="relative h-20 w-20 sm:h-22 sm:w-22 shrink-0 overflow-hidden rounded-2xl bg-surface-2 shadow-xs border border-line/40">
-                          <Link to={itemPath(item.type, item.slug)}>
+                        {/* Squircle Thumbnail with Centered Play Button */}
+                        <div className="relative h-20 w-20 sm:h-22 sm:w-22 shrink-0 overflow-hidden rounded-2xl bg-black/40 shadow-xs border border-line/40">
+                          <Link to={itemPath('video', item.slug)} className="block h-full w-full">
                             <Img
                               image={item.image}
                               alt={item.title}
@@ -663,23 +680,29 @@ export function HomePage() {
                               wrapperClassName="h-full w-full"
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
+                            {/* Play Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/45 transition-colors">
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-ink shadow-md transition-transform group-hover:scale-110">
+                                <PlayIcon size={11} className="ml-0.5" />
+                              </div>
+                            </div>
                           </Link>
                         </div>
 
                         {/* Content */}
                         <div className="flex flex-col justify-center flex-1 min-w-0">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text line-clamp-1 mb-0.5">
-                            {getArticleCategory(item)}
+                            Answers to EIC
                           </span>
                           <h3 className="font-serif text-sm sm:text-base font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
-                            <Link to={itemPath(item.type, item.slug)}>
+                            <Link to={itemPath('video', item.slug)}>
                               {item.title}
                             </Link>
                           </h3>
                           <div className="flex items-center gap-2 text-xs text-muted mt-1.5">
                             <time dateTime={item.date}>{formatDateShort(item.date)}</time>
                             <span>•</span>
-                            <span>{readingTimeMinutes(item.html || item.excerpt)} min read</span>
+                            <span className="truncate">{item.speaker || 'EIC Panel'}</span>
                           </div>
                         </div>
                       </article>
