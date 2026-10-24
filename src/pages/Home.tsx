@@ -484,7 +484,7 @@ export function HomePage() {
         liveFirst?.excerpt ||
         'Gathering pastors, church planters, elders, and ministry leaders from across India for three days of rigorous expository preaching, theological grounding, and pastoral fellowship.',
       image: liveFirst?.image || {
-        src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80',
+        src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
         alt: 'All India Pastors Conference 2026',
       },
       registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events',
@@ -492,7 +492,7 @@ export function HomePage() {
     };
   }, [events]);
 
-  // Upcoming events list for the right column
+  // Upcoming events list for the right column (4 events)
   const upcomingEventsList = useMemo(() => {
     return [
       {
@@ -500,9 +500,9 @@ export function HomePage() {
         title: 'All India Pastors Conference 2026',
         formattedDate: 'Nov 12 – 14, 2026',
         date: '2026-11-12',
-        venue: 'New Delhi, National Summit',
+        venue: 'New Delhi • National Summit',
         image: {
-          src: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2026',
         },
         registrationUrl: '/events',
@@ -511,11 +511,11 @@ export function HomePage() {
       {
         id: 'upcoming-2',
         title: 'Regional Pastors Roundtable: South India',
-        formattedDate: 'August 22, 2026',
+        formattedDate: 'Aug 22, 2026',
         date: '2026-08-22',
         venue: 'Bangalore, Karnataka',
         image: {
-          src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'Regional Pastors Roundtable',
         },
         registrationUrl: '/events',
@@ -524,12 +524,25 @@ export function HomePage() {
       {
         id: 'upcoming-3',
         title: 'Expository Preaching Seminar & Workshop',
-        formattedDate: 'October 5 – 7, 2026',
+        formattedDate: 'Oct 5 – 7, 2026',
         date: '2026-10-05',
         venue: 'Mumbai, Maharashtra',
         image: {
-          src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'Expository Preaching Seminar',
+        },
+        registrationUrl: '/events',
+        isUpcoming: true,
+      },
+      {
+        id: 'upcoming-4',
+        title: 'Church Leaders Theological Colloquium',
+        formattedDate: 'Dec 4 – 6, 2026',
+        date: '2026-12-04',
+        venue: 'Kolkata, West Bengal',
+        image: {
+          src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&h=800&q=80',
+          alt: 'Theological Colloquium',
         },
         registrationUrl: '/events',
         isUpcoming: true,
@@ -537,17 +550,17 @@ export function HomePage() {
     ];
   }, []);
 
-  // Past events list from live API data
+  // Past events list from live API data (4 events)
   const pastEventsList = useMemo(() => {
-    if (events?.items && events.items.length > 0) {
-      return events.items.slice(0, 3).map((item) => ({
+    if (events?.items && events.items.length >= 4) {
+      return events.items.slice(0, 4).map((item) => ({
         id: item.id,
         title: item.title,
         formattedDate: formatDateShort(item.eventDate || item.date),
         date: item.eventDate || item.date,
-        venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'AIPC Gathering',
+        venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
         image: item.image || {
-          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=800&q=80',
           alt: item.title,
         },
         registrationUrl: itemPath('event', item.slug),
@@ -562,7 +575,7 @@ export function HomePage() {
         date: '2023-09-28',
         venue: 'National Conference Assembly',
         image: {
-          src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2023',
         },
         registrationUrl: '/events',
@@ -575,7 +588,7 @@ export function HomePage() {
         date: '2023-09-27',
         venue: 'National Conference Assembly',
         image: {
-          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2023',
         },
         registrationUrl: '/events',
@@ -583,12 +596,25 @@ export function HomePage() {
       },
       {
         id: 'past-3',
+        title: 'AIPC 2022: Pastoral Fellowship in Christ',
+        formattedDate: 'Dec 24, 2022',
+        date: '2022-12-24',
+        venue: 'Annual Assembly',
+        image: {
+          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
+          alt: 'AIPC 2022',
+        },
+        registrationUrl: '/events',
+        isUpcoming: false,
+      },
+      {
+        id: 'past-4',
         title: 'AIPC 2021: Suffering and Sovereignty of God',
         formattedDate: 'Oct 25, 2021',
         date: '2021-10-25',
         venue: 'Pastoral Exposition',
         image: {
-          src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80',
+          src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2021',
         },
         registrationUrl: '/events',
@@ -860,16 +886,17 @@ export function HomePage() {
             {eventsLoading ? (
               <CardGridSkeleton variant="event" count={3} />
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* ---------------------------------------------------- */}
-                {/* LEFT BIG SECTION (7 cols): Latest Main Event         */}
+                {/* LEFT COLUMN (5 cols): Latest Main Event Flyer        */}
+                {/* Book / Flyer shaped with details placed below        */}
                 {/* ---------------------------------------------------- */}
-                <div className="lg:col-span-7 xl:col-span-7 flex flex-col">
-                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg overflow-hidden shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
+                <div className="lg:col-span-5 flex flex-col">
+                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300">
                     <div>
-                      {/* Event Main Banner Image */}
-                      <div className="relative h-64 sm:h-72 lg:h-80 w-full overflow-hidden bg-black/60">
-                        <Link to={mainLatestEvent.registrationUrl}>
+                      {/* Flyer / Book Shaped Image */}
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl transition-shadow duration-300">
+                        <Link to={mainLatestEvent.registrationUrl} className="block h-full w-full">
                           <Img
                             image={mainLatestEvent.image}
                             alt={mainLatestEvent.title}
@@ -877,69 +904,70 @@ export function HomePage() {
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
                         </Link>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                         {/* Top Badge */}
-                        <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-black/75 backdrop-blur-md px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/20">
+                        <div className="absolute top-3.5 left-3.5 flex items-center gap-2 rounded-full bg-black/80 backdrop-blur-md px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/20">
                           <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
                           <span>{mainLatestEvent.badge}</span>
                         </div>
 
                         {/* Bottom Date Pill */}
-                        <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg bg-black/80 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white/95 border border-white/15">
+                        <div className="absolute bottom-3.5 left-3.5 flex items-center gap-2 rounded-lg bg-black/85 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white border border-white/20">
                           <CalendarIcon size={14} className="text-amber-400" />
                           <span>{mainLatestEvent.formattedDate}</span>
                         </div>
                       </div>
 
-                      {/* Event Details */}
-                      <div className="p-6 sm:p-7">
+                      {/* Event Details Below Flyer */}
+                      <div className="pt-5">
                         <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-2">
                           <MapPinIcon size={14} />
                           <span>{mainLatestEvent.venue}</span>
                         </div>
 
-                        <h3 className="font-serif text-2xl sm:text-3xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
+                        <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
                           <Link to={mainLatestEvent.registrationUrl}>
                             {mainLatestEvent.title}
                           </Link>
                         </h3>
 
                         {mainLatestEvent.excerpt && (
-                          <p className="mt-3 text-sm text-body line-clamp-3 leading-relaxed">
+                          <p className="mt-2.5 text-xs sm:text-sm text-body line-clamp-3 leading-relaxed">
                             {mainLatestEvent.excerpt}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    {/* Registration CTA Button */}
-                    <div className="px-6 pb-6 sm:px-7 sm:pb-7 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-4">
+                    {/* Registration CTA Below */}
+                    <div className="mt-5 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-3">
                       <Link
                         to={mainLatestEvent.registrationUrl}
-                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
                       >
                         <span>Register for Conference</span>
-                        <ArrowRightIcon size={14} />
+                        <ArrowRightIcon size={13} />
                       </Link>
 
                       <Link
                         to="/events"
                         className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
                       >
-                        <span>Conference Info</span>
-                        <ArrowRightIcon size={12} />
+                        <span>All Details</span>
+                        <ArrowRightIcon size={11} />
                       </Link>
                     </div>
                   </article>
                 </div>
 
                 {/* ---------------------------------------------------- */}
-                {/* RIGHT SIDEBAR (5 cols): Upcoming & Past Events       */}
+                {/* RIGHT COLUMN (7 cols): 4 Event Flyers in 2x2 Grid    */}
+                {/* Same book/flyer style in smaller size                */}
                 {/* ---------------------------------------------------- */}
-                <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-between h-full">
+                <div className="lg:col-span-7 flex flex-col">
                   {/* Switcher Tabs: Upcoming vs Past */}
-                  <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-line/80">
+                  <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-line/80">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -950,7 +978,7 @@ export function HomePage() {
                             : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
                         }`}
                       >
-                        Upcoming Events
+                        Upcoming Events (4)
                       </button>
                       <button
                         type="button"
@@ -961,7 +989,7 @@ export function HomePage() {
                             : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
                         }`}
                       >
-                        Past Events
+                        Past Events (4)
                       </button>
                     </div>
 
@@ -969,56 +997,63 @@ export function HomePage() {
                       to="/events"
                       className="text-xs font-semibold text-accent-text hover:underline inline-flex items-center gap-1"
                     >
-                      <span>All Events</span>
+                      <span>View All</span>
                       <ArrowRightIcon size={12} />
                     </Link>
                   </div>
 
-                  {/* Event Boxes List */}
-                  <div className="flex flex-col justify-between flex-1 space-y-3.5">
+                  {/* 4 Events in 2x2 Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
                       <article
                         key={ev.id}
-                        className="group flex items-center gap-3.5 sm:gap-4 p-3 rounded-2xl border border-line/80 bg-bg hover:border-accent hover:shadow-md transition-all duration-200"
+                        className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 sm:p-4 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
                       >
-                        {/* 1. Image */}
-                        <div className="relative h-22 w-22 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-2xl bg-surface-2 shadow-xs border border-line/60">
-                          <Link to={ev.registrationUrl}>
-                            <Img
-                              image={ev.image}
-                              alt={ev.title}
-                              thumb
-                              wrapperClassName="h-full w-full"
-                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          </Link>
+                        <div>
+                          {/* Flyer / Book Poster in small size */}
+                          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl shadow-xs border border-line/60 bg-black/30 group-hover:shadow-md transition-all">
+                            <Link to={ev.registrationUrl} className="block h-full w-full">
+                              <Img
+                                image={ev.image}
+                                alt={ev.title}
+                                thumb
+                                wrapperClassName="h-full w-full"
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                            </Link>
+
+                            {/* Date Badge over poster */}
+                            <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded bg-black/80 backdrop-blur-xs px-2 py-0.5 text-[10px] font-semibold text-white/95 border border-white/10">
+                              <CalendarIcon size={11} className="text-amber-400" />
+                              <span>{ev.formattedDate}</span>
+                            </div>
+                          </div>
+
+                          {/* Event Details Below Flyer */}
+                          <div className="pt-3">
+                            <div className="flex items-center gap-1 text-[11px] text-muted mb-1 truncate">
+                              <MapPinIcon size={11} className="shrink-0 text-accent-text" />
+                              <span className="truncate">{ev.venue}</span>
+                            </div>
+
+                            <h4 className="font-serif text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
+                              <Link to={ev.registrationUrl}>
+                                {ev.title}
+                              </Link>
+                            </h4>
+                          </div>
                         </div>
 
-                        {/* 2. Details: Date, Title, Registration Button */}
-                        <div className="flex flex-col justify-center flex-1 min-w-0">
-                          {/* Date of the Event */}
-                          <div className="flex items-center gap-1.5 text-xs font-semibold text-accent-text mb-1">
-                            <CalendarIcon size={12} className="shrink-0 text-accent-text" />
-                            <time dateTime={ev.date}>{ev.formattedDate}</time>
-                          </div>
-
-                          {/* Title of the Event */}
-                          <h4 className="font-serif text-sm sm:text-base font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
-                            <Link to={ev.registrationUrl}>
-                              {ev.title}
-                            </Link>
-                          </h4>
-
-                          {/* Registration Button */}
-                          <div className="mt-2.5">
-                            <Link
-                              to={ev.registrationUrl}
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
-                            >
-                              <span>{ev.isUpcoming ? 'Register' : 'View Details'}</span>
-                              <ArrowRightIcon size={10} />
-                            </Link>
-                          </div>
+                        {/* Registration Button Below */}
+                        <div className="mt-3 pt-2.5 border-t border-line/50 flex items-center justify-between">
+                          <Link
+                            to={ev.registrationUrl}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
+                          >
+                            <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
+                            <ArrowRightIcon size={10} />
+                          </Link>
+                          <span className="text-[10px] text-muted font-medium">Conference</span>
                         </div>
                       </article>
                     ))}
