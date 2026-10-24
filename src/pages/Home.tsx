@@ -43,6 +43,80 @@ interface HeroNotificationSlide {
   url: string;
 }
 
+export function getArticleCategory(item: ContentItem): string {
+  const text = `${item.title} ${item.excerpt || ''}`.toLowerCase();
+  if (text.includes('marriage') || text.includes('husband') || text.includes('wife') || text.includes('premarital')) {
+    return 'Marriage & Family';
+  }
+  if (text.includes('father') || text.includes('parent') || text.includes('children') || text.includes('mother')) {
+    return 'Family & Parenting';
+  }
+  if (
+    text.includes('pastor') ||
+    text.includes('shepherd') ||
+    text.includes('elder') ||
+    text.includes('ministry') ||
+    text.includes('preach') ||
+    text.includes('accountability') ||
+    text.includes('calling')
+  ) {
+    return 'Pastoral Ministry';
+  }
+  if (
+    text.includes('psalm') ||
+    text.includes('scripture') ||
+    text.includes('bible') ||
+    text.includes('testament') ||
+    text.includes('exegesis')
+  ) {
+    return 'Biblical Studies';
+  }
+  if (
+    text.includes('joy') ||
+    text.includes('suffer') ||
+    text.includes('death') ||
+    text.includes('hades') ||
+    text.includes('hope') ||
+    text.includes('living') ||
+    text.includes('walk')
+  ) {
+    return 'Christian Living';
+  }
+  if (
+    text.includes('salvation') ||
+    text.includes('gospel') ||
+    text.includes('grace') ||
+    text.includes('atonement') ||
+    text.includes('resurrection') ||
+    text.includes('calvinism') ||
+    text.includes('creed') ||
+    text.includes('theology')
+  ) {
+    return 'Theology & Doctrine';
+  }
+  if (
+    text.includes('church') ||
+    text.includes('mission') ||
+    text.includes('fellowship') ||
+    text.includes('planting')
+  ) {
+    return 'Church & Mission';
+  }
+  if (item.terms.tag && item.terms.tag.length > 0) {
+    const tagName = item.terms.tag[0].name;
+    if (tagName && !['aipc', 'post', 'article'].includes(tagName.toLowerCase())) {
+      return tagName;
+    }
+  }
+  if (item.terms.topic && item.terms.topic.length > 0) {
+    const topicName = item.terms.topic[0].name;
+    if (topicName && topicName.toLowerCase() !== 'aipc') {
+      return topicName;
+    }
+  }
+  return 'Theology & Doctrine';
+}
+
 function HeroAutoSlider({ slides }: { slides: HeroNotificationSlide[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -181,9 +255,9 @@ export function HomePage() {
   const { data: featuredHero, isLoading: heroLoading } = useFeatured(homeConfig.heroSource, 1);
   const heroItem = featuredHero?.[0];
 
-  // 2. High-density Article Feed for Broadsheet Grid (fetch 14 articles)
+  // 2. High-density Article Feed for Broadsheet Grid (fetch 24 articles)
   const { data: latestArticles, isLoading: articlesLoading } = useContentList('article', {
-    perPage: 14,
+    perPage: 24,
   });
   const articlesList = latestArticles?.items || [];
 
@@ -304,27 +378,78 @@ export function HomePage() {
     return slides;
   }, [events, sermonsList, videosList, heroItem, articlesList]);
 
-  // Editor's Choice filter and pagination state
-  const [editorFilter, setEditorFilter] = useState<'all' | 'theology' | 'pastoral' | 'sermons'>('all');
-  const [editorPage, setEditorPage] = useState<number>(0);
+  // Latest Articles filter and pagination state
+  type ArticleFilterCategory = 'all' | 'theology' | 'living' | 'pastoral' | 'family';
+  const [articleFilter, setArticleFilter] = useState<ArticleFilterCategory>('all');
+  const [articlePage, setArticlePage] = useState<number>(0);
 
-  // Filter items for the Editor's Choice row
-  const editorItems = useMemo(() => {
-    let pool: ContentItem[] = [];
-    if (editorFilter === 'sermons') {
-      pool = sermonsList;
-    } else if (editorFilter === 'pastoral' || editorFilter === 'theology') {
-      pool = articlesList.filter((a) =>
-        a.title.toLowerCase().includes(editorFilter) ||
-        (a.terms.category && a.terms.category.some((c) => c.slug.includes(editorFilter))),
-      );
+  const filterPills: { id: ArticleFilterCategory; label: string }[] = [
+    { id: 'all', label: 'All Articles' },
+    { id: 'theology', label: 'Theology & Doctrine' },
+    { id: 'living', label: 'Christian Living' },
+    { id: 'pastoral', label: 'Pastoral Ministry' },
+    { id: 'family', label: 'Marriage & Family' },
+  ];
+
+  const getCategoryKey = (item: ContentItem): ArticleFilterCategory => {
+    const text = `${item.title} ${item.excerpt || ''}`.toLowerCase();
+    if (
+      text.includes('marriage') ||
+      text.includes('husband') ||
+      text.includes('wife') ||
+      text.includes('premarital') ||
+      text.includes('father') ||
+      text.includes('parent') ||
+      text.includes('children') ||
+      text.includes('mother') ||
+      text.includes('family')
+    ) {
+      return 'family';
     }
-    if (pool.length < 3) {
-      pool = articlesList.length >= 3 ? articlesList : [...articlesList, ...sermonsList];
+    if (
+      text.includes('pastor') ||
+      text.includes('shepherd') ||
+      text.includes('elder') ||
+      text.includes('ministry') ||
+      text.includes('preach') ||
+      text.includes('accountability') ||
+      text.includes('calling') ||
+      text.includes('church') ||
+      text.includes('plant')
+    ) {
+      return 'pastoral';
     }
-    const start = editorPage * 3;
-    return pool.slice(start, start + 3);
-  }, [articlesList, sermonsList, editorFilter, editorPage]);
+    if (
+      text.includes('joy') ||
+      text.includes('suffer') ||
+      text.includes('death') ||
+      text.includes('hades') ||
+      text.includes('hope') ||
+      text.includes('living') ||
+      text.includes('walk') ||
+      text.includes('life')
+    ) {
+      return 'living';
+    }
+    return 'theology';
+  };
+
+  // Pure article pool — zero sermons
+  const filteredArticles = useMemo(() => {
+    if (articleFilter === 'all') return articlesList;
+    const matches = articlesList.filter((a) => getCategoryKey(a) === articleFilter);
+    if (matches.length < 3) {
+      const remaining = articlesList.filter((a) => !matches.includes(a));
+      return [...matches, ...remaining];
+    }
+    return matches;
+  }, [articlesList, articleFilter]);
+
+  const displayedArticles = useMemo(() => {
+    const start = articlePage * 3;
+    const pageItems = filteredArticles.slice(start, start + 3);
+    return pageItems.length ? pageItems : filteredArticles.slice(0, 3);
+  }, [filteredArticles, articlePage]);
 
   // Items for Latest Teaching 3-card top row
   const latestRowTop1 = articlesList[4] || articlesList[0];
@@ -385,7 +510,7 @@ export function HomePage() {
                   <div className="flex items-center justify-between pb-3 mb-2 border-b border-line/80">
                     <div className="flex items-center gap-2">
                       <h2 className="font-serif text-xl sm:text-2xl font-bold text-ink">
-                        Latest Articles
+                        Latest Posts
                       </h2>
                       <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
                         Fresh
@@ -423,7 +548,7 @@ export function HomePage() {
                         {/* Content */}
                         <div className="flex flex-col justify-center flex-1 min-w-0">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text line-clamp-1 mb-0.5">
-                            {item.terms.category?.[0]?.name || 'Church Life'}
+                            {getArticleCategory(item)}
                           </span>
                           <h3 className="font-serif text-sm sm:text-base font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
                             <Link to={itemPath(item.type, item.slug)}>
@@ -447,7 +572,7 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 2: EDITOR'S CHOICE (Signature Circular Spotlight Row)*/}
+        {/* SECTION 2: LATEST ARTICLES (Signature Circular Spotlight Row)*/}
         {/* ------------------------------------------------------------ */}
         <section className="border-b border-line/80 py-12 bg-bg">
           <div className="container-page max-w-[1400px]">
@@ -456,7 +581,7 @@ export function HomePage() {
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
-                    Editor's Choice
+                    Latest Articles
                   </h2>
                   <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
                     Curated
@@ -465,23 +590,16 @@ export function HomePage() {
 
                 {/* Filter Pills below title (matching reference image) */}
                 <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                  {(
-                    [
-                      { id: 'all', label: 'All Resources' },
-                      { id: 'theology', label: 'Theology & Doctrine' },
-                      { id: 'pastoral', label: 'Pastoral Shepherding' },
-                      { id: 'sermons', label: 'Expository Sermons' },
-                    ] as const
-                  ).map((f) => (
+                  {filterPills.map((f) => (
                     <button
                       key={f.id}
                       type="button"
                       onClick={() => {
-                        setEditorFilter(f.id);
-                        setEditorPage(0);
+                        setArticleFilter(f.id);
+                        setArticlePage(0);
                       }}
                       className={`px-3 py-1 text-xs rounded-full font-medium transition-all cursor-pointer ${
-                        editorFilter === f.id
+                        articleFilter === f.id
                           ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] font-semibold shadow-xs'
                           : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
                       }`}
@@ -496,18 +614,18 @@ export function HomePage() {
               <div className="flex items-center gap-2 self-start sm:self-center">
                 <button
                   type="button"
-                  aria-label="Previous editor's choice"
-                  onClick={() => setEditorPage((p) => Math.max(0, p - 1))}
-                  disabled={editorPage === 0}
+                  aria-label="Previous articles"
+                  onClick={() => setArticlePage((p) => Math.max(0, p - 1))}
+                  disabled={articlePage === 0}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface text-ink hover:bg-surface-2 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ChevronLeftIcon size={16} />
                 </button>
                 <button
                   type="button"
-                  aria-label="Next editor's choice"
-                  onClick={() => setEditorPage((p) => p + 1)}
-                  disabled={editorItems.length < 3}
+                  aria-label="Next articles"
+                  onClick={() => setArticlePage((p) => p + 1)}
+                  disabled={(articlePage + 1) * 3 >= filteredArticles.length}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface text-ink hover:bg-surface-2 transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ChevronRightIcon size={16} />
@@ -517,7 +635,7 @@ export function HomePage() {
 
             {/* 3 Circular Spotlight Columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {editorItems.map((item) => (
+              {displayedArticles.map((item) => (
                 <article
                   key={item.id}
                   className="group flex items-start gap-4 p-4 rounded-xl border border-line/80 bg-surface shadow-xs transition-all duration-300 hover:border-accent hover:shadow-md"
@@ -541,7 +659,7 @@ export function HomePage() {
                   <div className="flex flex-col justify-between flex-1 min-w-0">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text block mb-1">
-                        {item.terms.category?.[0]?.name || item.type}
+                        {getArticleCategory(item)}
                       </span>
                       <h3 className="font-serif text-base font-bold leading-snug text-ink line-clamp-2 group-hover:text-accent-text transition-colors">
                         <Link to={itemPath(item.type, item.slug)}>
@@ -556,7 +674,7 @@ export function HomePage() {
                     </div>
                     <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between text-[11px] text-muted">
                       <span className="font-semibold text-ink truncate">
-                        {item.speaker || item.author?.name || 'Equip Indian Churches'}
+                        {item.author?.name || 'Equip Indian Churches'}
                       </span>
                       <time dateTime={item.date}>{formatDateShort(item.date)}</time>
                     </div>
