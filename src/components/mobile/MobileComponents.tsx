@@ -1,35 +1,85 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import type { ContentItem, Person } from '@/api/types';
+import type { ContentItem, Person, ImageInfo } from '@/api/types';
 import { PlayIcon, ChevronRightIcon, BookmarkIcon } from '@/components/ui/Icons';
 import { Img } from '@/components/ui/Img';
 import { itemPath, authorPath } from '@/lib/routes';
 import { useBookmarks } from '@/lib/bookmarks';
 
+export interface MobileHeroSlide {
+  id: string | number;
+  category: string;
+  badge?: string;
+  title: string;
+  excerpt?: string;
+  image?: ImageInfo;
+  to: string;
+  actionLabel?: string;
+  categoryDot?: string;
+}
+
 /** Reusable Full-Bleed Hero Banner matching Canon+ style in screenshots 1, 3, 4 */
 export function MobileHeroBanner({
   items,
+  slides,
   type = 'video',
   actionLabel = 'Watch Now',
 }: {
-  items: ContentItem[];
+  items?: ContentItem[];
+  slides?: MobileHeroSlide[];
   type?: 'video' | 'sermon' | 'article' | 'series';
   actionLabel?: string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Auto-cycle through hero items every 6s
-  useEffect(() => {
-    if (!items || items.length <= 1) return;
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % Math.min(items.length, 5));
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [items]);
+  const bannerSlides: MobileHeroSlide[] = useMemo(() => {
+    if (slides && slides.length > 0) return slides;
+    if (!items || items.length === 0) return [];
 
-  if (!items || items.length === 0) return null;
-  const current = items[activeIndex] || items[0];
-  const href = itemPath(current.type === 'sermon' ? 'sermon' : type === 'sermon' ? 'sermon' : current.type, current.slug);
+    return items.map((it) => {
+      let defaultCat = 'Featured';
+      let defaultAction = actionLabel;
+      if (it.type === 'sermon') {
+        defaultCat = 'Expository Sermon';
+        defaultAction = 'Watch Sermon';
+      } else if (it.type === 'video') {
+        defaultCat = 'Video & Podcast';
+        defaultAction = 'Watch Now';
+      } else if (it.type === 'article') {
+        defaultCat = 'Featured Article';
+        defaultAction = 'Read Article';
+      } else if (it.type === 'bookReview') {
+        defaultCat = 'Book Review';
+        defaultAction = 'Read Review';
+      } else if (it.type === 'event') {
+        defaultCat = 'Upcoming Event';
+        defaultAction = 'View Event';
+      }
+
+      return {
+        id: it.id,
+        category: it.terms.series?.[0]?.name || defaultCat,
+        badge: it.author?.name || undefined,
+        title: it.title,
+        excerpt: it.excerpt,
+        image: it.image,
+        to: itemPath(it.type === 'sermon' ? 'sermon' : type === 'sermon' ? 'sermon' : it.type, it.slug),
+        actionLabel: defaultAction,
+      };
+    });
+  }, [slides, items, type, actionLabel]);
+
+  // Auto-cycle through hero items every 5.5s
+  useEffect(() => {
+    if (bannerSlides.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % Math.min(bannerSlides.length, 5));
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [bannerSlides.length]);
+
+  if (bannerSlides.length === 0) return null;
+  const current = bannerSlides[activeIndex] || bannerSlides[0];
 
   return (
     <div className="relative w-full aspect-[4/5] sm:aspect-[16/10] overflow-hidden bg-black select-none">
@@ -43,28 +93,38 @@ export function MobileHeroBanner({
           eager
         />
         {/* Cinematic gradient fade at bottom & top */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070A0F] via-[#070A0F]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070A0F] via-[#070A0F]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
       </div>
 
       {/* Hero Content */}
-      <div className="absolute bottom-6 inset-x-0 px-5 flex flex-col justify-end text-white">
+      <div className="absolute bottom-6 inset-x-0 px-5 flex flex-col justify-end text-white z-10">
         {/* Eyebrow / Tag */}
-        {current.terms.series?.[0] && (
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#F0F6FB] mb-1 drop-shadow">
-            {current.terms.series[0].name}
-          </span>
-        )}
+        <div className="flex items-center gap-2 mb-2">
+          {current.category && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white border border-white/25 shadow-xs">
+              <span className={`h-1.5 w-1.5 rounded-full ${current.categoryDot || 'bg-amber-400'} animate-pulse`} />
+              <span>{current.category}</span>
+            </span>
+          )}
+          {current.badge && (
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-white/80 drop-shadow truncate max-w-[180px]">
+              {current.badge}
+            </span>
+          )}
+        </div>
 
         {/* Title */}
         <h2
           className="font-serif text-2xl sm:text-3xl font-black leading-tight drop-shadow-md line-clamp-2 text-white !text-white"
           style={{ color: '#FFFFFF' }}
         >
-          {current.title}
+          <Link to={current.to} className="hover:text-amber-200 transition-colors">
+            {current.title}
+          </Link>
         </h2>
 
-        {/* Description or Quote */}
+        {/* Description or Excerpt */}
         {current.excerpt && (
           <p
             className="mt-2 text-xs sm:text-sm text-white/90 line-clamp-2 drop-shadow leading-relaxed max-w-sm !text-white/90"
@@ -74,29 +134,29 @@ export function MobileHeroBanner({
           </p>
         )}
 
-        {/* CTA Button */}
+        {/* CTA Button & Indicators */}
         <div className="mt-3.5 flex items-center justify-between">
           <Link
-            to={href}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:text-[#F0F6FB] group transition-colors"
+            to={current.to}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/25 text-xs font-bold text-white transition-all shadow-xs group"
           >
-            <span>{actionLabel}</span>
-            <ChevronRightIcon size={16} className="text-[#F0F6FB] group-hover:translate-x-0.5 transition-transform" />
+            <span>{current.actionLabel || 'Explore'}</span>
+            <ChevronRightIcon size={14} className="text-white group-hover:translate-x-0.5 transition-transform" />
           </Link>
 
           {/* Dash indicators */}
-          {items.length > 1 && (
+          {bannerSlides.length > 1 && (
             <div className="flex items-center gap-1.5">
-              {items.slice(0, 5).map((_, idx) => (
+              {bannerSlides.slice(0, 5).map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setActiveIndex(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
-                  className={`h-0.5 transition-all duration-300 rounded-full ${
+                  className={`h-1 transition-all duration-300 rounded-full cursor-pointer ${
                     idx === activeIndex
-                      ? 'w-6 bg-white'
-                      : 'w-3 bg-white/30 hover:bg-white/60'
+                      ? 'w-6 bg-white shadow-xs'
+                      : 'w-2 bg-white/35 hover:bg-white/60'
                   }`}
                 />
               ))}
