@@ -88,12 +88,8 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b border-line/80 bg-surface/98 backdrop-blur-md transition-colors shadow-xs">
       {/* 1. Main Masthead Deck: Logo Centered + Edition & Action Controls */}
       <div className="container-page max-w-[1400px] flex h-16 lg:h-20 items-center justify-between gap-4">
-        {/* Left: Edition Info (Desktop Broadsheet Ticker) */}
-        <div className="hidden xl:flex items-center gap-2 text-xs text-muted font-medium w-1/3">
-          <span className="font-serif italic text-ink font-semibold">Equip Indian Churches</span>
-          <span>•</span>
-          <span className="truncate">Equipping the Church, Uniting the Saints</span>
-        </div>
+        {/* Left Spacer to maintain centered logo balance */}
+        <div className="hidden xl:block w-1/3" />
 
         {/* Center: Brand Logo / Wordmark */}
         <div className="flex items-center justify-start lg:justify-center flex-1 xl:w-1/3">
@@ -229,14 +225,6 @@ export function Header() {
                         widthClass,
                       )}
                     >
-                      {/* Top blurb banner */}
-                      <div className="mb-5 rounded-lg border border-line/60 bg-surface-2 px-4 py-2.5 flex items-center justify-between">
-                        <p className="text-xs text-muted leading-relaxed">{item.mega.blurb}</p>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-accent-text hidden sm:inline shrink-0 ml-3">
-                          Equip Indian Churches
-                        </span>
-                      </div>
-
                       {/* Columns grid */}
                       <div className={cn('grid gap-7', gridClass)}>
                         {item.mega.columns.map((col, idx) => (
