@@ -15,11 +15,12 @@ const bool = (v: unknown): boolean => v === true || str(v).toLowerCase() === 'tr
 const noTrailingSlash = (v: string): string => v.replace(/\/+$/, '');
 
 export const env = {
-  /** WordPress origin, e.g. https://equipindianchurches.com (never hardcoded in code). */
-  wpUrl: noTrailingSlash(str(raw.VITE_WP_URL)),
+  /** WordPress origin, e.g. https://admin.equipindianchurches.com. */
+  wpUrl: noTrailingSlash(str(raw.VITE_WP_URL)) || 'https://admin.equipindianchurches.com',
   /** Public URL of THIS React site (canonical links, OG tags, sitemap). */
   siteUrl: noTrailingSlash(
-    str(raw.VITE_SITE_URL) || (typeof window !== 'undefined' ? window.location.origin : ''),
+    str(raw.VITE_SITE_URL) ||
+      (typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://equipindianchurches.com'),
   ),
   /** Serve generated, WordPress-shaped demo data instead of calling the API. */
   useMock: bool(raw.VITE_USE_MOCK),

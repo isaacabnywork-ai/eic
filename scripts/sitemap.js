@@ -26,7 +26,7 @@ function readEnvFile() {
 
 const env = { ...readEnvFile(), ...process.env };
 const SITE_URL = (env.VITE_SITE_URL || 'https://equipindianchurches.com').replace(/\/+$/, '');
-const WP_URL = (env.VITE_WP_URL || 'https://equipindianchurches.com').replace(/\/+$/, '');
+const WP_URL = (env.VITE_WP_URL || 'https://admin.equipindianchurches.com').replace(/\/+$/, '');
 
 const staticRoutes = [
   '/',

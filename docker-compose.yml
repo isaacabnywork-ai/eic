@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eic-webapp
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - VITE_WP_URL=https://admin.equipindianchurches.com
+      - VITE_SITE_URL=https://equipindianchurches.com

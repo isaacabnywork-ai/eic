@@ -64,7 +64,12 @@ export function wpLinkToRoute(href: string): string | null {
   } catch {
     return null;
   }
-  if (url.origin !== new URL(env.wpUrl).origin) return null;
+  const allowedOrigins = new Set([
+    new URL(env.wpUrl).origin,
+    'https://admin.equipindianchurches.com',
+    'https://equipindianchurches.com',
+  ]);
+  if (!allowedOrigins.has(url.origin)) return null;
   const parts = url.pathname.split('/').filter(Boolean);
   if (parts.length === 2) {
     const [base, slug] = parts;
@@ -72,6 +77,7 @@ export function wpLinkToRoute(href: string): string | null {
     if (base === 'gallery') return `/gallery/${slug}`;
     if (base === 'series') return `/series/${slug}`;
     if (base === 'book-review') return `/book-reviews/${slug}`;
+    if (base === 'events') return `/events/${slug}`;
   }
   return null;
 }
