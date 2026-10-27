@@ -36,6 +36,33 @@ jobs:
           printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      - name: Diagnose VPS connectivity
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -eu
+
+          echo "Testing TCP connectivity to VPS port 22..."
+
+          python3 - <<'PY'
+          import os
+          import socket
+
+          host = os.environ["VPS_HOST"].strip()
+
+          if not host or any(c in host for c in "/:@ \t\n"):
+              raise SystemExit("VPS_HOST must contain only the hostname or IP address.")
+
+          print(f"Testing host: {host}, port: 22")
+
+          try:
+              with socket.create_connection((host, 22), timeout=10):
+                  print("SUCCESS: GitHub runner can reach TCP port 22.")
+          except Exception as exc:
+              print(f"FAILED: {type(exc).__name__}: {exc}")
+              raise SystemExit(1)
+          PY
+
       - name: Deploy application
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -47,6 +74,7 @@ jobs:
             -i ~/.ssh/id_ed25519 \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 \
             "$VPS_USER@$VPS_HOST" 'bash -se' <<'REMOTE'
           set -euo pipefail
 
