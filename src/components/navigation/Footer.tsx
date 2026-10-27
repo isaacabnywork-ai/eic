@@ -1,80 +1,16 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { site, socialLinks, wpLink } from '@/config/site';
-import { wpPages, contentTypes } from '@/config/content';
-import { env } from '@/config/env';
+import { site, socialLinks } from '@/config/site';
+import { contentTypes } from '@/config/content';
 import {
-  ExternalLinkIcon,
   FacebookIcon,
   InstagramIcon,
-  MailIcon,
   XIcon,
   YoutubeIcon,
 } from '@/components/ui/Icons';
-import { Button } from '@/components/ui/Button';
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleNewsletterSubmit = (e: FormEvent) => {
-    if (!env.newsletterActionUrl) {
-      e.preventDefault();
-      setSubscribed(true);
-      return;
-    }
-  };
-
   return (
     <footer className="border-t border-line bg-bg text-body transition-colors">
-      {/* Newsletter Section */}
-      <div className="border-b border-line bg-surface py-14 sm:py-16">
-        <div className="container-page max-w-4xl text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-accent-ink shadow-xs">
-            <MailIcon size={22} />
-          </div>
-          <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-ink tracking-tight">
-            Stay Equipped. Stay Encouraged.
-          </h3>
-          <p className="mt-2.5 text-sm sm:text-base text-muted max-w-xl mx-auto leading-relaxed">
-            Subscribe to receive new articles, expository sermons, and ministry resources directly in your inbox.
-          </p>
-
-          {subscribed ? (
-            <div className="mt-6 rounded-md bg-accent/15 border border-accent/40 p-4 text-sm font-semibold text-accent-text">
-              Thank you for subscribing! We look forward to staying connected.
-            </div>
-          ) : (
-            <form
-              action={env.newsletterActionUrl || undefined}
-              method={env.newsletterActionUrl ? 'POST' : undefined}
-              onSubmit={handleNewsletterSubmit}
-              className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 max-w-md mx-auto"
-            >
-              <input
-                type="email"
-                required
-                name={env.newsletterEmailField}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                aria-label="Email address for newsletter"
-                className="h-11 w-full rounded-[6px] border border-line bg-bg px-4 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                className="w-full sm:w-auto shrink-0 rounded-[6px] bg-accent text-accent-ink hover:brightness-105 font-semibold h-11 px-6 shadow-xs"
-              >
-                Subscribe
-              </Button>
-            </form>
-          )}
-        </div>
-      </div>
-
       {/* Main Footer Links: Clean Light Blue Background */}
       <div className="container-page py-14 sm:py-16 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-12">
@@ -186,48 +122,24 @@ export function Footer() {
               </h4>
               <ul className="space-y-2.5 text-sm text-body">
                 <li>
-                  <a
-                    href={wpLink(wpPages.about)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-ink transition-colors"
-                  >
-                    <span>About Us</span>
-                    <ExternalLinkIcon size={12} className="opacity-60" />
-                  </a>
+                  <Link to="/about" className="hover:text-ink transition-colors">
+                    About Us
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href={wpLink(wpPages.whatIsEic)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-ink transition-colors"
-                  >
-                    <span>What is EIC?</span>
-                    <ExternalLinkIcon size={12} className="opacity-60" />
-                  </a>
+                  <Link to="/about" className="hover:text-ink transition-colors">
+                    What is EIC?
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href={wpLink(wpPages.whatWeBelieve)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-ink transition-colors"
-                  >
-                    <span>What We Believe</span>
-                    <ExternalLinkIcon size={12} className="opacity-60" />
-                  </a>
+                  <Link to="/statement-of-faith" className="hover:text-ink transition-colors">
+                    What We Believe
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href={wpLink(wpPages.contact)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-ink transition-colors"
-                  >
-                    <span>Contact & Inquiries</span>
-                    <ExternalLinkIcon size={12} className="opacity-60" />
-                  </a>
+                  <Link to="/contact" className="hover:text-ink transition-colors">
+                    Contact & Inquiries
+                  </Link>
                 </li>
               </ul>
             </div>

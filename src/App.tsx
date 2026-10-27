@@ -22,6 +22,9 @@ import { SeminarySinglePage } from '@/pages/SeminarySingle';
 import { BookstoresArchivePage } from '@/pages/BookstoresArchive';
 import { BookstoreSinglePage } from '@/pages/BookstoreSingle';
 import { LibraryPage } from '@/pages/LibraryPage';
+import { AboutPage } from '@/pages/AboutPage';
+import { StatementOfFaithPage } from '@/pages/StatementOfFaithPage';
+import { ContactPage } from '@/pages/ContactPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 // Custom Admin Panel Components & Layout
@@ -183,6 +186,13 @@ const router = createBrowserRouter([
       // Recommendations: Bookstores
       { path: 'bookstores', element: <BookstoresArchivePage /> },
       { path: 'bookstores/:slug', element: <BookstoreSinglePage /> },
+      // Ministry & Doctrine Pages (Integrated natively in Next.js)
+      { path: 'about', element: <AboutPage /> },
+      { path: 'what-is-eic', element: <AboutPage /> },
+      { path: 'statement-of-faith', element: <StatementOfFaithPage /> },
+      { path: 'what-we-believe', element: <StatementOfFaithPage /> },
+      { path: 'contact', element: <ContactPage /> },
+      { path: 'contact-us', element: <Navigate to="/contact" replace /> },
       // 404
       { path: '*', element: <NotFoundPage /> },
     ],

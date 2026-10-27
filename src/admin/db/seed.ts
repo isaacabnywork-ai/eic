@@ -2108,8 +2108,8 @@ export const SEED_FOOTER_MENU: CustomFooterMenuConfig = {
       heading: 'About EIC',
       displayOrder: 1,
       links: [
-        { id: 'fl-about-1', label: 'Our Mission & Vision', url: 'https://equipindianchurches.com/about', target: '_blank', isEnabled: true, displayOrder: 1 },
-        { id: 'fl-about-2', label: 'Statement of Faith', url: 'https://equipindianchurches.com/statement-of-faith', target: '_blank', isEnabled: true, displayOrder: 2 },
+        { id: 'fl-about-1', label: 'About Equip Indian Churches', url: '/about', target: '_self', isEnabled: true, displayOrder: 1 },
+        { id: 'fl-about-2', label: 'Statement of Faith', url: '/statement-of-faith', target: '_self', isEnabled: true, displayOrder: 2 },
         { id: 'fl-about-3', label: 'Pastoral Leadership Team', url: '/authors', target: '_self', isEnabled: true, displayOrder: 3 },
       ],
     },
@@ -2137,9 +2137,8 @@ export const SEED_FOOTER_MENU: CustomFooterMenuConfig = {
       heading: 'Contact & Support',
       displayOrder: 4,
       links: [
-        { id: 'fl-cnt-1', label: 'Contact Inquiries', url: 'mailto:contact@equipindianchurches.com', target: '_blank', isEnabled: true, displayOrder: 1 },
-        { id: 'fl-cnt-2', label: 'Subscribe to Newsletter', url: '/library', target: '_self', isEnabled: true, displayOrder: 2 },
-        { id: 'fl-cnt-3', label: 'Privacy & Terms', url: '/privacy', target: '_self', isEnabled: true, displayOrder: 3 },
+        { id: 'fl-cnt-1', label: 'Contact & Inquiries', url: '/contact', target: '_self', isEnabled: true, displayOrder: 1 },
+        { id: 'fl-cnt-3', label: 'Privacy & Terms', url: '/privacy', target: '_self', isEnabled: true, displayOrder: 2 },
       ],
     },
   ],

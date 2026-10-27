@@ -35,9 +35,11 @@ const staticRoutes = [
   '/sermons',
   '/series',
   '/book-reviews',
-  '/gallery',
   '/events',
   '/authors',
+  '/about',
+  '/statement-of-faith',
+  '/contact',
   '/search',
 ];
 

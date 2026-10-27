@@ -156,28 +156,26 @@ export const navItems: NavItem[] = [
   },
   {
     label: 'About',
-    to: wpLink(wpPages.about),
+    to: '/about',
     mega: {
       blurb: 'Equipping local churches in India through sound, Scripture-centred biblical resources.',
       columns: [
         {
           title: 'Our Movement',
           links: [
-            { label: 'About Equip Indian Churches', to: wpLink(wpPages.about), external: true },
-            { label: 'What is EIC?', to: wpLink(wpPages.whatIsEic), external: true },
-            { label: 'Our Mission & Vision', to: wpLink(wpPages.about), external: true },
+            { label: 'About Equip Indian Churches', to: '/about' },
+            { label: 'What is EIC?', to: '/about' },
           ],
         },
         {
           title: 'Doctrine & Contact',
           links: [
-            { label: 'What We Believe (Statement of Faith)', to: wpLink(wpPages.whatWeBelieve), external: true },
-            { label: 'Contact & Inquiries', to: wpLink(wpPages.contact), external: true },
-            { label: 'Subscribe to Newsletter', to: '/#explore-resources' },
+            { label: 'What We Believe (Statement of Faith)', to: '/statement-of-faith' },
+            { label: 'Contact & Inquiries', to: '/contact' },
           ],
         },
       ],
-      cta: { label: 'Read our statement of faith', to: wpLink(wpPages.whatWeBelieve) },
+      cta: { label: 'Read our statement of faith', to: '/statement-of-faith' },
     },
   },
 ];
@@ -215,9 +213,9 @@ export const footerColumns: { title: string; links: { label: string; to: string;
   {
     title: 'About',
     links: [
-      { label: 'About us', to: wpLink(wpPages.about), external: true },
-      { label: 'What we believe', to: wpLink(wpPages.whatWeBelieve), external: true },
-      { label: 'Contact', to: wpLink(wpPages.contact), external: true },
+      { label: 'About us', to: '/about' },
+      { label: 'What we believe', to: '/statement-of-faith' },
+      { label: 'Contact', to: '/contact' },
       { label: 'Privacy policy', to: wpLink(wpPages.privacy), external: true },
     ],
   },

@@ -2157,17 +2157,17 @@
         "links": [
           {
             "id": "fl-about-1",
-            "label": "Our Mission & Vision",
-            "url": "https://equipindianchurches.com/about",
-            "target": "_blank",
+            "label": "About Equip Indian Churches",
+            "url": "/about",
+            "target": "_self",
             "isEnabled": true,
             "displayOrder": 1
           },
           {
             "id": "fl-about-2",
             "label": "Statement of Faith",
-            "url": "https://equipindianchurches.com/statement-of-faith",
-            "target": "_blank",
+            "url": "/statement-of-faith",
+            "target": "_self",
             "isEnabled": true,
             "displayOrder": 2
           },
@@ -2242,19 +2242,11 @@
         "links": [
           {
             "id": "fl-cnt-1",
-            "label": "Contact Inquiries",
-            "url": "mailto:contact@equipindianchurches.com",
-            "target": "_blank",
-            "isEnabled": true,
-            "displayOrder": 1
-          },
-          {
-            "id": "fl-cnt-2",
-            "label": "Subscribe to Newsletter",
-            "url": "/library",
+            "label": "Contact & Inquiries",
+            "url": "/contact",
             "target": "_self",
             "isEnabled": true,
-            "displayOrder": 2
+            "displayOrder": 1
           },
           {
             "id": "fl-cnt-3",
@@ -2262,7 +2254,7 @@
             "url": "/privacy",
             "target": "_self",
             "isEnabled": true,
-            "displayOrder": 3
+            "displayOrder": 2
           }
         ]
       }
