@@ -202,6 +202,7 @@ export const eventRepository = {
   getStats(): {
     total: number;
     published: number;
+    private: number;
     draft: number;
     scheduled: number;
     upcoming: number;
@@ -214,6 +215,7 @@ export const eventRepository = {
     const all = state.events;
 
     let published = 0;
+    let privateCount = 0;
     let draft = 0;
     let upcoming = 0;
     let expired = 0;
@@ -227,6 +229,7 @@ export const eventRepository = {
       }
       if (e.status === 'archived') archived++;
       if (e.status === 'draft') draft++;
+      if (e.status === 'private') privateCount++;
       if (e.status === 'published') {
         published++;
         if (e.startDate >= today) {
@@ -240,6 +243,7 @@ export const eventRepository = {
     return {
       total: all.filter((e) => e.status !== 'trash').length,
       published,
+      private: privateCount,
       draft,
       scheduled: upcoming,
       upcoming,

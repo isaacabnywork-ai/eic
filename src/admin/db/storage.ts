@@ -181,6 +181,18 @@ class AdminStorageEngine {
           const parsed = JSON.parse(stored) as AdminDatabaseState;
           // Basic schema validation check
           if (parsed.events && parsed.users && parsed.settings) {
+            // Auto-merge any newly added seed events (e.g. Modern Events Calendar suite)
+            const existingSlugs = new Set(parsed.events.map((e) => e.slug));
+            const missingSeed = SEED_EVENTS.filter((e) => !existingSlugs.has(e.slug));
+            if (missingSeed.length > 0) {
+              parsed.events = [...parsed.events, ...missingSeed];
+              try {
+                localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(parsed));
+              } catch {
+                // ignore
+              }
+            }
+
             this.memoryCache = parsed;
             this.setupSync();
             return parsed;

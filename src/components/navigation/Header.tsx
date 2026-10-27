@@ -75,8 +75,8 @@ export function Header() {
     if (label === 'Sermons & Media') {
       return p.startsWith('/sermons') || p.startsWith('/videos');
     }
-    if (label === 'Events & Gallery') {
-      return p.startsWith('/events') || p.startsWith('/gallery') || p.startsWith('/authors');
+    if (label === 'Events' || label === 'Events & Gallery') {
+      return p.startsWith('/events') || p.startsWith('/authors');
     }
     if (label === 'Recommendations') {
       return p.startsWith('/seminaries') || p.startsWith('/bookstores');

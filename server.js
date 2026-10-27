@@ -38,9 +38,30 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 function getDbState() {
+  let seedEvents = [];
+  if (fs.existsSync(DEFAULT_SEED_FILE)) {
+    try {
+      const seedObj = JSON.parse(fs.readFileSync(DEFAULT_SEED_FILE, 'utf-8'));
+      seedEvents = Array.isArray(seedObj.events) ? seedObj.events : [];
+    } catch (err) {}
+  }
+
   if (fs.existsSync(DB_FILE)) {
     try {
-      return fs.readFileSync(DB_FILE, 'utf-8');
+      const existingStr = fs.readFileSync(DB_FILE, 'utf-8');
+      const existingObj = JSON.parse(existingStr);
+      if (existingObj && Array.isArray(existingObj.events)) {
+        if (seedEvents.length > 0) {
+          const existingSlugs = new Set(existingObj.events.map((e) => e.slug));
+          const missing = seedEvents.filter((e) => !existingSlugs.has(e.slug));
+          if (missing.length > 0) {
+            existingObj.events = [...existingObj.events, ...missing];
+            saveDbState(existingObj);
+            return JSON.stringify(existingObj);
+          }
+        }
+        return existingStr;
+      }
     } catch (err) {
       console.error('Error reading admin_db.json:', err);
     }

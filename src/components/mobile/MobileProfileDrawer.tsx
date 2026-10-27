@@ -6,7 +6,6 @@ import {
   MoonIcon,
   BookIcon,
   CalendarIcon,
-  ImageIcon,
   SearchIcon,
   YoutubeIcon,
   FacebookIcon,
@@ -199,7 +198,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
               Fellowship & Ministry Network
             </span>
             <DrawerLink to="/events" icon={CalendarIcon} label="Conferences & Pastors Roundtables" onClick={onClose} />
-            <DrawerLink to="/gallery" icon={ImageIcon} label="Conference Photos & Albums" onClick={onClose} />
             <DrawerLink to="/churches" icon={MapPinIcon} label="Church Directory" onClick={onClose} />
           </div>
 

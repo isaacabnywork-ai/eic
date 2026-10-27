@@ -10,7 +10,6 @@ import {
   ArrowRightIcon,
   PlayIcon,
   HeadphonesIcon,
-  ImageIcon,
   MailIcon,
   ChevronRightIcon,
 } from '@/components/ui/Icons';
@@ -20,7 +19,6 @@ export function MobileEventsView() {
   const { data: eventsData } = useContentList('event', { perPage: 12 });
   const customEvents = usePublishedEvents();
   const { data: conferenceSermons } = useContentList('sermon', { perPage: 6 });
-  const { data: galleryAlbums } = useContentList('gallery', { perPage: 4 });
 
   const [activeCategory, setActiveCategory] = useState<'all' | 'conferences' | 'roundtables' | 'workshops'>('all');
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -335,52 +333,6 @@ export function MobileEventsView() {
                 <p className="mt-0.5 text-[11px] text-slate-500 dark:text-white/50 line-clamp-1">
                   {item.speaker || 'Conference Preacher'}
                 </p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 5. Photo Gallery Preview */}
-      {galleryAlbums?.items && galleryAlbums.items.length > 0 && (
-        <section className="mt-7 px-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-serif text-lg font-bold tracking-tight text-[#182541] dark:text-white flex items-center gap-2">
-              <ImageIcon size={18} className="text-primary dark:text-[#F0F6FB]" />
-              <span>Conference Moments & Memories</span>
-            </h3>
-            <Link
-              to="/gallery"
-              className="text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-[#182541] dark:text-white/50 dark:hover:text-white transition-colors"
-            >
-              See All
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {galleryAlbums.items.slice(0, 4).map((album) => (
-              <Link
-                key={album.id}
-                to={itemPath('gallery', album.slug)}
-                className="group relative overflow-hidden rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 aspect-[4/3] block"
-              >
-                {album.image ? (
-                  <img
-                    src={album.image.src}
-                    alt={album.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-white/10 text-slate-400">
-                    <ImageIcon size={28} />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-2.5">
-                  <h5 className="font-serif text-xs font-bold text-white line-clamp-1">
-                    {album.title}
-                  </h5>
-                </div>
               </Link>
             ))}
           </div>

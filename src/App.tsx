@@ -11,8 +11,6 @@ import { SeriesArchivePage } from '@/pages/SeriesArchive';
 import { SeriesSinglePage } from '@/pages/SeriesSingle';
 import { BookReviewsArchivePage } from '@/pages/BookReviewsArchive';
 import { BookReviewSinglePage } from '@/pages/BookReviewSingle';
-import { GalleryArchivePage } from '@/pages/GalleryArchive';
-import { GallerySinglePage } from '@/pages/GallerySingle';
 import { EventsArchivePage } from '@/pages/EventsArchive';
 import { EventSinglePage } from '@/pages/EventSingle';
 import { AuthorsArchivePage } from '@/pages/AuthorsArchive';
@@ -164,9 +162,9 @@ const router = createBrowserRouter([
       // Book Reviews
       { path: 'book-reviews', element: <BookReviewsArchivePage /> },
       { path: 'book-reviews/:slug', element: <BookReviewSinglePage /> },
-      // Gallery
-      { path: 'gallery', element: <GalleryArchivePage /> },
-      { path: 'gallery/:slug', element: <GallerySinglePage /> },
+      // Gallery (Private / Hidden for now)
+      { path: 'gallery', element: <Navigate to="/events" replace /> },
+      { path: 'gallery/:slug', element: <Navigate to="/events" replace /> },
       // Events
       { path: 'events', element: <EventsArchivePage /> },
       { path: 'events/:slug', element: <EventSinglePage /> },

@@ -145,11 +145,6 @@ export function Footer() {
                     Book Reviews
                   </Link>
                 </li>
-                <li>
-                  <Link to={`/${contentTypes.gallery.route}`} className="hover:text-ink transition-colors">
-                    Photo Galleries
-                  </Link>
-                </li>
               </ul>
             </div>
 

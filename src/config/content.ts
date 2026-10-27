@@ -229,7 +229,7 @@ export const contentTypes: Record<ContentKey, ContentTypeConfig> = {
     },
     related: [],
     featured: [{ by: 'latest' }],
-    enabled: true,
+    enabled: false,
   },
 
   /** Posts that carry the "events" term. No post type of its own. */
@@ -270,7 +270,7 @@ export const contentTypes: Record<ContentKey, ContentTypeConfig> = {
 };
 
 /** Content types that appear in global search (events are posts, so already covered). */
-export const searchableTypes: ContentKey[] = ['article', 'media', 'bookReview', 'gallery'];
+export const searchableTypes: ContentKey[] = ['article', 'media', 'bookReview'];
 
 /** Types that can be grouped inside a Series (taxonomy must be attached in WordPress). */
 export const seriesTypes: ContentKey[] = (Object.values(contentTypes) as ContentTypeConfig[])

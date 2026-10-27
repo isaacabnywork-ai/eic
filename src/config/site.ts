@@ -109,10 +109,10 @@ export const navItems: NavItem[] = [
     },
   },
   {
-    label: 'Events & Gallery',
+    label: 'Events',
     to: `/${t.event.route}`,
     mega: {
-      blurb: 'National pastor conferences, regional fellowship memories, and contributing leaders.',
+      blurb: 'National pastor conferences, regional fellowship gatherings, and ministry leadership.',
       columns: [
         {
           title: 'Conferences & Events',
@@ -120,14 +120,6 @@ export const navItems: NavItem[] = [
             { label: 'Upcoming Events & Conferences', to: `/${t.event.route}` },
             { label: 'All India Pastors Conference', to: `/${t.event.route}` },
             { label: 'Regional Roundtables', to: `/${t.event.route}` },
-          ],
-        },
-        {
-          title: 'Photo Galleries',
-          links: [
-            { label: 'All Photo Galleries', to: `/${t.gallery.route}` },
-            { label: 'AIPC Conference Albums', to: `/${t.gallery.route}` },
-            { label: 'Regional Fellowship Photos', to: `/${t.gallery.route}` },
           ],
         },
         {
@@ -222,7 +214,6 @@ export const footerColumns: { title: string; links: { label: string; to: string;
   {
     title: 'Community',
     links: [
-      { label: 'Gallery', to: `/${t.gallery.route}` },
       { label: 'Events', to: `/${t.event.route}` },
       ...(t.church.enabled ? [{ label: 'Church directory', to: `/${t.church.route}` }] : []),
     ],

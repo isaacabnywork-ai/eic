@@ -436,8 +436,9 @@ export function AdminEventEditorPage() {
                   onChange={(e) => setStatus(e.target.value as any)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-none"
                 >
-                  <option value="draft">Draft (Private)</option>
-                  <option value="published">Published</option>
+                  <option value="draft">Draft (Work in progress)</option>
+                  <option value="private">Private (Admin only)</option>
+                  <option value="published">Published (Live)</option>
                   <option value="scheduled">Scheduled</option>
                   <option value="archived">Archived</option>
                 </select>

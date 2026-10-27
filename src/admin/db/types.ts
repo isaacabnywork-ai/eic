@@ -18,7 +18,7 @@ export interface AdminUser {
   updatedAt: string;
 }
 
-export type EventStatus = 'published' | 'draft' | 'scheduled' | 'archived' | 'trash';
+export type EventStatus = 'published' | 'draft' | 'private' | 'scheduled' | 'archived' | 'trash';
 
 export type EventOperationalStatus = 'scheduled' | 'rescheduled' | 'postponed' | 'cancelled' | 'moved_online';
 

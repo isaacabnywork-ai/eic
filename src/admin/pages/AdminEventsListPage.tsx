@@ -393,6 +393,7 @@ export function AdminEventsListPage() {
               >
                 <option value="all">All Statuses ({stats.total})</option>
                 <option value="published">Published ({stats.published})</option>
+                <option value="private">Private ({stats.private})</option>
                 <option value="draft">Drafts ({stats.draft})</option>
                 <option value="scheduled">Scheduled ({stats.scheduled})</option>
                 <option value="archived">Archived ({stats.archived})</option>
@@ -490,6 +491,8 @@ export function AdminEventsListPage() {
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                               ev.status === 'published'
                                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : ev.status === 'private'
+                                ? 'bg-purple-50 text-purple-800 border-purple-200'
                                 : ev.status === 'draft'
                                 ? 'bg-amber-50 text-amber-800 border-amber-200'
                                 : 'bg-slate-100 text-slate-700 border-slate-200'
@@ -626,6 +629,21 @@ export function AdminEventsListPage() {
                       {c.name}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Status & Visibility
+                </label>
+                <select
+                  value={formData.status || 'published'}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs font-semibold text-[#182541] bg-white focus:ring-2 focus:ring-[#094899] outline-none"
+                >
+                  <option value="published">Published (Live for Everyone)</option>
+                  <option value="private">Private (Visible only in Admin)</option>
+                  <option value="draft">Draft (Unpublished)</option>
                 </select>
               </div>
 
