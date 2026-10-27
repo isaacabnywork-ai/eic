@@ -28,6 +28,40 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const INDEX_HTML = path.join(DIST_DIR, 'index.html');
+const DATA_DIR = path.resolve(__dirname, 'data');
+const DB_FILE = path.join(DATA_DIR, 'admin_db.json');
+const DEFAULT_SEED_FILE = path.join(DATA_DIR, 'default_seed.json');
+
+// Ensure database directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+function getDbState() {
+  if (fs.existsSync(DB_FILE)) {
+    try {
+      return fs.readFileSync(DB_FILE, 'utf-8');
+    } catch (err) {
+      console.error('Error reading admin_db.json:', err);
+    }
+  }
+  if (fs.existsSync(DEFAULT_SEED_FILE)) {
+    try {
+      const seedContent = fs.readFileSync(DEFAULT_SEED_FILE, 'utf-8');
+      fs.writeFileSync(DB_FILE, seedContent, 'utf-8');
+      return seedContent;
+    } catch (err) {
+      console.error('Error initializing admin_db.json from seed:', err);
+    }
+  }
+  return JSON.stringify({ events: [], users: [], settings: {} });
+}
+
+function saveDbState(stateObj) {
+  const tmpFile = path.join(DATA_DIR, `admin_db.tmp.${Date.now()}`);
+  fs.writeFileSync(tmpFile, JSON.stringify(stateObj, null, 2), 'utf-8');
+  fs.renameSync(tmpFile, DB_FILE);
+}
 
 // Verify that dist/ exists; if missing, auto-build for zero-friction CloudPanel startup
 if (!fs.existsSync(INDEX_HTML)) {
@@ -128,15 +162,67 @@ function serveFile(req, res, filePath, statusCode = 200) {
 
 // HTTP Server
 const server = http.createServer((req, res) => {
-  // Only handle GET and HEAD requests
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  let pathname = decodeURIComponent(parsedUrl.pathname);
+
+  // Admin Database API Endpoint
+  if (pathname === '/api/admin/db') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    if (req.method === 'GET') {
+      const dbContent = getDbState();
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+      });
+      res.end(dbContent);
+      return;
+    }
+
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+        if (body.length > 20 * 1024 * 1024) {
+          res.writeHead(413, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Payload too large' }));
+          req.destroy();
+        }
+      });
+
+      req.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.events)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid database payload' }));
+            return;
+          }
+
+          saveDbState(parsed);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, timestamp: new Date().toISOString() }));
+        } catch (err) {
+          console.error('Error saving admin DB:', err);
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+        }
+      });
+      return;
+    }
+
     res.writeHead(405, { 'Content-Type': 'text/plain' });
     res.end('Method Not Allowed');
     return;
   }
-
-  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  let pathname = decodeURIComponent(parsedUrl.pathname);
 
   // Health check endpoint
   if (pathname === '/healthz' || pathname === '/health') {
@@ -148,6 +234,13 @@ const server = http.createServer((req, res) => {
         timestamp: new Date().toISOString(),
       }),
     );
+    return;
+  }
+
+  // Only handle GET and HEAD requests for static SPA assets
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    res.writeHead(405, { 'Content-Type': 'text/plain' });
+    res.end('Method Not Allowed');
     return;
   }
 

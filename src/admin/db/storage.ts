@@ -49,6 +49,10 @@ type Listener = () => void;
 class AdminStorageEngine {
   private memoryCache: AdminDatabaseState | null = null;
   private listeners: Set<Listener> = new Set();
+  private isPushing = false;
+  private lastLocalSaveTime = 0;
+  private isSyncing = false;
+  private syncSetupDone = false;
 
   constructor() {
     this.init();
@@ -71,39 +75,120 @@ class AdminStorageEngine {
     }
   }
 
+  private setupSync() {
+    if (this.syncSetupDone || typeof window === 'undefined') return;
+    this.syncSetupDone = true;
+
+    // Immediately trigger background server synchronization
+    this.syncFromServer();
+
+    // Re-synchronize when tab regains focus or visibility changes
+    window.addEventListener('focus', () => {
+      this.syncFromServer();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        this.syncFromServer();
+      }
+    });
+
+    // Periodic sync poll every 30 seconds
+    setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        this.syncFromServer();
+      }
+    }, 30000);
+  }
+
+  /**
+   * Fetches latest database state from the server endpoint (/api/admin/db)
+   */
+  public async syncFromServer(): Promise<boolean> {
+    if (typeof window === 'undefined' || this.isSyncing) return false;
+    this.isSyncing = true;
+
+    try {
+      const res = await fetch('/api/admin/db', {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
+
+      if (!res.ok) return false;
+
+      const serverState = (await res.json()) as AdminDatabaseState;
+      if (serverState && Array.isArray(serverState.events) && Array.isArray(serverState.users)) {
+        // Prevent race condition: don't overwrite if a local save happened in the last 3 seconds while pushing
+        if (Date.now() - this.lastLocalSaveTime < 3000 && this.isPushing) {
+          return false;
+        }
+
+        const currentJson = JSON.stringify(this.memoryCache);
+        const serverJson = JSON.stringify(serverState);
+
+        if (currentJson !== serverJson) {
+          this.memoryCache = serverState;
+          try {
+            localStorage.setItem(`${STORAGE_PREFIX}state`, serverJson);
+          } catch {
+            // ignore localStorage quota errors
+          }
+          this.notify();
+        }
+        return true;
+      }
+    } catch {
+      // Server down or offline; gracefully fallback to memory & localStorage
+    } finally {
+      this.isSyncing = false;
+    }
+
+    return false;
+  }
+
+  /**
+   * Pushes the current database state to the server (/api/admin/db)
+   */
+  private async pushToServer(state: AdminDatabaseState): Promise<boolean> {
+    if (typeof window === 'undefined') return false;
+    this.isPushing = true;
+    this.lastLocalSaveTime = Date.now();
+
+    try {
+      const res = await fetch('/api/admin/db', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(state),
+      });
+
+      return res.ok;
+    } catch (err) {
+      console.warn('Could not push admin changes to server, saved in local cache:', err);
+      return false;
+    } finally {
+      this.isPushing = false;
+    }
+  }
+
   private init(): AdminDatabaseState {
     if (this.memoryCache) return this.memoryCache;
 
-    try {
-      const stored = localStorage.getItem(`${STORAGE_PREFIX}state`);
-      if (stored) {
-        const parsed = JSON.parse(stored) as AdminDatabaseState;
-        // Basic schema validation check
-        if (parsed.events && parsed.users && parsed.settings) {
-          // Sync check: ensure 'a-day-in-the-word' has no assigned speakers
-          const ditw = parsed.events.find(
-            (e) => e.id === 'event-day-in-the-word' || e.slug === 'a-day-in-the-word',
-          );
-          if (ditw && ditw.speakerIds && ditw.speakerIds.length > 0) {
-            ditw.speakerIds = [];
-            if (ditw.schedules) {
-              ditw.schedules.forEach((s) => {
-                s.speakerIds = [];
-              });
-            }
-            try {
-              localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(parsed));
-            } catch {
-              // Ignore localStorage write error
-            }
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`${STORAGE_PREFIX}state`);
+        if (stored) {
+          const parsed = JSON.parse(stored) as AdminDatabaseState;
+          // Basic schema validation check
+          if (parsed.events && parsed.users && parsed.settings) {
+            this.memoryCache = parsed;
+            this.setupSync();
+            return parsed;
           }
-
-          this.memoryCache = parsed;
-          return parsed;
         }
+      } catch (e) {
+        console.warn('Could not read custom admin database from localStorage, initializing fresh seed.', e);
       }
-    } catch (e) {
-      console.warn('Could not read custom admin database from localStorage, initializing fresh seed.', e);
     }
 
     // Default Seed State
@@ -122,8 +207,15 @@ class AdminStorageEngine {
       auditLogs: [...SEED_AUDIT_LOGS],
     };
 
-    this.saveState(freshState);
     this.memoryCache = freshState;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(freshState));
+      } catch {
+        // ignore
+      }
+      this.setupSync();
+    }
     return freshState;
   }
 
@@ -136,12 +228,16 @@ class AdminStorageEngine {
 
   public saveState(nextState: AdminDatabaseState) {
     this.memoryCache = nextState;
-    try {
-      localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(nextState));
-    } catch (e) {
-      console.error('Failed to write admin state to localStorage:', e);
+    this.lastLocalSaveTime = Date.now();
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(nextState));
+      } catch (e) {
+        console.error('Failed to write admin state to localStorage:', e);
+      }
     }
     this.notify();
+    this.pushToServer(nextState);
   }
 
   public update<K extends keyof AdminDatabaseState>(key: K, updater: (prev: AdminDatabaseState[K]) => AdminDatabaseState[K]) {

@@ -6,3 +6,7 @@ dist
 scripts/discover-output.json
 .DS_Store
 *.log
+
+# Persistent Admin Database on VPS (preserves live edits across git pulls)
+data/admin_db.json
+data/admin_db.tmp.*

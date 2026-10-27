@@ -1,0 +1,816 @@
+{
+  "users": [
+    {
+      "id": "user-superadmin-1",
+      "name": "EIC General Overseer",
+      "email": "admin@equipindianchurches.com",
+      "passwordHash": "8f3d6db8f9b9426fbc19c6e3b5e406f521c7cb5219e27c1340156d95f87b8f04",
+      "role": "super_admin",
+      "isActive": true,
+      "avatarUrl": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=256&h=256&q=80",
+      "lastLoginAt": "2026-10-27T10:44:01.815Z",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "user-eventmgr-2",
+      "name": "Pastoral Assemblies Coordinator",
+      "email": "events@equipindianchurches.com",
+      "passwordHash": "8f3d6db8f9b9426fbc19c6e3b5e406f521c7cb5219e27c1340156d95f87b8f04",
+      "role": "event_manager",
+      "isActive": true,
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&h=256&q=80",
+      "lastLoginAt": "2026-10-20T10:00:00.000Z",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "user-readonly-3",
+      "name": "Ministry Staff Reviewer",
+      "email": "staff@equipindianchurches.com",
+      "passwordHash": "8f3d6db8f9b9426fbc19c6e3b5e406f521c7cb5219e27c1340156d95f87b8f04",
+      "role": "read_only",
+      "isActive": true,
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80",
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-day-in-the-word",
+      "title": "A DAY IN THE WORD",
+      "slug": "a-day-in-the-word",
+      "shortDescription": "Expositions through Ephesians 1 And 2",
+      "fullDescription": "Equip Indian Churches (EIC) invites you to a one-day conference in Dimapur focused on the theme \"A Day in the Word\" with expositions from Ephesians chapters 1 and 2. In a time when the church needs strong biblical foundations, this conference seeks to encourage believers through faithful preaching, Christ-centred teaching, and meaningful fellowship.\n\nJoin pastors, church leaders, and believers from across the region for a day of learning, encouragement, and spiritual refreshment as we reflect on the riches of the Gospel and God's saving grace in Christ. The conference will also include opportunities to connect with others, explore resources from For The Truth bookstore, and be strengthened for faithful Christian living and ministry.\n\nWe warmly invite you to join us for this special gathering centred on God's Word.\n\nVenue: Grace Salvation Nagamese Church, Near BSF Transit camp. Half Nagarjan, Dimapur.",
+      "featuredPosterUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=1200&h=1600&q=80",
+      "galleryImageUrls": [],
+      "status": "published",
+      "operationalStatus": "scheduled",
+      "startDate": "2026-06-16",
+      "startTime": "09:30",
+      "endDate": "2026-06-16",
+      "endTime": "16:00",
+      "isAllDay": false,
+      "hideEndTime": false,
+      "timezone": "Asia/Kolkata",
+      "isRecurring": false,
+      "venueId": "venue-dimapur-1",
+      "customVenueName": "Grace Salvation Nagamese Church",
+      "customVenueAddress": "Near BSF Transit camp. Half Nagarjan, Dimapur",
+      "isOnlineOnly": false,
+      "speakerIds": [],
+      "organizerIds": [
+        "org-eic"
+      ],
+      "categoryIds": [
+        "cat-national-conf"
+      ],
+      "tagIds": [
+        "tag-pastors",
+        "tag-preaching",
+        "tag-doctrine"
+      ],
+      "registrationUrl": "https://equipindianchurches.com/events/a-day-in-the-word/register",
+      "registrationButtonLabel": "Register for Conference",
+      "registrationAvailable": true,
+      "isFree": false,
+      "price": 300,
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "schedules": [],
+      "faqs": [],
+      "createdById": "admin-super",
+      "createdByEmail": "admin@equipindianchurches.com",
+      "createdAt": "2026-10-27T10:44:01.816Z",
+      "updatedAt": "2026-10-27T10:44:01.816Z"
+    },
+    {
+      "id": "event-aipc-2026",
+      "title": "All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully",
+      "slug": "aipc-2026-proclaiming-christ-faithfully",
+      "shortDescription": "The premier annual national gathering of pastors, elders, church planters, and theological students from across India.",
+      "fullDescription": "### Conference Theme: Proclaiming Christ Faithfully in the 21st Century\n\nThe All India Pastors Conference (AIPC) 2026 gathers pastors, leaders, and servants of Christ for three intensive days of biblical instruction, expository sermons, pastoral fellowship, and mutual encouragement.\n\n#### Key Highlights\n- **Plenary Expository Addresses** through the Pastoral Epistles.\n- **Breakout Workshops** on hermeneutics, sermon preparation, church discipline, and biblical counseling.\n- **Pastoral Q&A Panels** addressing the contemporary challenges of shepherding local churches in India.\n- **Bookstall & Literature Grants** offering discounted and gifted sound theological resources.",
+      "featuredPosterUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&h=800&q=80",
+      "galleryImageUrls": [
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80"
+      ],
+      "status": "published",
+      "operationalStatus": "scheduled",
+      "startDate": "2026-11-12",
+      "startTime": "09:00",
+      "endDate": "2026-11-14",
+      "endTime": "17:30",
+      "isAllDay": false,
+      "hideEndTime": false,
+      "timezone": "Asia/Kolkata",
+      "isRecurring": false,
+      "venueId": "venue-delhi-1",
+      "isOnlineOnly": false,
+      "speakerIds": [
+        "speaker-anand-samuel",
+        "speaker-ajay-thomas",
+        "speaker-nathan-eda"
+      ],
+      "organizerIds": [
+        "org-eic",
+        "org-aipc"
+      ],
+      "categoryIds": [
+        "cat-national-conf"
+      ],
+      "tagIds": [
+        "tag-pastors",
+        "tag-preaching",
+        "tag-doctrine"
+      ],
+      "registrationUrl": "https://equipindianchurches.com/events/aipc-2026/register",
+      "registrationButtonLabel": "Register for Conference",
+      "registrationAvailable": true,
+      "externalInfoUrl": "https://equipindianchurches.com/events",
+      "isFree": false,
+      "price": 1500,
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "schedules": [
+        {
+          "id": "sch-1",
+          "title": "Opening Plenary: The Authority and Sufficiency of Scripture",
+          "description": "Expositional message setting the theological foundation of pastoral authority.",
+          "date": "2026-11-12",
+          "startTime": "09:30",
+          "endTime": "11:00",
+          "speakerIds": [
+            "speaker-ajay-thomas"
+          ],
+          "displayOrder": 1
+        },
+        {
+          "id": "sch-2",
+          "title": "Workshop Track A: Hermeneutical Principles for Expository Preaching",
+          "description": "Moving from original text to contemporary sermon outline with clarity and fidelity.",
+          "date": "2026-11-12",
+          "startTime": "11:30",
+          "endTime": "13:00",
+          "speakerIds": [
+            "speaker-anand-samuel"
+          ],
+          "displayOrder": 2
+        },
+        {
+          "id": "sch-3",
+          "title": "Pastoral Panel: Shepherding Local Flocks Through Cultural Pressure",
+          "description": "Interactive question and answer session with experienced Indian pastors.",
+          "date": "2026-11-13",
+          "startTime": "14:00",
+          "endTime": "16:00",
+          "speakerIds": [
+            "speaker-nathan-eda",
+            "speaker-ajay-thomas"
+          ],
+          "displayOrder": 3
+        }
+      ],
+      "faqs": [
+        {
+          "id": "faq-1",
+          "question": "Who should attend this conference?",
+          "answer": "Pastors, associate pastors, elders, church planters, deacons, and theological seminary students.",
+          "displayOrder": 1
+        },
+        {
+          "id": "faq-2",
+          "question": "Is accommodation provided with registration?",
+          "answer": "Registration covers lunch, tea, conference folder, and literature pack. Accommodations must be booked individually nearby.",
+          "displayOrder": 2
+        },
+        {
+          "id": "faq-3",
+          "question": "Will recordings and transcripts be made available?",
+          "answer": "Yes, all plenary messages will be published on the Equip Indian Churches media portal following the conference.",
+          "displayOrder": 3
+        }
+      ],
+      "seoTitle": "AIPC 2026: All India Pastors Conference | Equip Indian Churches",
+      "metaDescription": "National pastors conference gathering church leaders across India for expository preaching and sound doctrine.",
+      "createdById": "user-superadmin-1",
+      "createdByEmail": "admin@equipindianchurches.com",
+      "createdAt": "2026-08-01T00:00:00.000Z",
+      "updatedAt": "2026-10-20T00:00:00.000Z"
+    },
+    {
+      "id": "event-roundtable-south",
+      "title": "Regional Pastors Roundtable: South India Assembly",
+      "slug": "regional-pastors-roundtable-south-india",
+      "shortDescription": "A focused regional assembly for pastors in Karnataka, Tamil Nadu, and Kerala addressing church planting and local church health.",
+      "fullDescription": "### Regional Roundtable for Pastors and Elders\n\nAn intentional, relational regional forum designed to cultivate pastoral camaraderie, mutual accountability, and church revitalisation strategies across southern states.",
+      "featuredPosterUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=1200&h=800&q=80",
+      "galleryImageUrls": [],
+      "status": "published",
+      "operationalStatus": "scheduled",
+      "startDate": "2026-08-22",
+      "startTime": "10:00",
+      "endDate": "2026-08-22",
+      "endTime": "16:30",
+      "isAllDay": false,
+      "hideEndTime": false,
+      "timezone": "Asia/Kolkata",
+      "isRecurring": false,
+      "venueId": "venue-bangalore-2",
+      "isOnlineOnly": false,
+      "speakerIds": [],
+      "organizerIds": [
+        "org-eic"
+      ],
+      "categoryIds": [
+        "cat-regional-rt"
+      ],
+      "tagIds": [
+        "tag-pastors",
+        "tag-planting"
+      ],
+      "registrationUrl": "https://equipindianchurches.com/events/roundtable-south/register",
+      "registrationButtonLabel": "Register for Roundtable",
+      "registrationAvailable": true,
+      "isFree": true,
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "schedules": [],
+      "faqs": [],
+      "createdById": "user-eventmgr-2",
+      "createdByEmail": "events@equipindianchurches.com",
+      "createdAt": "2026-08-10T00:00:00.000Z",
+      "updatedAt": "2026-08-10T00:00:00.000Z"
+    },
+    {
+      "id": "event-preaching-workshop",
+      "title": "Expository Preaching Seminar & Workshop 2026",
+      "slug": "expository-preaching-seminar-workshop-2026",
+      "shortDescription": "Intensive training for young preachers on text-driven exegesis, Christ-centered hermeneutics, and pastoral delivery.",
+      "fullDescription": "### Hands-on Expository Preaching Lab\n\nLearn how to study the biblical passage in its grammatical-historical context, identify the authorial intent, formulate the main homiletical idea, and apply God’s eternal truth to contemporary hearts.",
+      "featuredPosterUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&h=800&q=80",
+      "galleryImageUrls": [],
+      "status": "published",
+      "operationalStatus": "scheduled",
+      "startDate": "2026-10-05",
+      "startTime": "09:00",
+      "endDate": "2026-10-07",
+      "endTime": "17:00",
+      "isAllDay": false,
+      "hideEndTime": false,
+      "timezone": "Asia/Kolkata",
+      "isRecurring": false,
+      "venueId": "venue-mumbai-3",
+      "isOnlineOnly": false,
+      "speakerIds": [
+        "speaker-ajay-thomas",
+        "speaker-boboy-singh"
+      ],
+      "organizerIds": [
+        "org-eic"
+      ],
+      "categoryIds": [
+        "cat-preaching-workshop"
+      ],
+      "tagIds": [
+        "tag-preaching",
+        "tag-pastors"
+      ],
+      "registrationUrl": "https://equipindianchurches.com/events/preaching-workshop-2026",
+      "registrationButtonLabel": "Reserve Workshop Seat",
+      "registrationAvailable": true,
+      "isFree": false,
+      "price": 800,
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "schedules": [],
+      "faqs": [],
+      "createdById": "user-superadmin-1",
+      "createdByEmail": "admin@equipindianchurches.com",
+      "createdAt": "2026-09-01T00:00:00.000Z",
+      "updatedAt": "2026-09-01T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-national-conf",
+      "name": "National Conference",
+      "slug": "national-conference",
+      "description": "All India pastoral gatherings and annual national convocations.",
+      "colorHex": "#D9A62E",
+      "displayOrder": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-regional-rt",
+      "name": "Regional Roundtable",
+      "slug": "regional-roundtable",
+      "description": "State and city-level theological and pastoral fellowship roundtables.",
+      "colorHex": "#2563EB",
+      "displayOrder": 2,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-preaching-workshop",
+      "name": "Expository Preaching Workshop",
+      "slug": "expository-preaching-workshop",
+      "description": "Hands-on hermeneutics, homiletics, and sermon-preparation labs.",
+      "colorHex": "#059669",
+      "displayOrder": 3,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-theological-colloquium",
+      "name": "Theological Colloquium",
+      "slug": "theological-colloquium",
+      "description": "Scholarly discussions and doctrinal papers on church health.",
+      "colorHex": "#7C3AED",
+      "displayOrder": 4,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-pastors",
+      "name": "Pastors & Elders",
+      "slug": "pastors-elders",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tag-preaching",
+      "name": "Biblical Preaching",
+      "slug": "biblical-preaching",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tag-planting",
+      "name": "Church Planting",
+      "slug": "church-planting",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tag-doctrine",
+      "name": "Sound Doctrine",
+      "slug": "sound-doctrine",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "speakers": [
+    {
+      "id": "speaker-anand-samuel",
+      "name": "Anand Samuel",
+      "slug": "anand-samuel",
+      "designation": "Senior Pastor",
+      "organization": "Grace Bible Church",
+      "photoUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&h=400&q=80",
+      "biography": "Serving in pastoral ministry and expositional preaching across Indian local churches for over two decades.",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "speaker-ajay-thomas",
+      "name": "Ajay Thomas",
+      "slug": "ajay-thomas",
+      "designation": "Lead Pastor",
+      "organization": "The Crossway Fellowship",
+      "photoUrl": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&h=400&q=80",
+      "biography": "Pastor, church planter, and author devoted to theological clarity and pastoral mentorship in urban India.",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 2,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "speaker-nathan-eda",
+      "name": "Nathan Eda",
+      "slug": "nathan-eda",
+      "designation": "Pastor & Theological Educator",
+      "organization": "Metropolitan Bible Assembly",
+      "photoUrl": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&h=400&q=80",
+      "biography": "Focusing on urban disciple-making, planting confessional Baptist congregations, and pastoral care.",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 3,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "speaker-boboy-singh",
+      "name": "Boboy Nambram Singh",
+      "slug": "boboy-singh",
+      "designation": "Pastor",
+      "organization": "Grace Church Imphal",
+      "photoUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=400&q=80",
+      "biography": "Shepherding believers in northeast India, teaching expository worship and biblical ecclesiology.",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 4,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "organizers": [
+    {
+      "id": "org-eic",
+      "name": "Equip Indian Churches",
+      "slug": "equip-indian-churches",
+      "logoUrl": "https://equipindianchurches.com/wp-content/uploads/2021/04/EIC-Logo-1.png",
+      "description": "An online resource ministry committed to equipping pastors and churches with biblical truth across India.",
+      "contactEmail": "contact@equipindianchurches.com",
+      "contactPhone": "+91 98765 43210",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 1,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "org-aipc",
+      "name": "All India Pastors Conference Council",
+      "slug": "aipc-council",
+      "logoUrl": "https://equipindianchurches.com/wp-content/uploads/2021/04/EIC-Logo-1.png",
+      "description": "Annual gathering of evangelical pastors, theologians, and church leaders dedicated to biblical preaching.",
+      "contactEmail": "aipc@equipindianchurches.com",
+      "websiteUrl": "https://equipindianchurches.com",
+      "displayOrder": 2,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "venues": [
+    {
+      "id": "venue-delhi-1",
+      "name": "Constitution Club of India",
+      "slug": "constitution-club-delhi",
+      "address": "Rafi Marg, Sansad Marg Area",
+      "city": "New Delhi",
+      "state": "Delhi",
+      "country": "India",
+      "postalCode": "110001",
+      "mapUrl": "https://maps.google.com/?q=Constitution+Club+of+India+New+Delhi",
+      "capacity": 650,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "venue-bangalore-2",
+      "name": "Good Shepherd Auditorium",
+      "slug": "good-shepherd-bangalore",
+      "address": "Museum Road, Shanthala Nagar",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "country": "India",
+      "postalCode": "560025",
+      "mapUrl": "https://maps.google.com/?q=Good+Shepherd+Auditorium+Bangalore",
+      "capacity": 500,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "venue-mumbai-3",
+      "name": "YMCA International Centre",
+      "slug": "ymca-international-mumbai",
+      "address": "Mumbai Central",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "country": "India",
+      "postalCode": "400008",
+      "mapUrl": "https://maps.google.com/?q=YMCA+International+Mumbai",
+      "capacity": 350,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "venue-kolkata-4",
+      "name": "Kolkata Theological Centre",
+      "slug": "kolkata-theological-centre",
+      "address": "Park Street",
+      "city": "Kolkata",
+      "state": "West Bengal",
+      "country": "India",
+      "postalCode": "700016",
+      "mapUrl": "https://maps.google.com/?q=Kolkata+Theological+Centre",
+      "capacity": 250,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "headerMenu": {
+    "id": "header_menu",
+    "name": "Custom Desktop & Mobile Header Navigation",
+    "updatedAt": "2026-10-27T10:44:01.816Z",
+    "updatedBy": "admin@equipindianchurches.com",
+    "items": [
+      {
+        "id": "menu-art",
+        "label": "Articles",
+        "url": "/articles",
+        "target": "_self",
+        "isEnabled": true,
+        "displayOrder": 1,
+        "children": [
+          {
+            "id": "menu-art-all",
+            "label": "All Articles & Essays",
+            "url": "/articles",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "menu-art-series",
+            "label": "Teaching Series",
+            "url": "/series",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "menu-art-books",
+            "label": "Book Reviews",
+            "url": "/book-reviews",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      },
+      {
+        "id": "menu-sermons",
+        "label": "Sermons & Media",
+        "url": "/sermons",
+        "target": "_self",
+        "isEnabled": true,
+        "displayOrder": 2,
+        "children": [
+          {
+            "id": "menu-serm-all",
+            "label": "Expository Sermons",
+            "url": "/sermons",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "menu-serm-vid",
+            "label": "Videos & Podcasts",
+            "url": "/videos",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "menu-serm-aipc",
+            "label": "AIPC Conference Messages",
+            "url": "/sermons?category=aipc",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      },
+      {
+        "id": "menu-events",
+        "label": "Events & Conferences",
+        "url": "/events",
+        "target": "_self",
+        "isEnabled": true,
+        "displayOrder": 3,
+        "children": [
+          {
+            "id": "menu-ev-upcoming",
+            "label": "Upcoming Assemblies",
+            "url": "/events",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "menu-ev-gallery",
+            "label": "Photo Galleries",
+            "url": "/gallery",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          }
+        ]
+      },
+      {
+        "id": "menu-rec",
+        "label": "Recommendations",
+        "url": "/seminaries",
+        "target": "_self",
+        "isEnabled": true,
+        "displayOrder": 4,
+        "children": [
+          {
+            "id": "menu-rec-sem",
+            "label": "Bible Seminaries & Colleges",
+            "url": "/seminaries",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "menu-rec-book",
+            "label": "Gospel Bookstores",
+            "url": "/bookstores",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          }
+        ]
+      }
+    ]
+  },
+  "footerMenu": {
+    "id": "footer_menu_config",
+    "updatedAt": "2026-10-27T10:44:01.816Z",
+    "updatedBy": "admin@equipindianchurches.com",
+    "groups": [
+      {
+        "id": "fg-about",
+        "heading": "About EIC",
+        "displayOrder": 1,
+        "links": [
+          {
+            "id": "fl-about-1",
+            "label": "Our Mission & Vision",
+            "url": "https://equipindianchurches.com/about",
+            "target": "_blank",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "fl-about-2",
+            "label": "Statement of Faith",
+            "url": "https://equipindianchurches.com/statement-of-faith",
+            "target": "_blank",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "fl-about-3",
+            "label": "Pastoral Leadership Team",
+            "url": "/authors",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      },
+      {
+        "id": "fg-events",
+        "heading": "Events & Assemblies",
+        "displayOrder": 2,
+        "links": [
+          {
+            "id": "fl-ev-1",
+            "label": "National Pastors Conference (AIPC)",
+            "url": "/events",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "fl-ev-2",
+            "label": "Regional Roundtables",
+            "url": "/events",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "fl-ev-3",
+            "label": "Event Photo Albums",
+            "url": "/gallery",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      },
+      {
+        "id": "fg-resources",
+        "heading": "Resources",
+        "displayOrder": 3,
+        "links": [
+          {
+            "id": "fl-res-1",
+            "label": "Articles & Essays",
+            "url": "/articles",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "fl-res-2",
+            "label": "Expository Sermons",
+            "url": "/sermons",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "fl-res-3",
+            "label": "Faithful Book Reviews",
+            "url": "/book-reviews",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      },
+      {
+        "id": "fg-contact",
+        "heading": "Contact & Support",
+        "displayOrder": 4,
+        "links": [
+          {
+            "id": "fl-cnt-1",
+            "label": "Contact Inquiries",
+            "url": "mailto:contact@equipindianchurches.com",
+            "target": "_blank",
+            "isEnabled": true,
+            "displayOrder": 1
+          },
+          {
+            "id": "fl-cnt-2",
+            "label": "Subscribe to Newsletter",
+            "url": "/library",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 2
+          },
+          {
+            "id": "fl-cnt-3",
+            "label": "Privacy & Terms",
+            "url": "/privacy",
+            "target": "_self",
+            "isEnabled": true,
+            "displayOrder": 3
+          }
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "defaultTimezone": "Asia/Kolkata",
+    "defaultCurrency": "INR",
+    "defaultCurrencySymbol": "₹",
+    "defaultRegistrationLabel": "Register for Conference",
+    "supportEmail": "contact@equipindianchurches.com",
+    "eventsPerPage": 10,
+    "enablePublicCustomEvents": false,
+    "enablePublicCustomMenus": false,
+    "autoArchivePastEvents": true,
+    "updatedAt": "2026-10-27T10:44:01.816Z",
+    "updatedBy": "admin@equipindianchurches.com"
+  },
+  "media": [
+    {
+      "id": "media-1",
+      "name": "AIPC 2026 Official Banner.jpg",
+      "url": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&h=800&q=80",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 245000,
+      "altText": "All India Pastors Conference 2026",
+      "width": 1200,
+      "height": 800,
+      "uploadedById": "user-superadmin-1",
+      "uploadedByEmail": "admin@equipindianchurches.com",
+      "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "media-2",
+      "name": "South India Roundtable Poster.jpg",
+      "url": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=1200&h=800&q=80",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 198000,
+      "altText": "South India Pastors Roundtable",
+      "width": 1200,
+      "height": 800,
+      "uploadedById": "user-superadmin-1",
+      "uploadedByEmail": "admin@equipindianchurches.com",
+      "createdAt": "2026-08-10T00:00:00.000Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "audit-1",
+      "userId": "user-superadmin-1",
+      "userEmail": "admin@equipindianchurches.com",
+      "action": "system.init",
+      "entity": "system",
+      "details": {
+        "version": "1.0.0",
+        "initializedAt": "2026-01-01T00:00:00.000Z"
+      },
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "audit-2",
+      "userId": "user-superadmin-1",
+      "userEmail": "admin@equipindianchurches.com",
+      "action": "event.create",
+      "entity": "event",
+      "entityId": "event-aipc-2026",
+      "entityTitle": "All India Pastors Conference (AIPC) 2026",
+      "details": {
+        "status": "published",
+        "venue": "Constitution Club of India"
+      },
+      "timestamp": "2026-08-01T00:00:00.000Z"
+    }
+  ]
+}

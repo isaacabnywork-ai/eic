@@ -130,11 +130,11 @@ export function EventSinglePage() {
     return customEvents.find((e) => e.slug.trim().toLowerCase() === clean) || null;
   }, [customEvents, slug]);
 
-  // Direct DB lookup for full entity relational data
+  // Direct DB lookup for full entity relational data (re-evaluates on live sync)
   const rawCustomEvent: CustomEvent | null = useMemo(() => {
     if (!slug) return null;
     return eventRepository.getBySlug(slug);
-  }, [slug]);
+  }, [slug, customEvents]);
 
   // 2. Fallback to WordPress query if not in custom database
   const { data: wpEvent, isLoading: wpLoading, isError: wpIsError, error: wpError, refetch } = useContentItem(
@@ -166,17 +166,17 @@ export function EventSinglePage() {
   const venue: Venue | null = useMemo(() => {
     if (!rawCustomEvent?.venueId) return null;
     return taxonomyRepository.getVenues().find((v) => v.id === rawCustomEvent.venueId) || null;
-  }, [rawCustomEvent?.venueId]);
+  }, [rawCustomEvent?.venueId, customEvents]);
 
   const organizer: Organizer | null = useMemo(() => {
     if (!rawCustomEvent?.organizerIds?.[0]) return null;
     return taxonomyRepository.getOrganizers().find((o) => o.id === rawCustomEvent.organizerIds[0]) || null;
-  }, [rawCustomEvent?.organizerIds]);
+  }, [rawCustomEvent?.organizerIds, customEvents]);
 
   const category: EventCategory | null = useMemo(() => {
     if (!rawCustomEvent?.categoryIds?.[0]) return null;
     return taxonomyRepository.getCategories().find((c) => c.id === rawCustomEvent.categoryIds[0]) || null;
-  }, [rawCustomEvent?.categoryIds]);
+  }, [rawCustomEvent?.categoryIds, customEvents]);
 
   // Unified event representation
   const event = useMemo(() => {
@@ -411,38 +411,6 @@ export function EventSinglePage() {
                   <span>+ Add to Google Calendar</span>
                 </a>
               </div>
-
-              {/* 5. Schedule Sessions (if present) */}
-              {event.schedules.length > 0 && (
-                <div className="pt-4 border-t border-[#D0E1F0] dark:border-white/10 space-y-4">
-                  <h3 className="font-serif text-xl font-bold text-[#182541] dark:text-white flex items-center gap-2">
-                    <ClockIcon className="w-5 h-5 text-[#094899] dark:text-sky-400" />
-                    <span>Schedule & Agenda</span>
-                  </h3>
-                  <div className="space-y-3">
-                    {event.schedules.map((sess) => (
-                      <div
-                        key={sess.id}
-                        className="p-4 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div>
-                          <span className="text-xs font-bold text-[#094899] dark:text-sky-400 block mb-0.5">
-                            {formatTimeDisplay(sess.startTime)} – {formatTimeDisplay(sess.endTime)}
-                          </span>
-                          <h4 className="font-bold text-sm text-[#182541] dark:text-white">
-                            {sess.title}
-                          </h4>
-                          {sess.description && (
-                            <p className="text-xs text-slate-500 dark:text-white/60 mt-1">
-                              {sess.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* 6. Related Events Navigation (Matches Reference Image 3) */}
               <div className="pt-8 border-t border-[#D0E1F0] dark:border-white/10">
