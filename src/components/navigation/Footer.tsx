@@ -91,17 +91,6 @@ export function Footer() {
               />
               <span className="sr-only">{site.name} - Equipping the Church</span>
             </Link>
-            {env.contactEmail && (
-              <p className="text-xs text-muted">
-                Contact:{' '}
-                <a
-                  href={`mailto:${env.contactEmail}`}
-                  className="text-ink hover:text-accent-text underline transition-colors"
-                >
-                  {env.contactEmail}
-                </a>
-              </p>
-            )}
 
             {/* Social Icons */}
             <div className="flex items-center gap-2.5 pt-2">
