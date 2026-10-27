@@ -27,6 +27,7 @@ jobs:
           VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
         run: |
           set -eu
+
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
@@ -35,6 +36,36 @@ jobs:
 
           printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
+
+      - name: Verify SSH host-key configuration
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -eu
+
+          echo "Configured VPS host: $VPS_HOST"
+
+          if [ -z "$VPS_HOST" ]; then
+            echo "ERROR: VPS_HOST is empty."
+            exit 1
+          fi
+
+          echo "Known-hosts fingerprints:"
+          ssh-keygen -lf ~/.ssh/known_hosts
+
+          echo "Entries matching the configured host:"
+          ssh-keygen -F "$VPS_HOST" -f ~/.ssh/known_hosts
+
+          echo "Checking the expected Ed25519 fingerprint..."
+          EXPECTED="SHA256:sM+EKZFDQ5Gufgd9qQSzUN5Rrxyja7C+TVbuKjXdXhg"
+
+          if ! ssh-keygen -lf ~/.ssh/known_hosts |
+            grep -F "$EXPECTED"; then
+            echo "ERROR: Expected VPS fingerprint is missing."
+            exit 1
+          fi
+
+          echo "Host-key configuration diagnostic completed."
 
       - name: Diagnose VPS connectivity
         env:
@@ -51,7 +82,9 @@ jobs:
           host = os.environ["VPS_HOST"].strip()
 
           if not host or any(c in host for c in "/:@ \t\n"):
-              raise SystemExit("VPS_HOST must contain only the hostname or IP address.")
+              raise SystemExit(
+                  "VPS_HOST must contain only a hostname or IP address."
+              )
 
           print(f"Testing host: {host}, port: 22")
 
