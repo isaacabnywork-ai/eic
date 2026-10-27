@@ -30,67 +30,157 @@ export const authRepository = {
     }
   },
 
-  async login(email: string, plainPassword: string): Promise<{ success: boolean; session?: AdminSession; error?: string }> {
+  async login(
+    usernameOrEmail: string,
+    plainPassword: string,
+  ): Promise<{ success: boolean; session?: AdminSession; error?: string }> {
+    const cleanInput = usernameOrEmail.trim();
+    if (!cleanInput || !plainPassword) {
+      return { success: false, error: 'Please enter both your WordPress username or email and password.' };
+    }
+
+    // 1. Attempt Live WordPress Authentication via backend proxy
+    let wpSuccess = false;
+    let wpUser: { username: string; displayName: string; email: string; role: AdminRole } | null = null;
+    let wpError: string | null = null;
+
+    try {
+      const response = await fetch('/api/admin/auth/wp-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usernameOrEmail: cleanInput,
+          password: plainPassword,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.user) {
+          wpSuccess = true;
+          wpUser = data.user;
+        } else {
+          wpError = data.error || 'Invalid credentials.';
+        }
+      } else {
+        const data = await response.json().catch(() => null);
+        wpError = data?.error || 'Authentication server error.';
+      }
+    } catch {
+      // Network failure or offline dev
+      wpError = 'Could not reach WordPress authentication endpoint.';
+    }
+
+    // 2. If WordPress authentication succeeded, provision / update local admin user
+    if (wpSuccess && wpUser) {
+      const state = adminDb.getState();
+      const cleanEmail = wpUser.email.toLowerCase();
+      const cleanName = wpUser.username.toLowerCase();
+
+      const existingUser = state.users.find(
+        (u) =>
+          u.email.toLowerCase() === cleanEmail ||
+          u.name.toLowerCase() === cleanName ||
+          u.email.toLowerCase().startsWith(`${cleanName}@`),
+      );
+
+      let activeUser: AdminUser;
+      if (existingUser) {
+        activeUser = {
+          ...existingUser,
+          name: wpUser.displayName || existingUser.name,
+          email: wpUser.email || existingUser.email,
+          role: existingUser.role === 'super_admin' ? 'super_admin' : 'administrator',
+          isActive: true,
+          lastLoginAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        adminDb.update('users', (prev) => prev.map((u) => (u.id === activeUser.id ? activeUser : u)));
+      } else {
+        activeUser = {
+          id: `wp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          name: wpUser.displayName || wpUser.username,
+          email: wpUser.email,
+          passwordHash: await this.hashPassword(plainPassword),
+          role: 'administrator',
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+        };
+        adminDb.update('users', (prev) => [activeUser, ...prev]);
+      }
+
+      // Create session (expires in 12 hours)
+      const token = `wp_token_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const expiresAt = Date.now() + 12 * 60 * 60 * 1000;
+      const session: AdminSession = { token, user: activeUser, expiresAt };
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+      adminDb.logAudit({
+        userId: activeUser.id,
+        userEmail: activeUser.email,
+        action: 'user.login',
+        entity: 'auth',
+        details: { method: 'wordpress_sso', username: wpUser.username, role: activeUser.role },
+      });
+
+      return { success: true, session };
+    }
+
+    // 3. Fallback: Check local administrative user (for offline development or emergency recovery)
     const state = adminDb.getState();
-    const cleanEmail = email.trim().toLowerCase();
-    const user = state.users.find((u) => u.email.toLowerCase() === cleanEmail);
+    const cleanLower = cleanInput.toLowerCase();
+    const localUser = state.users.find(
+      (u) => u.email.toLowerCase() === cleanLower || u.name.toLowerCase() === cleanLower,
+    );
 
-    if (!user) {
-      adminDb.logAudit({
-        userId: 'anonymous',
-        userEmail: cleanEmail,
-        action: 'user.login_failed',
-        entity: 'auth',
-        details: { reason: 'user_not_found' },
-      });
-      return { success: false, error: 'Invalid email or password.' };
+    if (localUser && localUser.isActive) {
+      const hashedAttempt = await this.hashPassword(plainPassword);
+      const matchesHash = localUser.passwordHash === hashedAttempt;
+      const matchesDefaultSeed = plainPassword === DEFAULT_ADMIN_PASSWORD;
+
+      if (matchesHash || matchesDefaultSeed) {
+        const updatedUser: AdminUser = {
+          ...localUser,
+          lastLoginAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        adminDb.update('users', (prev) => prev.map((u) => (u.id === localUser.id ? updatedUser : u)));
+
+        const token = `local_token_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        const expiresAt = Date.now() + 12 * 60 * 60 * 1000;
+        const session: AdminSession = { token, user: updatedUser, expiresAt };
+
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+        adminDb.logAudit({
+          userId: localUser.id,
+          userEmail: localUser.email,
+          action: 'user.login',
+          entity: 'auth',
+          details: { method: 'local_fallback', role: localUser.role },
+        });
+
+        return { success: true, session };
+      }
     }
 
-    if (!user.isActive) {
-      return { success: false, error: 'This administrative account is disabled.' };
-    }
-
-    // Check password
-    const hashedAttempt = await this.hashPassword(plainPassword);
-    const matchesHash = user.passwordHash === hashedAttempt;
-    const matchesDefaultSeed = plainPassword === DEFAULT_ADMIN_PASSWORD;
-
-    if (!matchesHash && !matchesDefaultSeed) {
-      adminDb.logAudit({
-        userId: user.id,
-        userEmail: user.email,
-        action: 'user.login_failed',
-        entity: 'auth',
-        details: { reason: 'incorrect_password' },
-      });
-      return { success: false, error: 'Invalid email or password.' };
-    }
-
-    // Update last login
-    const updatedUser: AdminUser = {
-      ...user,
-      lastLoginAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    adminDb.update('users', (prev) => prev.map((u) => (u.id === user.id ? updatedUser : u)));
-
-    // Create session (expires in 8 hours)
-    const token = `token_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    const expiresAt = Date.now() + 8 * 60 * 60 * 1000;
-    const session: AdminSession = { token, user: updatedUser, expiresAt };
-
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
+    // Log failure
     adminDb.logAudit({
-      userId: user.id,
-      userEmail: user.email,
-      action: 'user.login',
+      userId: 'anonymous',
+      userEmail: cleanInput,
+      action: 'user.login_failed',
       entity: 'auth',
-      details: { role: user.role },
+      details: { reason: wpError || 'invalid_credentials' },
     });
 
-    return { success: true, session };
+    return {
+      success: false,
+      error: wpError || 'Invalid WordPress username, email, or password.',
+    };
   },
 
   getCurrentSession(): AdminSession | null {

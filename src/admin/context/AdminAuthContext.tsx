@@ -7,7 +7,7 @@ interface AdminAuthContextValue {
   session: AdminSession | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, plainPassword: string) => Promise<{ success: boolean; error?: string }>;
+  login: (usernameOrEmail: string, plainPassword: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   hasRole: (roles: AdminRole[]) => boolean;
   can: (action: 'view' | 'create' | 'edit' | 'delete' | 'publish' | 'manage_users' | 'manage_settings', entity?: string) => boolean;
@@ -26,8 +26,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback(async (email: string, plainPassword: string) => {
-    const res = await authRepository.login(email, plainPassword);
+  const login = useCallback(async (usernameOrEmail: string, plainPassword: string) => {
+    const res = await authRepository.login(usernameOrEmail, plainPassword);
     if (res.success && res.session) {
       setSession(res.session);
       return { success: true };
