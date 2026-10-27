@@ -43,38 +43,23 @@ jobs:
         run: |
           set -eu
 
-          echo "Checking VPS host configuration..."
-
           if [ -z "$VPS_HOST" ]; then
             echo "ERROR: VPS_HOST is empty."
             exit 1
           fi
 
+          echo "Configured host: $VPS_HOST"
           echo "Known-hosts fingerprints:"
           ssh-keygen -lf ~/.ssh/known_hosts
 
-          echo "Entries matching the configured host:"
+          echo "Matching host-key entries:"
           ssh-keygen -F "$VPS_HOST" -f ~/.ssh/known_hosts || true
-
-          echo "Checking for the expected VPS fingerprint..."
-          EXPECTED="SHA256:sM+EKZFDQ5Gufgd9qQSzUN5Rrxyja7C+TVbuKjXdXhg"
-
-          if ssh-keygen -lf ~/.ssh/known_hosts | grep -Fq "$EXPECTED"; then
-            echo "Expected VPS fingerprint is present."
-          else
-            echo "WARNING: Expected fingerprint not found."
-            echo "The SSH connection will still enforce strict host verification."
-          fi
-
-          echo "Host-key diagnostic completed."
 
       - name: Diagnose VPS connectivity
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
         run: |
           set -eu
-
-          echo "Testing TCP connectivity to VPS port 22..."
 
           python3 - <<'PY'
           import os
@@ -83,15 +68,13 @@ jobs:
           host = os.environ["VPS_HOST"].strip()
 
           if not host or any(c in host for c in "/:@ \t\n"):
-              raise SystemExit(
-                  "VPS_HOST must contain only a hostname or IP address."
-              )
+              raise SystemExit("VPS_HOST must be a hostname or IP address only.")
 
-          print(f"Testing host: {host}, port: 22")
+          print(f"Testing TCP connectivity to {host}:22")
 
           try:
               with socket.create_connection((host, 22), timeout=10):
-                  print("SUCCESS: GitHub runner can reach TCP port 22.")
+                  print("SUCCESS: TCP port 22 is reachable.")
           except Exception as exc:
               print(f"FAILED: {type(exc).__name__}: {exc}")
               raise SystemExit(1)
@@ -111,6 +94,42 @@ jobs:
             -o ConnectTimeout=15 \
             "$VPS_USER@$VPS_HOST" 'bash -se' <<'REMOTE'
           set -euo pipefail
+
+          # Load Node.js and npm installed through NVM.
+          export NVM_DIR="$HOME/.nvm"
+
+          if [ -s "$NVM_DIR/nvm.sh" ]; then
+            . "$NVM_DIR/nvm.sh"
+          fi
+
+          # Fallback to the known Node.js installation path.
+          if [ -d "$NVM_DIR/versions/node" ]; then
+            NODE_VERSION_DIR="$(find "$NVM_DIR/versions/node" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+            if [ -n "$NODE_VERSION_DIR" ]; then
+              export PATH="$NODE_VERSION_DIR/bin:$PATH"
+            fi
+          fi
+
+          # Find PM2 in the app user's NVM installation if necessary.
+          if ! command -v pm2 >/dev/null 2>&1; then
+            for PM2_BIN in "$NVM_DIR"/versions/node/*/bin/pm2; do
+              if [ -x "$PM2_BIN" ]; then
+                export PATH="$(dirname "$PM2_BIN"):$PATH"
+                break
+              fi
+            done
+          fi
+
+          echo "Node: $(command -v node || true)"
+          echo "npm: $(command -v npm || true)"
+          echo "PM2: $(command -v pm2 || true)"
+
+          if ! command -v node >/dev/null 2>&1 ||
+             ! command -v npm >/dev/null 2>&1 ||
+             ! command -v pm2 >/dev/null 2>&1; then
+            echo "ERROR: Node.js, npm, or PM2 is unavailable."
+            exit 1
+          fi
 
           cd /home/equipindianchurches-app/htdocs/equipindianchurches.com
 
