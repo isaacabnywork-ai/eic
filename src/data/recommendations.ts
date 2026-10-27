@@ -61,19 +61,6 @@ export const seminariesData: RecommendationItem[] = [
 
 export const bookstoresData: RecommendationItem[] = [
   {
-    id: 'alethia-books',
-    slug: 'alethia-books',
-    title: 'Alethia Books',
-    category: 'bookstore',
-    categoryLabel: 'Christian Bookstore & Distributor',
-    subtitle: 'Sound Christian Literature in India',
-    description:
-      'Alethia Books is dedicated to making sound, reformed, and gospel-centred Christian books, theological commentaries, and Bibles easily accessible to believers, pastors, and study groups across India.',
-    website: 'https://alethiabooks.com/',
-    location: 'India-wide Shipping',
-    focusAreas: ['Theology & Doctrine', 'Commentaries & Study Bibles', 'Christian Living', 'Puritan Classics'],
-  },
-  {
     id: 'for-the-truth',
     slug: 'for-the-truth',
     title: 'For The Truth',

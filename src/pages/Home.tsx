@@ -1381,10 +1381,6 @@ export function HomePage() {
                       <h2 className="font-serif text-xl sm:text-2xl font-bold text-ink">
                         Answers to EIC
                       </h2>
-                      <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text flex items-center gap-1">
-                        <PlayIcon size={9} />
-                        <span>Video Q&A</span>
-                      </span>
                     </div>
                     <Link
                       to={`/${contentTypes.video.route}`}
@@ -1459,9 +1455,6 @@ export function HomePage() {
                   <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
                     Latest Articles
                   </h2>
-                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                    Curated
-                  </span>
                 </div>
 
                 {/* Filter Pills below title (matching reference image) */}
@@ -1562,7 +1555,7 @@ export function HomePage() {
         </section>
 
         {/* ------------------------------------------------------------ */}
-        {/* SECTION 3: EVENTS & CONFERENCES (Assemblies in India)        */}
+        {/* SECTION 3: EVENTS & CONFERENCES                             */}
         {/* ------------------------------------------------------------ */}
         <section className="border-b border-line/80 py-12 bg-surface">
           <div className="container-page max-w-[1400px]">
@@ -1573,9 +1566,6 @@ export function HomePage() {
                   <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
                     Events & Conferences
                   </h2>
-                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                    Assemblies in India
-                  </span>
                 </div>
                 <p className="text-xs text-muted mt-1">
                   National pastors conferences, regional ministerial roundtables, and expository training workshops
@@ -1830,9 +1820,6 @@ export function HomePage() {
                   <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
                     Expository Videos
                   </h2>
-                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                    Interactive Video Ministry
-                  </span>
                 </div>
                 <p className="text-xs text-muted mt-1">
                   Gospel-centered panel discussions, expositional teachings, and ministry conversations
@@ -1863,9 +1850,6 @@ export function HomePage() {
                   <h2 className="font-serif text-2xl lg:text-3xl font-black uppercase tracking-[0.06em] text-ink">
                     Faithful Book Reviews
                   </h2>
-                  <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
-                    Staff Recommendations
-                  </span>
                 </div>
                 <p className="text-xs text-muted mt-1">
                   Biblical assessments and evaluations of essential theological, pastoral, and devotional books

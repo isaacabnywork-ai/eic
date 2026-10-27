@@ -223,9 +223,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
 
             <DrawerLink to="/bookstores" icon={BookIcon} label="Recommended Bookstores" onClick={onClose} />
             <div className="pl-7 space-y-1 pb-1">
-              <Link to="/bookstores/alethia-books" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • Alethia Books
-              </Link>
               <Link to="/bookstores/for-the-truth" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
                 • For The Truth
               </Link>

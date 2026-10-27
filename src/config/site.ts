@@ -160,7 +160,6 @@ export const navItems: NavItem[] = [
           title: 'Bookstores',
           links: [
             { label: 'All Bookstores & Publishers', to: '/bookstores' },
-            { label: 'Alethia Books', to: '/bookstores/alethia-books' },
             { label: 'For The Truth', to: '/bookstores/for-the-truth' },
             { label: 'Sola Books', to: '/bookstores/sola-books' },
           ],
@@ -216,7 +215,6 @@ export const footerColumns: { title: string; links: { label: string; to: string;
       { label: 'Evangelical Theological Seminary', to: '/seminaries/evangelical-theological-seminary' },
       { label: 'Satya Vachan Seminary', to: '/seminaries/satya-vachan-seminary' },
       { label: 'Bookstores', to: '/bookstores' },
-      { label: 'Alethia Books', to: '/bookstores/alethia-books' },
       { label: 'For The Truth', to: '/bookstores/for-the-truth' },
       { label: 'Sola Books', to: '/bookstores/sola-books' },
     ],
