@@ -2088,14 +2088,6 @@
             "target": "_self",
             "isEnabled": true,
             "displayOrder": 2
-          },
-          {
-            "id": "menu-serm-aipc",
-            "label": "AIPC Conference Messages",
-            "url": "/sermons?category=aipc",
-            "target": "_self",
-            "isEnabled": true,
-            "displayOrder": 3
           }
         ]
       },
@@ -2203,20 +2195,12 @@
             "displayOrder": 1
           },
           {
-            "id": "fl-ev-2",
-            "label": "Regional Roundtables",
-            "url": "/events",
-            "target": "_self",
-            "isEnabled": true,
-            "displayOrder": 2
-          },
-          {
             "id": "fl-ev-3",
             "label": "Event Photo Albums",
             "url": "/gallery",
             "target": "_self",
             "isEnabled": true,
-            "displayOrder": 3
+            "displayOrder": 2
           }
         ]
       },

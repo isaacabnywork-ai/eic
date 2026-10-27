@@ -197,7 +197,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
               Fellowship & Ministry Network
             </span>
-            <DrawerLink to="/events" icon={CalendarIcon} label="Conferences & Pastors Roundtables" onClick={onClose} />
+            <DrawerLink to="/events" icon={CalendarIcon} label="Conferences & Events" onClick={onClose} />
             <DrawerLink to="/churches" icon={MapPinIcon} label="Church Directory" onClick={onClose} />
           </div>
 

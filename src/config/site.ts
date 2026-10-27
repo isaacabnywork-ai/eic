@@ -84,7 +84,6 @@ export const navItems: NavItem[] = [
           title: 'Expository Sermons',
           links: [
             { label: 'All Expository Sermons', to: `/${t.sermon.route}` },
-            { label: 'Conference Messages', to: `/${t.sermon.route}` },
           ],
           source: { kind: 'sermonCategories' },
         },
@@ -92,7 +91,6 @@ export const navItems: NavItem[] = [
           title: 'Videos & Conversations',
           links: [
             { label: 'All Video Teachings', to: `/${t.video.route}` },
-            { label: 'Panel Discussions & Q&A', to: `/${t.video.route}` },
           ],
           source: { kind: 'videoCategories' },
         },
@@ -100,8 +98,6 @@ export const navItems: NavItem[] = [
           title: 'Media Channels',
           links: [
             { label: 'YouTube Channel', to: 'https://www.youtube.com/@EquipIndianChurches', external: true },
-            { label: 'All India Pastors Conference', to: `/${t.sermon.route}` },
-            { label: 'Teaching Expositions', to: `/${t.sermon.route}` },
           ],
         },
       ],
@@ -118,8 +114,6 @@ export const navItems: NavItem[] = [
           title: 'Conferences & Events',
           links: [
             { label: 'Upcoming Events & Conferences', to: `/${t.event.route}` },
-            { label: 'All India Pastors Conference', to: `/${t.event.route}` },
-            { label: 'Regional Roundtables', to: `/${t.event.route}` },
           ],
         },
         {
@@ -130,7 +124,7 @@ export const navItems: NavItem[] = [
           ],
         },
       ],
-      cta: { label: 'View upcoming gatherings & roundtables', to: `/${t.event.route}` },
+      cta: { label: 'View upcoming events & gatherings', to: `/${t.event.route}` },
     },
   },
   {

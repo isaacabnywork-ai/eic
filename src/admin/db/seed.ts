@@ -2069,7 +2069,6 @@ export const SEED_HEADER_MENU: CustomMenuConfig = {
       children: [
         { id: 'menu-serm-all', label: 'Expository Sermons', url: '/sermons', target: '_self', isEnabled: true, displayOrder: 1 },
         { id: 'menu-serm-vid', label: 'Videos & Podcasts', url: '/videos', target: '_self', isEnabled: true, displayOrder: 2 },
-        { id: 'menu-serm-aipc', label: 'AIPC Conference Messages', url: '/sermons?category=aipc', target: '_self', isEnabled: true, displayOrder: 3 },
       ],
     },
     {
@@ -2120,8 +2119,7 @@ export const SEED_FOOTER_MENU: CustomFooterMenuConfig = {
       displayOrder: 2,
       links: [
         { id: 'fl-ev-1', label: 'National Pastors Conference (AIPC)', url: '/events', target: '_self', isEnabled: true, displayOrder: 1 },
-        { id: 'fl-ev-2', label: 'Regional Roundtables', url: '/events', target: '_self', isEnabled: true, displayOrder: 2 },
-        { id: 'fl-ev-3', label: 'Event Photo Albums', url: '/gallery', target: '_self', isEnabled: true, displayOrder: 3 },
+        { id: 'fl-ev-3', label: 'Event Photo Albums', url: '/gallery', target: '_self', isEnabled: true, displayOrder: 2 },
       ],
     },
     {
