@@ -1,7 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { 
-  Mail, 
-  MapPin, 
   Phone, 
   CheckCircle2, 
   Send, 
@@ -32,7 +30,6 @@ export function ContactPage() {
       // Simulate form processing with a short delay
       await new Promise((resolve) => setTimeout(resolve, 600));
 
-      // Construct mailto link as a guaranteed fallback trigger or local state success
       setSubmitted(true);
       setFormData({
         name: '',
@@ -42,7 +39,7 @@ export function ContactPage() {
         message: '',
       });
     } catch {
-      setErrorMessage('Could not send message. Please reach out to us directly via email or phone.');
+      setErrorMessage('Could not send message. Please reach out to us directly via phone.');
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +49,7 @@ export function ContactPage() {
     <>
       <SeoHead
         title="Contact & Inquiries"
-        description="Get in touch with the pastoral team at Equip Indian Churches. Contact information, address in Lucknow, phone, email, and inquiry form."
+        description="Get in touch with the pastoral team at Equip Indian Churches. Contact coordinator Bro. Santosh, phone, WhatsApp, and inquiry form."
         path="/contact"
       />
 
@@ -106,41 +103,6 @@ export function ContactPage() {
                   >
                     +91 98867 69948
                   </a>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-text">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                    Email Address
-                  </p>
-                  <a
-                    href="mailto:info@admin.equipindianchurches.com"
-                    className="font-bold text-ink hover:text-accent-text transition-colors text-sm sm:text-base mt-0.5 block break-all"
-                  >
-                    info@admin.equipindianchurches.com
-                  </a>
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="flex items-start gap-4 border-t border-line/60 pt-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-text">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                    Postal Address
-                  </p>
-                  <p className="text-sm text-body leading-relaxed mt-0.5 font-medium">
-                    16B/243, Vrindavan Yojna 4,<br />
-                    Raebareli Road,<br />
-                    Lucknow – 226029, UP, (India)
-                  </p>
                 </div>
               </div>
             </div>
