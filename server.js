@@ -101,8 +101,8 @@ function serveFile(req, res, filePath, statusCode = 200) {
     if (filePath.includes(`${path.sep}assets${path.sep}`)) {
       // Vite hashed asset - cache immutably for 1 year
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    } else if (filePath === INDEX_HTML) {
-      // index.html - never cache so users always get new releases immediately
+    } else if (filePath === INDEX_HTML || filePath.includes('favicon')) {
+      // index.html and favicons - revalidate immediately
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     } else {
       // Other static files (favicon, sitemap, etc.)
