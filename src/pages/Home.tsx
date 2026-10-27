@@ -23,6 +23,7 @@ import {
 import { itemPath } from '@/lib/routes';
 import { formatDateShort } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
+import { usePublishedEvents } from '@/lib/publicEvents';
 
 interface HeroNotificationSlide {
   id: string;
@@ -1008,18 +1009,33 @@ export function HomePage() {
     return [...apiSlides, ...extra].slice(0, 8);
   }, [bookList]);
 
-  // 6. Upcoming Events
+  // 6. Upcoming Events (Live WordPress API + Custom Admin Database)
   const { data: events, isLoading: eventsLoading } = useContentList('event', {
     perPage: 3,
   });
+  const customEvents = usePublishedEvents();
 
   // Compose dynamic notification slides for the Hero Auto-Slider
   const heroSlides = useMemo<HeroNotificationSlide[]>(() => {
     const slides: HeroNotificationSlide[] = [];
 
-    // 1. Latest Event
+    // 1. Latest Event (Prefers published custom event from Admin panel)
+    const latestCustom = customEvents[0];
     const latestEvent = events?.items?.[0];
-    if (latestEvent) {
+    if (latestCustom) {
+      slides.push({
+        id: `custom-event-${latestCustom.id}`,
+        category: 'Latest Event',
+        categoryDot: 'bg-amber-400',
+        badge: latestCustom.badge,
+        title: latestCustom.title,
+        excerpt: latestCustom.excerpt || undefined,
+        date: latestCustom.date,
+        metaExtra: latestCustom.venue,
+        image: latestCustom.image,
+        url: latestCustom.registrationUrl,
+      });
+    } else if (latestEvent) {
       slides.push({
         id: `event-${latestEvent.id}`,
         category: 'Latest Event',
@@ -1177,8 +1193,23 @@ export function HomePage() {
   // Events tab switcher state (Upcoming vs Past)
   const [eventsTab, setEventsTab] = useState<'upcoming' | 'past'>('upcoming');
 
-  // Main featured latest event for the left column
+  // Main featured latest event for the left column (Prefers latest published custom event)
   const mainLatestEvent = useMemo(() => {
+    if (customEvents.length > 0) {
+      const top = customEvents[0];
+      return {
+        id: top.id,
+        title: top.title,
+        formattedDate: top.formattedDate,
+        date: top.date,
+        venue: top.venue,
+        badge: 'Latest Main Event',
+        excerpt: top.excerpt,
+        image: top.image,
+        registrationUrl: top.registrationUrl,
+        isUpcoming: true,
+      };
+    }
     const liveFirst = events?.items?.[0];
     return {
       id: liveFirst?.id || 'aipc-2026-main',
@@ -1197,11 +1228,11 @@ export function HomePage() {
       registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events',
       isUpcoming: true,
     };
-  }, [events]);
+  }, [events, customEvents]);
 
   // Upcoming events list for the right column (4 events)
   const upcomingEventsList = useMemo(() => {
-    return [
+    const DEFAULT_EVENTS = [
       {
         id: 'upcoming-1',
         title: 'All India Pastors Conference 2026',
@@ -1255,7 +1286,41 @@ export function HomePage() {
         isUpcoming: true,
       },
     ];
-  }, []);
+
+    if (customEvents.length > 1) {
+      const items = customEvents.slice(1, 5).map((ev) => ({
+        id: ev.id,
+        title: ev.title,
+        formattedDate: ev.formattedDate,
+        date: ev.date,
+        venue: ev.venue,
+        image: ev.image,
+        registrationUrl: ev.registrationUrl,
+        isUpcoming: true,
+      }));
+      // Pad with defaults if fewer than 4
+      if (items.length < 4) {
+        const needed = 4 - items.length;
+        items.push(...DEFAULT_EVENTS.slice(items.length, items.length + needed));
+      }
+      return items;
+    } else if (customEvents.length === 1) {
+      return [
+        {
+          id: customEvents[0].id,
+          title: customEvents[0].title,
+          formattedDate: customEvents[0].formattedDate,
+          date: customEvents[0].date,
+          venue: customEvents[0].venue,
+          image: customEvents[0].image,
+          registrationUrl: customEvents[0].registrationUrl,
+          isUpcoming: true,
+        },
+        ...DEFAULT_EVENTS.slice(1),
+      ];
+    }
+    return DEFAULT_EVENTS;
+  }, [customEvents]);
 
   // Past events list from live API data (4 events)
   const pastEventsList = useMemo(() => {

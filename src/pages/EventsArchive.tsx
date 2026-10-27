@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useContentList } from '@/hooks/queries';
 import { useArchiveParams } from '@/hooks/useArchiveParams';
 import { SeoHead } from '@/components/seo/SeoHead';
@@ -8,6 +9,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState, ErrorState } from '@/components/ui/States';
 import { EventCard } from '@/components/cards/EventCard';
 import { MobileEventsView } from '@/components/mobile/MobileEventsView';
+import { usePublishedEvents, customEventToContentItem } from '@/lib/publicEvents';
 
 export function EventsArchivePage() {
   const { state, listParams, update, clear, hasFilters } = useArchiveParams('event');
@@ -15,6 +17,24 @@ export function EventsArchivePage() {
     'event',
     listParams,
   );
+  const customEvents = usePublishedEvents();
+
+  const combinedItems = useMemo(() => {
+    const customContentItems = customEvents.map(customEventToContentItem);
+    if (!data?.items) return customContentItems;
+
+    let filteredCustom = customContentItems;
+    if (state.q) {
+      const q = state.q.toLowerCase();
+      filteredCustom = customContentItems.filter(
+        (e) => e.title.toLowerCase().includes(q) || e.excerpt.toLowerCase().includes(q),
+      );
+    }
+
+    return [...filteredCustom, ...data.items];
+  }, [customEvents, data?.items, state.q]);
+
+  const hasAnyItems = combinedItems.length > 0;
 
   return (
     <>
@@ -35,45 +55,47 @@ export function EventsArchivePage() {
           description="Conferences, regional leaders' forums, and training seminars designed to sharpen pastors and bring believers together."
         />
 
-      <div className="container-page py-10">
-        <FilterBar
-          type="event"
-          state={state}
-          onUpdate={update}
-          onClear={clear}
-          hasFilters={hasFilters}
-          total={data?.total}
-        />
-
-        {isLoading ? (
-          <CardGridSkeleton variant="event" count={6} />
-        ) : isError ? (
-          <ErrorState error={error} onRetry={() => void refetch()} />
-        ) : data && data.items.length > 0 ? (
-          <div className={isPlaceholderData ? 'opacity-60 transition-opacity' : ''}>
-            <div className="grid gap-6 md:grid-cols-2">
-              {data.items.map((event) => (
-                <EventCard key={event.id} item={event} />
-              ))}
-            </div>
-
-            <Pagination
-              page={state.page}
-              totalPages={data.totalPages}
-              onChange={(newPage) => update({ page: newPage })}
-            />
-          </div>
-        ) : (
-          <EmptyState
-            title="No events listed"
-            message={
-              hasFilters
-                ? 'Try adjusting your search keywords.'
-                : 'There are no upcoming events scheduled at this moment. Stay tuned for future announcements!'
-            }
+        <div className="container-page py-10">
+          <FilterBar
+            type="event"
+            state={state}
+            onUpdate={update}
+            onClear={clear}
+            hasFilters={hasFilters}
+            total={(data?.total || 0) + customEvents.length}
           />
-        )}
-      </div>
+
+          {isLoading && !hasAnyItems ? (
+            <CardGridSkeleton variant="event" count={6} />
+          ) : isError && !hasAnyItems ? (
+            <ErrorState error={error} onRetry={() => void refetch()} />
+          ) : hasAnyItems ? (
+            <div className={isPlaceholderData ? 'opacity-60 transition-opacity' : ''}>
+              <div className="grid gap-6 md:grid-cols-2">
+                {combinedItems.map((event) => (
+                  <EventCard key={event.id} item={event} />
+                ))}
+              </div>
+
+              {data && data.totalPages > 1 && (
+                <Pagination
+                  page={state.page}
+                  totalPages={data.totalPages}
+                  onChange={(newPage) => update({ page: newPage })}
+                />
+              )}
+            </div>
+          ) : (
+            <EmptyState
+              title="No events listed"
+              message={
+                hasFilters
+                  ? 'Try adjusting your search keywords.'
+                  : 'There are no upcoming events scheduled at this moment. Stay tuned for future announcements!'
+              }
+            />
+          )}
+        </div>
       </div>
     </>
   );

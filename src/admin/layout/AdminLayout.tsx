@@ -17,7 +17,7 @@ function AdminShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070A0F] text-slate-100 flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#F0F6FB] text-[#182541] flex flex-col font-sans antialiased selection:bg-[#094899] selection:text-white">
       {/* Sidebar */}
       <AdminSidebar
         isMobileOpen={isMobileOpen}

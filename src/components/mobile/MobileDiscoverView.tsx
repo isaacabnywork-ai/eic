@@ -16,6 +16,7 @@ import { itemPath } from '@/lib/routes';
 import { formatDateShort } from '@/lib/format';
 import { Img } from '@/components/ui/Img';
 import { CalendarIcon, MapPinIcon, ArrowRightIcon } from '@/components/ui/Icons';
+import { usePublishedEvents } from '@/lib/publicEvents';
 
 export function MobileDiscoverView() {
   // 1. Featured items across all categories for the Hero Banner
@@ -43,8 +44,9 @@ export function MobileDiscoverView() {
     return videoPool;
   }, [answersList, videoPool]);
 
-  // 3. Upcoming Events & Conferences
+  // 3. Upcoming Events & Conferences (Custom Admin Database + Live WordPress Fallback)
   const { data: eventsData } = useContentList('event', { perPage: 4 });
+  const customEvents = usePublishedEvents();
   const liveEvents = eventsData?.items || [];
 
   const upcomingEventsList = useMemo(() => {
@@ -111,6 +113,27 @@ export function MobileDiscoverView() {
       },
     ];
 
+    if (customEvents.length > 0) {
+      const mappedCustom = customEvents.map((ev) => ({
+        id: ev.id,
+        title: ev.title,
+        formattedDate: ev.formattedDate,
+        date: ev.date,
+        venue: ev.venue,
+        excerpt: ev.excerpt,
+        image: ev.image,
+        registrationUrl: ev.registrationUrl,
+        badge: ev.badge,
+      }));
+
+      if (mappedCustom.length >= 4) {
+        return mappedCustom.slice(0, 4);
+      }
+      const existingTitles = new Set(mappedCustom.map((e) => e.title.toLowerCase()));
+      const fill = DEFAULT_EVENTS.filter((e) => !existingTitles.has(e.title.toLowerCase()));
+      return [...mappedCustom, ...fill].slice(0, 4);
+    }
+
     if (!liveEvents.length) return DEFAULT_EVENTS;
 
     const mappedLive = liveEvents.map((item) => ({
@@ -128,7 +151,7 @@ export function MobileDiscoverView() {
     const existingIds = new Set<string | number>(mappedLive.map((e) => e.id));
     const fill = DEFAULT_EVENTS.filter((e) => !existingIds.has(e.id));
     return [...mappedLive, ...fill].slice(0, 4);
-  }, [liveEvents]);
+  }, [liveEvents, customEvents]);
 
   // 4. Start a Series / Shows (2:3 Vertical Poster Cards)
   const { data: seriesList } = useSeriesCards({ count: 6, coverType: 'article' });

@@ -125,6 +125,16 @@ export const eventRepository = {
     return updated;
   },
 
+  save(eventData: Partial<CustomEvent> & { title: string }): CustomEvent {
+    if (eventData.id) {
+      const existing = this.getById(eventData.id);
+      if (existing) {
+        return this.update(eventData.id, eventData) || existing;
+      }
+    }
+    return this.create(eventData as any);
+  },
+
   setStatus(id: string, status: EventStatus): CustomEvent | null {
     return this.update(id, { status });
   },
@@ -192,6 +202,7 @@ export const eventRepository = {
     total: number;
     published: number;
     draft: number;
+    scheduled: number;
     upcoming: number;
     expired: number;
     archived: number;
@@ -229,6 +240,7 @@ export const eventRepository = {
       total: all.filter((e) => e.status !== 'trash').length,
       published,
       draft,
+      scheduled: upcoming,
       upcoming,
       expired,
       archived,

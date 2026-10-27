@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { HomePage } from '@/pages/Home';
 import { ArticlesArchivePage } from '@/pages/ArticlesArchive';
@@ -31,17 +31,17 @@ import { AdminProtectedRoute } from '@/admin/components/AdminProtectedRoute';
 import { AdminLoginPage } from '@/admin/pages/AdminLoginPage';
 import { AdminDashboardPage } from '@/admin/pages/AdminDashboardPage';
 import { AdminEventsListPage } from '@/admin/pages/AdminEventsListPage';
-import { AdminEventEditorPage } from '@/admin/pages/AdminEventEditorPage';
-import { AdminCategoriesPage } from '@/admin/pages/AdminCategoriesPage';
-import { AdminSpeakersPage } from '@/admin/pages/AdminSpeakersPage';
-import { AdminOrganizersPage } from '@/admin/pages/AdminOrganizersPage';
-import { AdminVenuesPage } from '@/admin/pages/AdminVenuesPage';
 import { AdminMediaPage } from '@/admin/pages/AdminMediaPage';
 import { AdminHeaderMenuPage } from '@/admin/pages/AdminHeaderMenuPage';
 import { AdminFooterMenuPage } from '@/admin/pages/AdminFooterMenuPage';
 import { AdminSettingsPage } from '@/admin/pages/AdminSettingsPage';
 import { AdminUsersPage } from '@/admin/pages/AdminUsersPage';
 import { AdminActivityLogPage } from '@/admin/pages/AdminActivityLogPage';
+
+function AdminEventEditRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/admin/events?tab=editor&id=${id}` : '/admin/events?tab=editor'} replace />;
+}
 
 const router = createBrowserRouter([
   // Custom Administration Panel Routes (Completely decoupled from WordPress core)
@@ -58,6 +58,7 @@ const router = createBrowserRouter([
           </AdminProtectedRoute>
         ),
       },
+      // Unified Events Hub — All event listings and adding items housed in one place
       {
         path: 'events',
         element: (
@@ -68,51 +69,27 @@ const router = createBrowserRouter([
       },
       {
         path: 'events/new',
-        element: (
-          <AdminProtectedRoute>
-            <AdminEventEditorPage />
-          </AdminProtectedRoute>
-        ),
+        element: <Navigate to="/admin/events?tab=editor" replace />,
       },
       {
         path: 'events/:id/edit',
-        element: (
-          <AdminProtectedRoute>
-            <AdminEventEditorPage />
-          </AdminProtectedRoute>
-        ),
+        element: <AdminEventEditRedirect />,
       },
       {
         path: 'categories',
-        element: (
-          <AdminProtectedRoute>
-            <AdminCategoriesPage />
-          </AdminProtectedRoute>
-        ),
+        element: <Navigate to="/admin/events?tab=categories" replace />,
       },
       {
         path: 'speakers',
-        element: (
-          <AdminProtectedRoute>
-            <AdminSpeakersPage />
-          </AdminProtectedRoute>
-        ),
+        element: <Navigate to="/admin/events?tab=speakers" replace />,
       },
       {
         path: 'organizers',
-        element: (
-          <AdminProtectedRoute>
-            <AdminOrganizersPage />
-          </AdminProtectedRoute>
-        ),
+        element: <Navigate to="/admin/events?tab=organizers" replace />,
       },
       {
         path: 'venues',
-        element: (
-          <AdminProtectedRoute>
-            <AdminVenuesPage />
-          </AdminProtectedRoute>
-        ),
+        element: <Navigate to="/admin/events?tab=venues" replace />,
       },
       {
         path: 'media',

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useContentList } from '@/hooks/queries';
 import { dateParts } from '@/lib/format';
 import { itemPath } from '@/lib/routes';
+import { usePublishedEvents } from '@/lib/publicEvents';
 import {
   CalendarIcon,
   MapPinIcon,
@@ -17,6 +18,7 @@ import { MobileSectionHeader } from './MobileComponents';
 
 export function MobileEventsView() {
   const { data: eventsData } = useContentList('event', { perPage: 12 });
+  const customEvents = usePublishedEvents();
   const { data: conferenceSermons } = useContentList('sermon', { perPage: 6 });
   const { data: galleryAlbums } = useContentList('gallery', { perPage: 4 });
 
@@ -30,7 +32,26 @@ export function MobileEventsView() {
     setNewsletterSubmitted(true);
   };
 
-  const events = eventsData?.items || [];
+  const apiEvents = eventsData?.items || [];
+
+  // Merge custom events from admin panel first, so latest events are always shown
+  const events = useMemo(() => {
+    if (customEvents.length > 0) {
+      const customMapped = customEvents.map((ce) => ({
+        id: ce.id,
+        title: ce.title,
+        slug: ce.slug,
+        date: ce.date,
+        eventDate: ce.date,
+        excerpt: ce.excerpt,
+        venue: ce.venue,
+        href: ce.registrationUrl,
+        image: ce.image,
+      }));
+      return customMapped;
+    }
+    return apiEvents;
+  }, [customEvents, apiEvents]);
 
   return (
     <div className="flex flex-col bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pb-24 md:hidden transition-colors">
@@ -120,9 +141,10 @@ export function MobileEventsView() {
 
         {events.length > 0 ? (
           <div className="space-y-4">
-            {events.map((event) => {
+            {events.map((event: any) => {
               const { day, month, year } = dateParts(event.eventDate || event.date);
-              const href = itemPath('article', event.slug);
+              const href = event.href || itemPath('article', event.slug);
+              const venueText = event.venue || 'All India / Regional Gathering';
 
               return (
                 <article
@@ -142,7 +164,7 @@ export function MobileEventsView() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-white/60 mb-1">
                         <MapPinIcon size={12} />
-                        <span>All India / Regional Gathering</span>
+                        <span className="truncate">{venueText}</span>
                       </div>
 
                       <h4 className="font-serif text-base font-bold text-[#182541] dark:text-white leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
