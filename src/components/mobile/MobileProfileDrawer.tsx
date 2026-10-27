@@ -91,7 +91,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             <img
               src={site.mobileLogoUrl}
               alt={site.name}
-              className="h-8 w-auto object-contain object-left invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
+              className="h-10 sm:h-11 w-auto object-contain object-left invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = site.mobileLogoFallback;
               }}

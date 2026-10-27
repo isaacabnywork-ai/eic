@@ -45,7 +45,7 @@ export function Layout() {
       {/* Main Content View */}
       <main
         id="main-content"
-        className={`flex-1 ${!isHeroRoute ? 'pt-14 md:pt-0' : ''}`}
+        className={`flex-1 ${!isHeroRoute ? 'pt-16 md:pt-0' : ''}`}
       >
         <Outlet />
       </main>

@@ -68,7 +68,7 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-40 flex h-14 w-full items-center justify-between px-4 md:hidden transition-all duration-300 ${
+      className={`fixed top-0 inset-x-0 z-40 flex h-16 w-full items-center justify-between px-3.5 sm:px-4 md:hidden transition-all duration-300 ${
         isOverHero
           ? 'bg-gradient-to-b from-black/85 via-black/40 to-transparent border-b-0 text-white'
           : 'bg-[#F0F6FB]/90 dark:bg-[#070A0F]/90 backdrop-blur-md border-b border-[#D0E1F0] dark:border-white/10 shadow-xs dark:shadow-md text-[#182541] dark:text-white'
@@ -108,7 +108,7 @@ export function MobileTopBar({ onOpenProfile }: MobileTopBarProps) {
             <img
               src={site.mobileLogoUrl}
               alt={site.name}
-              className={`h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 ${
+              className={`h-11 sm:h-12 w-auto max-w-[170px] sm:max-w-[200px] object-contain transition-transform group-hover:scale-105 ${
                 isOverHero
                   ? 'drop-shadow-md'
                   : 'invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0 drop-shadow-xs dark:drop-shadow-md'

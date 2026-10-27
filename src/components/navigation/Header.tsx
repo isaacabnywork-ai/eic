@@ -100,7 +100,7 @@ export function Header() {
             <img
               src={site.logoUrl}
               alt={site.name}
-              className="h-9 sm:h-11 lg:h-12 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
+              className="h-11 sm:h-13 lg:h-14 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = site.logoFallback;
               }}
