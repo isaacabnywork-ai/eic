@@ -8,7 +8,7 @@ import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import { eventRepository } from '@/admin/db/repositories/eventRepository';
 import { taxonomyRepository } from '@/admin/db/repositories/taxonomyRepository';
 import { usePublishedEvents } from '@/lib/publicEvents';
-import type { CustomEvent, Venue, Speaker, Organizer, EventCategory } from '@/admin/db/types';
+import type { CustomEvent, Venue, Organizer, EventCategory } from '@/admin/db/types';
 import { 
   Calendar as CalendarIcon, 
   Clock as ClockIcon, 
@@ -177,14 +177,6 @@ export function EventSinglePage() {
     if (!rawCustomEvent?.categoryIds?.[0]) return null;
     return taxonomyRepository.getCategories().find((c) => c.id === rawCustomEvent.categoryIds[0]) || null;
   }, [rawCustomEvent?.categoryIds]);
-
-  const speakers: Speaker[] = useMemo(() => {
-    if (!rawCustomEvent?.speakerIds?.length) return [];
-    const allSpeakers = taxonomyRepository.getSpeakers();
-    return rawCustomEvent.speakerIds
-      .map((id) => allSpeakers.find((s) => s.id === id))
-      .filter((s): s is Speaker => Boolean(s));
-  }, [rawCustomEvent?.speakerIds]);
 
   // Unified event representation
   const event = useMemo(() => {
@@ -419,51 +411,6 @@ export function EventSinglePage() {
                   <span>+ Add to Google Calendar</span>
                 </a>
               </div>
-
-              {/* 4. Speakers & Faculty (if present) */}
-              {speakers.length > 0 && (
-                <div className="pt-4 border-t border-[#D0E1F0] dark:border-white/10 space-y-4">
-                  <h3 className="font-serif text-xl font-bold text-[#182541] dark:text-white flex items-center gap-2">
-                    <UsersIcon className="w-5 h-5 text-[#094899] dark:text-sky-400" />
-                    <span>Conference Faculty & Speakers</span>
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {speakers.map((sp) => (
-                      <div
-                        key={sp.id}
-                        className="flex items-center gap-3.5 p-4 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5"
-                      >
-                        {sp.photoUrl ? (
-                          <img
-                            src={sp.photoUrl}
-                            alt={sp.name}
-                            className="w-14 h-14 rounded-full object-cover shrink-0 border border-slate-200"
-                          />
-                        ) : (
-                          <div className="w-14 h-14 rounded-full bg-[#182541] text-white flex items-center justify-center font-bold text-base shrink-0">
-                            {sp.name.charAt(0)}
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-sm text-[#182541] dark:text-white truncate">
-                            {sp.name}
-                          </h4>
-                          {sp.designation && (
-                            <p className="text-xs text-[#094899] dark:text-sky-400 font-semibold truncate">
-                              {sp.designation}
-                            </p>
-                          )}
-                          {sp.organization && (
-                            <p className="text-[11px] text-slate-500 dark:text-white/50 truncate">
-                              {sp.organization}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* 5. Schedule Sessions (if present) */}
               {event.schedules.length > 0 && (

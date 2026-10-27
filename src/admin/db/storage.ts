@@ -80,6 +80,24 @@ class AdminStorageEngine {
         const parsed = JSON.parse(stored) as AdminDatabaseState;
         // Basic schema validation check
         if (parsed.events && parsed.users && parsed.settings) {
+          // Sync check: ensure 'a-day-in-the-word' has no assigned speakers
+          const ditw = parsed.events.find(
+            (e) => e.id === 'event-day-in-the-word' || e.slug === 'a-day-in-the-word',
+          );
+          if (ditw && ditw.speakerIds && ditw.speakerIds.length > 0) {
+            ditw.speakerIds = [];
+            if (ditw.schedules) {
+              ditw.schedules.forEach((s) => {
+                s.speakerIds = [];
+              });
+            }
+            try {
+              localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(parsed));
+            } catch {
+              // Ignore localStorage write error
+            }
+          }
+
           this.memoryCache = parsed;
           return parsed;
         }
