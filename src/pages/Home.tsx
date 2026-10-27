@@ -1411,7 +1411,7 @@ export function HomePage() {
 
   return (
     <>
-      <SeoHead title="Home" description={site.description} path="/" />
+      <SeoHead title="Equip Indian Churches" description={site.description} path="/" />
 
       {/* ============================================================== */}
       {/* MOBILE EXPERIENCE (< md): Native Streaming App (UNTOUCHED)     */}

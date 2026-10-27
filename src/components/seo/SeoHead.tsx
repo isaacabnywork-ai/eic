@@ -26,7 +26,10 @@ export function SeoHead({
   author,
   noindex = false,
 }: SeoProps) {
-  const fullTitle = title ? `${title} • ${site.name}` : `${site.name} • ${site.tagline}`;
+  const isHomePage = !title || title === 'Home' || title === site.name;
+  const fullTitle = isHomePage
+    ? `${site.name} • ${site.tagline}`
+    : `${title} • ${site.name}`;
   const canonical = path ? absoluteUrl(path) : env.siteUrl;
   const ogImage = image || site.defaultOgImage || (env.siteUrl ? `${env.siteUrl}/og-image.png` : undefined);
 
