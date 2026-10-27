@@ -18,6 +18,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,11 +29,16 @@ const HOST = process.env.HOST || '0.0.0.0';
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const INDEX_HTML = path.join(DIST_DIR, 'index.html');
 
-// Verify that dist/ exists
+// Verify that dist/ exists; if missing, auto-build for zero-friction CloudPanel startup
 if (!fs.existsSync(INDEX_HTML)) {
-  console.error('\n❌ Error: dist/index.html not found!');
-  console.error('Please run "npm run build" before starting the Node.js server.\n');
-  process.exit(1);
+  console.log('\n📦 dist/index.html not found. Running "npm run build" automatically...');
+  try {
+    execSync('npm run build', { stdio: 'inherit', cwd: __dirname });
+    console.log('✓ Build successful!\n');
+  } catch (err) {
+    console.error('\n❌ Build failed. Please run "npm run build" manually:\n', err);
+    process.exit(1);
+  }
 }
 
 // MIME Type Map
