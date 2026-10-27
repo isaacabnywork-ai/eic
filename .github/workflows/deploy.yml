@@ -1,0 +1,81 @@
+
+name: Deploy Equip Indian Churches
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eic-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy to VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Configure secure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy application
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          set -eu
+
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "$VPS_USER@$VPS_HOST" 'bash -se' <<'REMOTE'
+          set -euo pipefail
+
+          cd /home/equipindianchurches-app/htdocs/equipindianchurches.com
+
+          echo "Fetching latest main branch..."
+          git fetch origin main
+          git reset --hard origin/main
+
+          echo "Installing dependencies..."
+          npm ci
+
+          echo "Building production application..."
+          npm run build
+
+          test -f dist/index.html
+
+          echo "Reloading application..."
+          if pm2 describe equipindianchurches >/dev/null 2>&1; then
+            pm2 reload ecosystem.config.cjs --update-env
+          else
+            pm2 start ecosystem.config.cjs
+          fi
+
+          pm2 save
+
+          echo "Checking local application response..."
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3000/ >/dev/null
+
+          echo "Deployment completed successfully."
+          REMOTE
