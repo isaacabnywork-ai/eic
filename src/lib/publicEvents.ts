@@ -77,16 +77,22 @@ export function getPublishedCustomEvents(): PublicDisplayEvent[] {
     });
 
     return sorted.map((ev: CustomEvent) => {
-      // Resolve venue
-      let venueLabel = 'All India • National Gathering';
+      // Resolve venue (prioritize custom venue info entered directly on the event)
+      let venueLabel = '';
       let venueAddress = '';
-      if (ev.venueId && venuesMap.has(ev.venueId)) {
+      if (ev.customVenueName?.trim()) {
+        venueLabel = ev.customVenueName.trim();
+        venueAddress = ev.customVenueAddress?.trim() || '';
+      } else if (ev.venueId && venuesMap.has(ev.venueId)) {
         const v = venuesMap.get(ev.venueId)!;
         venueLabel = `${v.name}, ${v.city}`;
         venueAddress = `${v.address ? v.address + ', ' : ''}${v.city}${v.state ? ', ' + v.state : ''}`;
-      } else if (ev.customVenueName) {
-        venueLabel = ev.customVenueName;
-        venueAddress = ev.customVenueAddress || '';
+      } else if (ev.customVenueAddress?.trim()) {
+        venueAddress = ev.customVenueAddress.trim();
+        venueLabel = ev.customVenueAddress.trim();
+      } else {
+        venueLabel = 'Equip Indian Churches Gathering';
+        venueAddress = '';
       }
 
       // Resolve category

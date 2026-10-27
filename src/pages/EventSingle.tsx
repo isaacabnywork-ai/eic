@@ -14,12 +14,11 @@ import {
   Clock as ClockIcon, 
   MapPin as MapPinIcon, 
   Users as UsersIcon, 
-  DollarSign as CostIcon, 
+  IndianRupee as CostIcon, 
   Share2, 
   Check, 
   ArrowLeft, 
   ArrowRight, 
-  ExternalLink,
   ChevronRight
 } from 'lucide-react';
 
@@ -180,16 +179,24 @@ export function EventSinglePage() {
 
   // Unified event representation
   const event = useMemo(() => {
-    if (customEvent && rawCustomEvent) {
+    if (rawCustomEvent) {
       const isPast = new Date(rawCustomEvent.endDate || rawCustomEvent.startDate).getTime() < Date.now() - 86400000;
+      const customName = rawCustomEvent.customVenueName?.trim();
+      const customAddr = rawCustomEvent.customVenueAddress?.trim();
+
+      // Prioritize the custom venue and address entered on the event.
+      // Only fall back to predefined venue if no custom details exist at all.
+      const venueName = customName || (!customAddr && venue ? venue.name : '');
+      const venueAddress = customAddr || (!customName && venue ? venue.address : '');
+
       return {
         id: rawCustomEvent.id,
         title: rawCustomEvent.title,
-        eyebrow: category?.name || customEvent.badge || 'One Day Conference',
+        eyebrow: category?.name || customEvent?.badge || 'One Day Conference',
         slug: rawCustomEvent.slug,
         subtitle: rawCustomEvent.shortDescription,
         description: rawCustomEvent.fullDescription || rawCustomEvent.shortDescription,
-        featuredImage: rawCustomEvent.featuredPosterUrl || customEvent.image.src,
+        featuredImage: rawCustomEvent.featuredPosterUrl || customEvent?.image?.src || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&h=1600&q=80',
         startDate: rawCustomEvent.startDate,
         endDate: rawCustomEvent.endDate,
         startTime: rawCustomEvent.startTime,
@@ -201,11 +208,11 @@ export function EventSinglePage() {
             : `${rawCustomEvent.currencySymbol || '₹'} ${Number(rawCustomEvent.price).toLocaleString('en-IN')}`,
         organizerName: organizer?.name || 'Equip Indian Churches',
         organizerBio: organizer?.description || 'Serving local churches across India through expository preaching and sound doctrine.',
-        venueName: venue?.name || rawCustomEvent.customVenueName || 'Grace Salvation Nagamese Church',
-        venueAddress: venue?.address || rawCustomEvent.customVenueAddress || 'Near BSF Transit camp. Half Nagarjan, Dimapur.',
-        venueCity: venue?.city || 'Dimapur',
-        venueState: venue?.state || 'Nagaland',
-        googleMapsUrl: venue?.mapUrl,
+        venueName,
+        venueAddress,
+        venueCity: venue?.city || '',
+        venueState: venue?.state || '',
+        googleMapsUrl: undefined,
         registrationUrl: rawCustomEvent.registrationUrl || '',
         registrationButtonLabel: rawCustomEvent.registrationButtonLabel || 'Register Now',
         registrationAvailable: rawCustomEvent.registrationAvailable && !isPast,
@@ -230,13 +237,13 @@ export function EventSinglePage() {
         startTime: '09:30',
         endTime: '16:00',
         isExpired: isPast,
-        cost: 'INR300.00',
+        cost: '₹ 300',
         organizerName: 'Equip Indian Churches',
         organizerBio: 'Serving local churches across India through expository preaching and sound doctrine.',
-        venueName: typeof wpEvent.meta?.venue === 'string' ? wpEvent.meta.venue : 'All India Pastors Assembly',
-        venueAddress: 'National Conference Hall, New Delhi, India',
-        venueCity: 'New Delhi',
-        venueState: 'Delhi',
+        venueName: typeof wpEvent.meta?.venue === 'string' ? wpEvent.meta.venue : '',
+        venueAddress: '',
+        venueCity: '',
+        venueState: '',
         googleMapsUrl: undefined,
         registrationUrl: typeof wpEvent.meta?.registrationUrl === 'string' ? wpEvent.meta.registrationUrl : '',
         registrationButtonLabel: 'Register for Event',
@@ -311,7 +318,7 @@ export function EventSinglePage() {
     endDate: event.endDate,
     startTime: event.startTime,
     endTime: event.endTime,
-    venue: `${event.venueName}, ${event.venueAddress}`,
+    venue: [event.venueName, event.venueAddress].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(', '),
     description: event.subtitle || event.title,
   });
 
@@ -384,11 +391,13 @@ export function EventSinglePage() {
                   )}
 
                   {/* Venue Callout Block */}
-                  {event.venueName && (
+                  {(event.venueName || event.venueAddress) && (
                     <div className="pt-3 font-semibold text-slate-900 dark:text-white">
                       <span>Venue: </span>
-                      <span className="font-bold">{event.venueName}</span>
-                      {event.venueAddress && <span>, {event.venueAddress}</span>}
+                      <span className="font-bold">{event.venueName || event.venueAddress}</span>
+                      {event.venueAddress && event.venueName && event.venueAddress.trim().toLowerCase() !== event.venueName.trim().toLowerCase() && (
+                        <span>, {event.venueAddress}</span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -564,7 +573,7 @@ export function EventSinglePage() {
                 </div>
 
                 {/* VENUE (Physical Address) */}
-                {event.venueName && (
+                {(event.venueName || event.venueAddress) && (
                   <div className="flex items-start gap-4 pt-4 border-t border-slate-100 dark:border-white/10">
                     <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/10 text-[#182541] dark:text-white shrink-0 mt-0.5">
                       <MapPinIcon className="w-5 h-5 text-slate-700 dark:text-white" />
@@ -573,24 +582,15 @@ export function EventSinglePage() {
                       <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                         Venue
                       </h3>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-white mt-1">
-                        {event.venueName}
-                      </p>
-                      {event.venueAddress && (
+                      {event.venueName && (
+                        <p className="text-sm font-semibold text-slate-800 dark:text-white mt-1">
+                          {event.venueName}
+                        </p>
+                      )}
+                      {event.venueAddress && event.venueAddress.trim().toLowerCase() !== event.venueName?.trim().toLowerCase() && (
                         <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5 leading-relaxed">
                           {event.venueAddress}
                         </p>
-                      )}
-                      {event.googleMapsUrl && (
-                        <a
-                          href={event.googleMapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#094899] dark:text-sky-400 mt-2 hover:underline"
-                        >
-                          <span>Open in Google Maps</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
                       )}
                     </div>
                   </div>

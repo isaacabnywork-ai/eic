@@ -181,7 +181,7 @@ export function AdminEventsListPage() {
           hideEndTime: false,
           timezone: 'Asia/Kolkata',
           isRecurring: false,
-          venueId: venues[0]?.id || '',
+          venueId: '',
           customVenueName: '',
           customVenueAddress: '',
           isOnlineOnly: false,
@@ -696,35 +696,50 @@ export function AdminEventsListPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Venue / Location
-                </label>
-                <select
-                  value={formData.venueId || ''}
-                  onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
-                  className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs font-semibold text-[#182541] bg-white focus:ring-2 focus:ring-[#094899] outline-none"
-                >
-                  <option value="">-- Select Configured Venue --</option>
-                  {venues.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name} ({v.city})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Predefined Venue
+                  </label>
+                  <select
+                    value={formData.venueId || ''}
+                    onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
+                    className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs font-semibold text-[#182541] bg-white focus:ring-2 focus:ring-[#094899] outline-none"
+                  >
+                    <option value="">-- No predefined / Custom --</option>
+                    {venues.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name} ({v.city})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Custom Venue Text (if not in list)
-                </label>
-                <input
-                  type="text"
-                  value={formData.customVenueName || ''}
-                  onChange={(e) => setFormData({ ...formData, customVenueName: e.target.value })}
-                  placeholder="e.g. Constitution Club of India, New Delhi"
-                  className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs text-[#182541] outline-none"
-                />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Custom Venue Name / Hall
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.customVenueName || ''}
+                    onChange={(e) => setFormData({ ...formData, customVenueName: e.target.value })}
+                    placeholder="e.g. Grace Salvation Nagamese Church"
+                    className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs text-[#182541] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Custom Venue Address
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.customVenueAddress || ''}
+                    onChange={(e) => setFormData({ ...formData, customVenueAddress: e.target.value })}
+                    placeholder="e.g. Half Nagarjan, Dimapur"
+                    className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs text-[#182541] outline-none"
+                  />
+                </div>
               </div>
 
               <div className="md:col-span-2">
