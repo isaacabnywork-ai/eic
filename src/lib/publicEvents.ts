@@ -165,6 +165,12 @@ export function customEventToContentItem(ev: PublicDisplayEvent): ContentItem {
       badge: ev.badge,
       formattedDate: ev.formattedDate,
       isCustom: true,
+      price: ev.price,
+      isFree: ev.isFree,
+      cost:
+        ev.isFree || !ev.price || Number(ev.price) <= 0
+          ? 'Free'
+          : `${ev.currencySymbol || '₹'} ${Number(ev.price).toLocaleString('en-IN')}`,
     },
     eventDate: ev.date,
   };

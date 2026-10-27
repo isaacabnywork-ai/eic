@@ -14,6 +14,7 @@ export function EventCard({ item }: EventCardProps) {
   const { day, month, year } = dateParts(item.eventDate || item.date);
   const venue = typeof item.meta?.venue === 'string' ? item.meta.venue : null;
   const badge = typeof item.meta?.badge === 'string' ? item.meta.badge : 'Conference / Event';
+  const cost = typeof item.meta?.cost === 'string' ? item.meta.cost : null;
 
   return (
     <article className="group flex flex-col sm:flex-row items-start gap-5 rounded-2xl border border-line bg-surface p-5 sm:p-6 shadow-xs transition-all duration-300 hover:border-ink/20 hover:shadow-md">
@@ -41,6 +42,11 @@ export function EventCard({ item }: EventCardProps) {
                 <span className="truncate max-w-[200px]">{venue}</span>
               </span>
             )}
+            {cost && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent/10 text-accent-text border border-accent/20">
+                {cost}
+              </span>
+            )}
           </div>
 
           <h3 className="font-serif text-lg sm:text-xl font-bold leading-snug text-ink">
@@ -57,13 +63,20 @@ export function EventCard({ item }: EventCardProps) {
         </div>
 
         <div className="mt-4 pt-3 border-t border-line/50 flex items-center justify-between">
-          <Link
-            to={eventHref}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-accent-ink bg-accent/15 hover:bg-accent hover:text-accent-ink px-3.5 py-1.5 rounded-full transition-colors"
-          >
-            <span>Event Details</span>
-            <ArrowRightIcon size={12} />
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <Link
+              to={eventHref}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-accent-ink bg-accent/15 hover:bg-accent hover:text-accent-ink px-3.5 py-1.5 rounded-full transition-colors"
+            >
+              <span>Event Details</span>
+              <ArrowRightIcon size={12} />
+            </Link>
+            {cost && (
+              <span className="text-xs font-bold text-ink hidden sm:inline-block">
+                {cost}
+              </span>
+            )}
+          </div>
 
           {customUrl && isExternal && (
             <a

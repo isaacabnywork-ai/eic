@@ -195,7 +195,10 @@ export function EventSinglePage() {
         startTime: rawCustomEvent.startTime,
         endTime: rawCustomEvent.endTime,
         isExpired: isPast,
-        cost: rawCustomEvent.isFree ? 'Free' : `${rawCustomEvent.currency || 'INR'}${rawCustomEvent.price ? rawCustomEvent.price.toFixed(2) : '300.00'}`,
+        cost:
+          rawCustomEvent.isFree || !rawCustomEvent.price || Number(rawCustomEvent.price) <= 0
+            ? 'Free'
+            : `${rawCustomEvent.currencySymbol || '₹'} ${Number(rawCustomEvent.price).toLocaleString('en-IN')}`,
         organizerName: organizer?.name || 'Equip Indian Churches',
         organizerBio: organizer?.description || 'Serving local churches across India through expository preaching and sound doctrine.',
         venueName: venue?.name || rawCustomEvent.customVenueName || 'Grace Salvation Nagamese Church',

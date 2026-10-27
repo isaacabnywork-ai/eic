@@ -141,7 +141,8 @@ export function AdminEventsListPage() {
     registrationUrl: '',
     registrationButtonLabel: 'Register Now',
     registrationAvailable: true,
-    isFree: true,
+    isFree: false,
+    price: 300,
     currency: 'INR',
     currencySymbol: '₹',
     schedules: [],
@@ -153,7 +154,13 @@ export function AdminEventsListPage() {
       if (editingId) {
         const found = eventRepository.getById(editingId);
         if (found) {
-          setFormData({ ...found });
+          setFormData({
+            ...found,
+            isFree: found.isFree !== undefined ? found.isFree : (!found.price || found.price === 0),
+            price: found.price !== undefined ? found.price : 0,
+            currency: found.currency || 'INR',
+            currencySymbol: found.currencySymbol || '₹',
+          });
         }
       } else {
         // Reset to fresh event template
@@ -186,20 +193,11 @@ export function AdminEventsListPage() {
           registrationUrl: 'https://equipindianchurches.com/events',
           registrationButtonLabel: 'Register Now',
           registrationAvailable: true,
-          isFree: true,
+          isFree: false,
+          price: 300,
           currency: 'INR',
           currencySymbol: '₹',
-          schedules: [
-            {
-              id: 's-1',
-              title: 'Keynote Expository Session I',
-              date: new Date().toISOString().slice(0, 10),
-              startTime: '09:30',
-              endTime: '11:00',
-              speakerIds: [],
-              displayOrder: 1,
-            },
-          ],
+          schedules: [],
           faqs: [],
         });
       }
@@ -216,6 +214,11 @@ export function AdminEventsListPage() {
     const slug = formData.slug?.trim() || 
       formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+    const isFree = Boolean(formData.isFree);
+    const priceNum = isFree ? 0 : (formData.price !== undefined && formData.price !== null ? Number(formData.price) : 0);
+    const currencyStr = (formData.currency || 'INR').trim().toUpperCase();
+    const symbolStr = formData.currencySymbol || (currencyStr === 'USD' ? '$' : currencyStr === 'EUR' ? '€' : currencyStr === 'GBP' ? '£' : '₹');
+
     const saved = eventRepository.save({
       ...formData,
       title: formData.title.trim(),
@@ -229,6 +232,10 @@ export function AdminEventsListPage() {
       endTime: formData.endTime || '17:30',
       registrationUrl: formData.registrationUrl?.trim() || '/events',
       registrationButtonLabel: formData.registrationButtonLabel?.trim() || 'Register Now',
+      isFree: isFree || priceNum <= 0,
+      price: priceNum,
+      currency: currencyStr,
+      currencySymbol: symbolStr,
       createdById: user?.id || 'admin',
       createdByEmail: user?.email || 'admin@equipindianchurches.com',
     } as any);
@@ -464,9 +471,16 @@ export function AdminEventsListPage() {
                                   {ev.title}
                                 </button>
                               </h4>
-                              <p className="text-[11px] font-mono text-slate-400 truncate mt-0.5">
-                                /{ev.slug}
-                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[11px] font-mono text-slate-400 truncate">
+                                  /{ev.slug}
+                                </span>
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                                  {ev.isFree || !ev.price || Number(ev.price) <= 0
+                                    ? 'Free'
+                                    : `${ev.currencySymbol || '₹'} ${Number(ev.price).toLocaleString('en-IN')}`}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </td>
@@ -766,6 +780,106 @@ export function AdminEventsListPage() {
                   onChange={(e) => setFormData({ ...formData, registrationButtonLabel: e.target.value })}
                   className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs text-[#182541] outline-none"
                 />
+              </div>
+
+              {/* Event Pricing / Admission Fee */}
+              <div className="md:col-span-2 pt-4 border-t border-slate-100 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Event Admission & Registration Fee
+                    </label>
+                    <span className="text-[11px] text-slate-500">
+                      Configure ticket price for public display on the event details page and event cards.
+                    </span>
+                  </div>
+                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#094899] bg-[#F0F6FB] px-3 py-1.5 rounded-xl border border-[#D0E1F0] self-start sm:self-auto">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.isFree)}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData({
+                          ...formData,
+                          isFree: checked,
+                          price: checked ? 0 : (formData.price || 300),
+                        });
+                      }}
+                      className="rounded border-[#D0E1F0] text-[#094899] focus:ring-[#094899] w-4 h-4"
+                    />
+                    <span>Free Event (No Fee)</span>
+                  </label>
+                </div>
+
+                {!formData.isFree ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#F0F6FB] border border-[#D0E1F0]">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold text-[#182541] mb-1">
+                        Registration Price / Ticket Fee <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="flex items-center rounded-xl border border-[#D0E1F0] bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-[#094899]">
+                        <span className="font-bold text-slate-600 mr-2 text-sm">
+                          {formData.currencySymbol || '₹'}
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          required={!formData.isFree}
+                          value={formData.price !== undefined && formData.price !== null ? formData.price : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : Number(e.target.value);
+                            setFormData({
+                              ...formData,
+                              price: val,
+                              isFree: val <= 0,
+                            });
+                          }}
+                          placeholder="e.g. 300"
+                          className="w-full text-sm font-semibold text-[#182541] outline-none bg-transparent"
+                        />
+                      </div>
+                      <span className="text-[11px] text-slate-500 mt-1 block">
+                        Will be displayed publicly on the single event page and event cards (e.g. ₹ 300).
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#182541] mb-1">
+                        Currency
+                      </label>
+                      <select
+                        value={formData.currency || 'INR'}
+                        onChange={(e) => {
+                          const curr = e.target.value;
+                          const symbol = curr === 'USD' ? '$' : curr === 'EUR' ? '€' : curr === 'GBP' ? '£' : '₹';
+                          setFormData({
+                            ...formData,
+                            currency: curr,
+                            currencySymbol: symbol,
+                          });
+                        }}
+                        className="w-full px-3 py-2 border border-[#D0E1F0] rounded-xl text-xs font-semibold text-[#182541] bg-white outline-none focus:ring-2 focus:ring-[#094899]"
+                      >
+                        <option value="INR">INR (₹ Indian Rupee)</option>
+                        <option value="USD">USD ($ US Dollar)</option>
+                        <option value="EUR">EUR (€ Euro)</option>
+                        <option value="GBP">GBP (£ British Pound)</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800 flex items-center justify-between">
+                    <span>✓ This event is marked as <strong>Free Admission</strong>. Public cost will show as <strong>Free</strong>.</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, isFree: false, price: formData.price || 300 })}
+                      className="text-xs font-bold text-emerald-700 underline hover:text-emerald-900 cursor-pointer ml-2 shrink-0"
+                    >
+                      Set Ticket Price
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
