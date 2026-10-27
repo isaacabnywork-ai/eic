@@ -168,7 +168,7 @@ const server = http.createServer((req, res) => {
   // Admin Database API Endpoint
   if (pathname === '/api/admin/db') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, HEAD, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
@@ -177,13 +177,18 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    if (req.method === 'GET') {
+    if (req.method === 'GET' || req.method === 'HEAD') {
       const dbContent = getDbState();
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=UTF-8',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Content-Length': Buffer.byteLength(dbContent, 'utf-8'),
       });
-      res.end(dbContent);
+      if (req.method === 'HEAD') {
+        res.end();
+      } else {
+        res.end(dbContent);
+      }
       return;
     }
 

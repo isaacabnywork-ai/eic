@@ -21,7 +21,7 @@ function adminDbDevPlugin(): Plugin {
         }
 
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, HEAD, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
         if (req.method === 'OPTIONS') {
@@ -30,7 +30,7 @@ function adminDbDevPlugin(): Plugin {
           return;
         }
 
-        if (req.method === 'GET') {
+        if (req.method === 'GET' || req.method === 'HEAD') {
           if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir, { recursive: true });
           }
@@ -43,7 +43,11 @@ function adminDbDevPlugin(): Plugin {
           }
           res.setHeader('Content-Type', 'application/json; charset=UTF-8');
           res.setHeader('Cache-Control', 'no-cache');
-          res.end(content);
+          if (req.method === 'HEAD') {
+            res.end();
+          } else {
+            res.end(content);
+          }
           return;
         }
 
