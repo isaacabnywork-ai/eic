@@ -143,7 +143,7 @@ export function MobileEventsView() {
           <div className="space-y-4">
             {events.map((event: any) => {
               const { day, month, year } = dateParts(event.eventDate || event.date);
-              const href = event.href || itemPath('article', event.slug);
+              const href = `/events/${event.slug}`;
               const venueText = event.venue || 'All India / Regional Gathering';
 
               return (

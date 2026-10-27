@@ -1200,20 +1200,22 @@ export function HomePage() {
       return {
         id: top.id,
         title: top.title,
+        slug: top.slug,
         formattedDate: top.formattedDate,
         date: top.date,
         venue: top.venue,
         badge: 'Latest Main Event',
         excerpt: top.excerpt,
         image: top.image,
-        registrationUrl: top.registrationUrl,
-        isUpcoming: true,
+        registrationUrl: top.registrationUrl || `/events/${top.slug}`,
+        isUpcoming: top.isUpcoming,
       };
     }
     const liveFirst = events?.items?.[0];
     return {
       id: liveFirst?.id || 'aipc-2026-main',
       title: 'All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully',
+      slug: liveFirst?.slug || 'all-india-pastors-conference-2026',
       formattedDate: 'November 12 – 14, 2026',
       date: '2026-11-12',
       venue: 'New Delhi, India',
@@ -1225,7 +1227,7 @@ export function HomePage() {
         src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
         alt: 'All India Pastors Conference 2026',
       },
-      registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events',
+      registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events/all-india-pastors-conference-2026',
       isUpcoming: true,
     };
   }, [events, customEvents]);
@@ -1236,6 +1238,7 @@ export function HomePage() {
       {
         id: 'upcoming-1',
         title: 'All India Pastors Conference 2026',
+        slug: 'all-india-pastors-conference-2026',
         formattedDate: 'Nov 12 – 14, 2026',
         date: '2026-11-12',
         venue: 'New Delhi • National Summit',
@@ -1243,12 +1246,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2026',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/all-india-pastors-conference-2026',
         isUpcoming: true,
       },
       {
         id: 'upcoming-2',
         title: 'Regional Pastors Roundtable: South India',
+        slug: 'regional-pastors-roundtable-south-india',
         formattedDate: 'Aug 22, 2026',
         date: '2026-08-22',
         venue: 'Bangalore, Karnataka',
@@ -1256,12 +1260,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'Regional Pastors Roundtable',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/regional-pastors-roundtable-south-india',
         isUpcoming: true,
       },
       {
         id: 'upcoming-3',
         title: 'Expository Preaching Seminar & Workshop',
+        slug: 'expository-preaching-seminar-workshop-2026',
         formattedDate: 'Oct 5 – 7, 2026',
         date: '2026-10-05',
         venue: 'Mumbai, Maharashtra',
@@ -1269,12 +1274,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'Expository Preaching Seminar',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/expository-preaching-seminar-workshop-2026',
         isUpcoming: true,
       },
       {
         id: 'upcoming-4',
         title: 'Church Leaders Theological Colloquium',
+        slug: 'church-leaders-theological-colloquium',
         formattedDate: 'Dec 4 – 6, 2026',
         date: '2026-12-04',
         venue: 'Kolkata, West Bengal',
@@ -1282,7 +1288,7 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'Theological Colloquium',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/church-leaders-theological-colloquium',
         isUpcoming: true,
       },
     ];
@@ -1291,12 +1297,13 @@ export function HomePage() {
       const items = customEvents.slice(1, 5).map((ev) => ({
         id: ev.id,
         title: ev.title,
+        slug: ev.slug,
         formattedDate: ev.formattedDate,
         date: ev.date,
         venue: ev.venue,
         image: ev.image,
-        registrationUrl: ev.registrationUrl,
-        isUpcoming: true,
+        registrationUrl: ev.registrationUrl || `/events/${ev.slug}`,
+        isUpcoming: ev.isUpcoming,
       }));
       // Pad with defaults if fewer than 4
       if (items.length < 4) {
@@ -1309,12 +1316,13 @@ export function HomePage() {
         {
           id: customEvents[0].id,
           title: customEvents[0].title,
+          slug: customEvents[0].slug,
           formattedDate: customEvents[0].formattedDate,
           date: customEvents[0].date,
           venue: customEvents[0].venue,
           image: customEvents[0].image,
-          registrationUrl: customEvents[0].registrationUrl,
-          isUpcoming: true,
+          registrationUrl: customEvents[0].registrationUrl || `/events/${customEvents[0].slug}`,
+          isUpcoming: customEvents[0].isUpcoming,
         },
         ...DEFAULT_EVENTS.slice(1),
       ];
@@ -1328,6 +1336,7 @@ export function HomePage() {
       return events.items.slice(0, 4).map((item) => ({
         id: item.id,
         title: item.title,
+        slug: item.slug,
         formattedDate: formatDateShort(item.eventDate || item.date),
         date: item.eventDate || item.date,
         venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
@@ -1335,7 +1344,7 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=800&q=80',
           alt: item.title,
         },
-        registrationUrl: itemPath('event', item.slug),
+        registrationUrl: `/events/${item.slug}`,
         isUpcoming: false,
       }));
     }
@@ -1343,6 +1352,7 @@ export function HomePage() {
       {
         id: 'past-1',
         title: 'Day 2 at AIPC 2023: Faithful Shepherding',
+        slug: 'aipc-2023-day-2',
         formattedDate: 'Sep 28, 2023',
         date: '2023-09-28',
         venue: 'National Conference Assembly',
@@ -1350,12 +1360,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2023',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/aipc-2023-day-2',
         isUpcoming: false,
       },
       {
         id: 'past-2',
         title: 'Day 1 at AIPC 2023: The Sufficiency of Scripture',
+        slug: 'aipc-2023-day-1',
         formattedDate: 'Sep 27, 2023',
         date: '2023-09-27',
         venue: 'National Conference Assembly',
@@ -1363,12 +1374,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2023',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/aipc-2023-day-1',
         isUpcoming: false,
       },
       {
         id: 'past-3',
         title: 'AIPC 2022: Pastoral Fellowship in Christ',
+        slug: 'aipc-2022',
         formattedDate: 'Dec 24, 2022',
         date: '2022-12-24',
         venue: 'Annual Assembly',
@@ -1376,12 +1388,13 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2022',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/aipc-2022',
         isUpcoming: false,
       },
       {
         id: 'past-4',
         title: 'AIPC 2021: Suffering and Sovereignty of God',
+        slug: 'aipc-2021',
         formattedDate: 'Oct 25, 2021',
         date: '2021-10-25',
         venue: 'Pastoral Exposition',
@@ -1389,7 +1402,7 @@ export function HomePage() {
           src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&h=800&q=80',
           alt: 'AIPC 2021',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/aipc-2021',
         isUpcoming: false,
       },
     ];
@@ -1663,17 +1676,17 @@ export function HomePage() {
                 <div className="lg:col-span-5 flex flex-col">
                   <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
                     <div>
-                      {/* Flyer / Book Shaped Image (Height-controlled so whole section fits on screen) */}
-                      <div className="relative aspect-[3/4] max-h-[360px] w-auto mx-auto overflow-hidden rounded-2xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl transition-shadow duration-300">
-                        <Link to={mainLatestEvent.registrationUrl} className="block h-full w-full">
+                      {/* Flyer / Book Shaped Image (Height-controlled so whole section fits on screen, never cut off) */}
+                      <div className="relative aspect-[3/4] max-h-[440px] w-auto mx-auto overflow-hidden rounded-2xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-shadow duration-300">
+                        <Link to={`/events/${mainLatestEvent.slug}`} className="block h-full w-full">
                           <Img
                             image={mainLatestEvent.image}
                             alt={mainLatestEvent.title}
                             wrapperClassName="h-full w-full"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
                           />
                         </Link>
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                         {/* Top Badge */}
                         <div className="absolute top-3.5 left-3.5 flex items-center gap-2 rounded-full bg-black/80 backdrop-blur-md px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/20">
@@ -1696,7 +1709,7 @@ export function HomePage() {
                         </div>
 
                         <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
-                          <Link to={mainLatestEvent.registrationUrl}>
+                          <Link to={`/events/${mainLatestEvent.slug}`}>
                             {mainLatestEvent.title}
                           </Link>
                         </h3>
@@ -1711,16 +1724,28 @@ export function HomePage() {
 
                     {/* Registration CTA Below */}
                     <div className="mt-5 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-3">
-                      <Link
-                        to={mainLatestEvent.registrationUrl}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-                      >
-                        <span>Register for Conference</span>
-                        <ArrowRightIcon size={13} />
-                      </Link>
+                      {mainLatestEvent.registrationUrl && (mainLatestEvent.registrationUrl.startsWith('http://') || mainLatestEvent.registrationUrl.startsWith('https://')) ? (
+                        <a
+                          href={mainLatestEvent.registrationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                        >
+                          <span>Register for Conference</span>
+                          <ArrowRightIcon size={13} />
+                        </a>
+                      ) : (
+                        <Link
+                          to={`/events/${mainLatestEvent.slug}`}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                        >
+                          <span>Register for Conference</span>
+                          <ArrowRightIcon size={13} />
+                        </Link>
+                      )}
 
                       <Link
-                        to="/events"
+                        to={`/events/${mainLatestEvent.slug}`}
                         className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
                       >
                         <span>All Details</span>
@@ -1779,15 +1804,15 @@ export function HomePage() {
                         className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
                       >
                         <div>
-                          {/* Small Flyer / Book Poster (Height controlled to stay compact) */}
-                          <div className="relative h-32 sm:h-36 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-black/40 group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-                            <Link to={ev.registrationUrl} className="block h-full w-full">
+                          {/* Flyer Poster Container (Never cut off, object-contain on dark canvas) */}
+                          <div className="relative h-44 sm:h-52 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-all duration-300">
+                            <Link to={`/events/${ev.slug}`} className="block h-full w-full">
                               <Img
                                 image={ev.image}
                                 alt={ev.title}
                                 thumb
                                 wrapperClassName="h-full w-full"
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain"
                               />
                             </Link>
 
@@ -1806,7 +1831,7 @@ export function HomePage() {
                             </div>
 
                             <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
-                              <Link to={ev.registrationUrl}>
+                              <Link to={`/events/${ev.slug}`}>
                                 {ev.title}
                               </Link>
                             </h4>
@@ -1815,13 +1840,25 @@ export function HomePage() {
 
                         {/* Registration Button Below */}
                         <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
-                          <Link
-                            to={ev.registrationUrl}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
-                          >
-                            <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
-                            <ArrowRightIcon size={10} />
-                          </Link>
+                          {ev.registrationUrl && (ev.registrationUrl.startsWith('http://') || ev.registrationUrl.startsWith('https://')) ? (
+                            <a
+                              href={ev.registrationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs cursor-pointer"
+                            >
+                              <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
+                              <ArrowRightIcon size={10} />
+                            </a>
+                          ) : (
+                            <Link
+                              to={`/events/${ev.slug}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
+                            >
+                              <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
+                              <ArrowRightIcon size={10} />
+                            </Link>
+                          )}
                           <span className="text-[10px] text-muted font-medium">Conference</span>
                         </div>
                       </article>

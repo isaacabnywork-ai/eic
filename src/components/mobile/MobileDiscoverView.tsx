@@ -54,6 +54,7 @@ export function MobileDiscoverView() {
       {
         id: 'upcoming-1',
         title: 'All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully',
+        slug: 'all-india-pastors-conference-2026',
         formattedDate: 'Nov 12 – 14, 2026',
         date: '2026-11-12',
         venue: 'New Delhi • National Summit',
@@ -63,12 +64,13 @@ export function MobileDiscoverView() {
           src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=600&q=80',
           alt: 'AIPC 2026',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/all-india-pastors-conference-2026',
         badge: 'National Summit',
       },
       {
         id: 'upcoming-2',
         title: 'Regional Pastors Roundtable: South India',
+        slug: 'regional-pastors-roundtable-south-india',
         formattedDate: 'Aug 22, 2026',
         date: '2026-08-22',
         venue: 'Bangalore, Karnataka',
@@ -78,12 +80,13 @@ export function MobileDiscoverView() {
           src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&h=600&q=80',
           alt: 'Regional Pastors Roundtable',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/regional-pastors-roundtable-south-india',
         badge: 'Regional Assembly',
       },
       {
         id: 'upcoming-3',
         title: 'Expository Preaching Seminar & Workshop',
+        slug: 'expository-preaching-seminar-workshop-2026',
         formattedDate: 'Oct 5 – 7, 2026',
         date: '2026-10-05',
         venue: 'Mumbai, Maharashtra',
@@ -93,12 +96,13 @@ export function MobileDiscoverView() {
           src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&h=600&q=80',
           alt: 'Expository Preaching Seminar',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/expository-preaching-seminar-workshop-2026',
         badge: 'Training Workshop',
       },
       {
         id: 'upcoming-4',
         title: 'Church Leaders Theological Colloquium',
+        slug: 'church-leaders-theological-colloquium',
         formattedDate: 'Dec 4 – 6, 2026',
         date: '2026-12-04',
         venue: 'Kolkata, West Bengal',
@@ -108,7 +112,7 @@ export function MobileDiscoverView() {
           src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&h=600&q=80',
           alt: 'Theological Colloquium',
         },
-        registrationUrl: '/events',
+        registrationUrl: '/events/church-leaders-theological-colloquium',
         badge: 'Leadership Colloquium',
       },
     ];
@@ -117,6 +121,7 @@ export function MobileDiscoverView() {
       const mappedCustom = customEvents.map((ev) => ({
         id: ev.id,
         title: ev.title,
+        slug: ev.slug,
         formattedDate: ev.formattedDate,
         date: ev.date,
         venue: ev.venue,
@@ -139,12 +144,13 @@ export function MobileDiscoverView() {
     const mappedLive = liveEvents.map((item) => ({
       id: item.id,
       title: item.title,
+      slug: item.slug,
       formattedDate: item.eventDate ? formatDateShort(item.eventDate) : formatDateShort(item.date),
       date: item.eventDate || item.date,
       venue: typeof item.meta?.venue === 'string' ? item.meta.venue : 'All India / Regional Gathering',
       excerpt: item.excerpt || 'Equipping the local church in India with sound doctrine and gospel-centered ministry.',
       image: item.image || DEFAULT_EVENTS[0].image,
-      registrationUrl: itemPath('event', item.slug),
+      registrationUrl: `/events/${item.slug}`,
       badge: 'Upcoming Event',
     }));
 
@@ -287,15 +293,17 @@ export function MobileDiscoverView() {
               className="group w-64 shrink-0 rounded-2xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 snap-start select-none shadow-xs dark:shadow-none hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 transition flex flex-col justify-between"
             >
               <div>
-                {/* Flyer Image Container (Portrait Rectangle like a Book / Flyer) */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-slate-900 border border-black/10 shadow-xs">
-                  <Img
-                    image={event.image}
-                    alt={event.title}
-                    wrapperClassName="h-full w-full"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                {/* Flyer Image Container (Portrait Rectangle like a Book / Flyer, Never Cut Off) */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-slate-950 border border-black/10 shadow-xs">
+                  <Link to={`/events/${event.slug}`} className="block h-full w-full">
+                    <Img
+                      image={event.image}
+                      alt={event.title}
+                      wrapperClassName="h-full w-full"
+                      className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </Link>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                   {/* Top Badge */}
                   <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-white border border-white/20 uppercase tracking-wider">
@@ -318,26 +326,38 @@ export function MobileDiscoverView() {
                   </div>
 
                   <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
-                    <Link to={event.registrationUrl}>{event.title}</Link>
+                    <Link to={`/events/${event.slug}`}>{event.title}</Link>
                   </h4>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="mt-3 pt-2.5 border-t border-[#D0E1F0] dark:border-white/10 flex items-center justify-between">
-                <Link
-                  to={event.registrationUrl}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#182541] dark:bg-white text-white dark:text-[#182541] text-xs font-bold transition shadow-xs hover:opacity-90"
-                >
-                  <span>Register</span>
-                  <ArrowRightIcon size={10} />
-                </Link>
+                {event.registrationUrl && (event.registrationUrl.startsWith('http://') || event.registrationUrl.startsWith('https://')) ? (
+                  <a
+                    href={event.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#182541] dark:bg-white text-white dark:text-[#182541] text-xs font-bold transition shadow-xs hover:opacity-90"
+                  >
+                    <span>Register</span>
+                    <ArrowRightIcon size={10} />
+                  </a>
+                ) : (
+                  <Link
+                    to={`/events/${event.slug}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#182541] dark:bg-white text-white dark:text-[#182541] text-xs font-bold transition shadow-xs hover:opacity-90"
+                  >
+                    <span>Register</span>
+                    <ArrowRightIcon size={10} />
+                  </Link>
+                )}
 
                 <Link
-                  to="/events"
+                  to={`/events/${event.slug}`}
                   className="text-xs font-semibold text-slate-500 dark:text-white/60 hover:text-[#182541] dark:hover:text-white inline-flex items-center gap-1 transition"
                 >
-                  <span>All Events</span>
+                  <span>Details</span>
                   <ArrowRightIcon size={10} />
                 </Link>
               </div>

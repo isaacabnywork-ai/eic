@@ -7,18 +7,30 @@ export interface PublicDisplayEvent {
   id: string;
   title: string;
   slug: string;
+  eventUrl: string;
   formattedDate: string;
   date: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
   venue: string;
+  venueAddress?: string;
   badge: string;
   excerpt: string;
+  shortDescription?: string;
+  fullDescription?: string;
   image: {
     src: string;
     alt: string;
   };
   registrationUrl: string;
+  registrationButtonLabel?: string;
   isUpcoming: boolean;
   isCustom: boolean;
+  isFree?: boolean;
+  price?: number;
+  currency?: string;
+  currencySymbol?: string;
 }
 
 const DEFAULT_EVENT_IMAGE =
@@ -67,11 +79,14 @@ export function getPublishedCustomEvents(): PublicDisplayEvent[] {
     return sorted.map((ev: CustomEvent) => {
       // Resolve venue
       let venueLabel = 'All India • National Gathering';
+      let venueAddress = '';
       if (ev.venueId && venuesMap.has(ev.venueId)) {
         const v = venuesMap.get(ev.venueId)!;
         venueLabel = `${v.name}, ${v.city}`;
+        venueAddress = `${v.address ? v.address + ', ' : ''}${v.city}${v.state ? ', ' + v.state : ''}`;
       } else if (ev.customVenueName) {
         venueLabel = ev.customVenueName;
+        venueAddress = ev.customVenueAddress || '';
       }
 
       // Resolve category
@@ -86,21 +101,33 @@ export function getPublishedCustomEvents(): PublicDisplayEvent[] {
         id: ev.id,
         title: ev.title,
         slug: ev.slug,
+        eventUrl: `/events/${ev.slug}`,
         formattedDate,
         date: ev.startDate || '2026-11-12',
+        endDate: ev.endDate,
+        startTime: ev.startTime,
+        endTime: ev.endTime,
         venue: venueLabel,
+        venueAddress,
         badge: badgeLabel,
         excerpt:
           ev.shortDescription ||
           ev.fullDescription?.slice(0, 160) ||
           'Gathering pastors, church planters, and believers across India for sound doctrine and expository preaching.',
+        shortDescription: ev.shortDescription,
+        fullDescription: ev.fullDescription,
         image: {
           src: ev.featuredPosterUrl || DEFAULT_EVENT_IMAGE,
           alt: ev.title,
         },
-        registrationUrl: ev.registrationUrl || '/events',
-        isUpcoming: true,
+        registrationUrl: ev.registrationUrl || `/events/${ev.slug}`,
+        registrationButtonLabel: ev.registrationButtonLabel || 'Register for Event',
+        isUpcoming: new Date(ev.endDate || ev.startDate || '2026-11-12').getTime() >= Date.now() - 86400000,
         isCustom: true,
+        isFree: ev.isFree,
+        price: ev.price,
+        currency: ev.currency || 'INR',
+        currencySymbol: ev.currencySymbol || '₹',
       };
     });
   } catch (err) {

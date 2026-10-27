@@ -14,6 +14,7 @@ import { BookReviewSinglePage } from '@/pages/BookReviewSingle';
 import { GalleryArchivePage } from '@/pages/GalleryArchive';
 import { GallerySinglePage } from '@/pages/GallerySingle';
 import { EventsArchivePage } from '@/pages/EventsArchive';
+import { EventSinglePage } from '@/pages/EventSingle';
 import { AuthorsArchivePage } from '@/pages/AuthorsArchive';
 import { AuthorSinglePage } from '@/pages/AuthorSingle';
 import { SearchPage } from '@/pages/SearchPage';
@@ -168,6 +169,7 @@ const router = createBrowserRouter([
       { path: 'gallery/:slug', element: <GallerySinglePage /> },
       // Events
       { path: 'events', element: <EventsArchivePage /> },
+      { path: 'events/:slug', element: <EventSinglePage /> },
       // Authors
       { path: 'authors', element: <AuthorsArchivePage /> },
       { path: 'authors/:id', element: <AuthorSinglePage /> },

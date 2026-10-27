@@ -11,9 +11,9 @@ export const routes = {
   search: '/search',
 } as const;
 
-/** "events" are Posts, so they open on the article page. "media" is an unsplit video. */
+/** "media" is an unsplit video. */
 const singleRouteKey = (type: ContentKey): ContentKey =>
-  type === 'event' ? 'article' : type === 'media' ? 'video' : type;
+  type === 'media' ? 'video' : type;
 
 export function archivePath(type: ContentKey, query?: Record<string, string | number | undefined>): string {
   const base = `/${contentTypes[type === 'media' ? 'video' : type].route}`;

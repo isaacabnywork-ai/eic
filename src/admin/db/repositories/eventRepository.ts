@@ -69,7 +69,8 @@ export const eventRepository = {
 
   getBySlug(slug: string): CustomEvent | null {
     const state = adminDb.getState();
-    return state.events.find((e) => e.slug === slug) || null;
+    const clean = slug.trim().toLowerCase();
+    return state.events.find((e) => e.slug.trim().toLowerCase() === clean) || null;
   },
 
   create(eventData: Omit<CustomEvent, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'createdByEmail'>): CustomEvent {

@@ -236,6 +236,74 @@ export const SEED_ORGANIZERS: Organizer[] = [
 
 export const SEED_EVENTS: CustomEvent[] = [
   {
+    id: 'event-day-in-the-word',
+    title: 'A DAY IN THE WORD',
+    slug: 'a-day-in-the-word',
+    shortDescription: 'Expositions through Ephesians 1 And 2',
+    fullDescription: `Equip Indian Churches (EIC) invites you to a one-day conference in Dimapur focused on the theme "A Day in the Word" with expositions from Ephesians chapters 1 and 2. In a time when the church needs strong biblical foundations, this conference seeks to encourage believers through faithful preaching, Christ-centred teaching, and meaningful fellowship.
+
+Join pastors, church leaders, and believers from across the region for a day of learning, encouragement, and spiritual refreshment as we reflect on the riches of the Gospel and God's saving grace in Christ. The conference will also include opportunities to connect with others, explore resources from For The Truth bookstore, and be strengthened for faithful Christian living and ministry.
+
+We warmly invite you to join us for this special gathering centred on God's Word.
+
+Venue: Grace Salvation Nagamese Church, Near BSF Transit camp. Half Nagarjan, Dimapur.`,
+    featuredPosterUrl:
+      'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=1200&h=1600&q=80',
+    galleryImageUrls: [],
+    status: 'published',
+    operationalStatus: 'scheduled',
+    startDate: '2026-06-16',
+    startTime: '09:30',
+    endDate: '2026-06-16',
+    endTime: '16:00',
+    isAllDay: false,
+    hideEndTime: false,
+    timezone: 'Asia/Kolkata',
+    isRecurring: false,
+    venueId: 'venue-dimapur-1',
+    customVenueName: 'Grace Salvation Nagamese Church',
+    customVenueAddress: 'Near BSF Transit camp. Half Nagarjan, Dimapur',
+    isOnlineOnly: false,
+    speakerIds: ['speaker-anand-samuel'],
+    organizerIds: ['org-eic'],
+    categoryIds: ['cat-national-conf'],
+    tagIds: ['tag-pastors', 'tag-preaching', 'tag-doctrine'],
+    registrationUrl: 'https://equipindianchurches.com/events/a-day-in-the-word/register',
+    registrationButtonLabel: 'Register for Conference',
+    registrationAvailable: true,
+    isFree: false,
+    price: 300,
+    currency: 'INR',
+    currencySymbol: '₹',
+    schedules: [
+      {
+        id: 'sch-ditw-1',
+        title: 'Exposition I: The Riches of Grace in Christ (Ephesians 1)',
+        description: 'Morning exposition through Ephesians chapter 1.',
+        date: '2026-06-16',
+        startTime: '09:30',
+        endTime: '12:00',
+        speakerIds: ['speaker-anand-samuel'],
+        displayOrder: 1,
+      },
+      {
+        id: 'sch-ditw-2',
+        title: 'Exposition II: Alive Together with Christ (Ephesians 2)',
+        description: 'Afternoon session focusing on unity, regeneration, and church architecture.',
+        date: '2026-06-16',
+        startTime: '13:30',
+        endTime: '16:00',
+        speakerIds: ['speaker-anand-samuel'],
+        displayOrder: 2,
+      },
+    ],
+    faqs: [],
+    createdById: 'admin-super',
+    createdByEmail: 'admin@equipindianchurches.com',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
     id: 'event-aipc-2026',
     title: 'All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully',
     slug: 'aipc-2026-proclaiming-christ-faithfully',
