@@ -25,7 +25,147 @@ import { BookstoreSinglePage } from '@/pages/BookstoreSingle';
 import { LibraryPage } from '@/pages/LibraryPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
+// Custom Admin Panel Components & Layout
+import { AdminLayout } from '@/admin/layout/AdminLayout';
+import { AdminProtectedRoute } from '@/admin/components/AdminProtectedRoute';
+import { AdminLoginPage } from '@/admin/pages/AdminLoginPage';
+import { AdminDashboardPage } from '@/admin/pages/AdminDashboardPage';
+import { AdminEventsListPage } from '@/admin/pages/AdminEventsListPage';
+import { AdminEventEditorPage } from '@/admin/pages/AdminEventEditorPage';
+import { AdminCategoriesPage } from '@/admin/pages/AdminCategoriesPage';
+import { AdminSpeakersPage } from '@/admin/pages/AdminSpeakersPage';
+import { AdminOrganizersPage } from '@/admin/pages/AdminOrganizersPage';
+import { AdminVenuesPage } from '@/admin/pages/AdminVenuesPage';
+import { AdminMediaPage } from '@/admin/pages/AdminMediaPage';
+import { AdminHeaderMenuPage } from '@/admin/pages/AdminHeaderMenuPage';
+import { AdminFooterMenuPage } from '@/admin/pages/AdminFooterMenuPage';
+import { AdminSettingsPage } from '@/admin/pages/AdminSettingsPage';
+import { AdminUsersPage } from '@/admin/pages/AdminUsersPage';
+import { AdminActivityLogPage } from '@/admin/pages/AdminActivityLogPage';
+
 const router = createBrowserRouter([
+  // Custom Administration Panel Routes (Completely decoupled from WordPress core)
+  {
+    path: 'admin',
+    element: <AdminLayout />,
+    children: [
+      { path: 'login', element: <AdminLoginPage /> },
+      {
+        index: true,
+        element: (
+          <AdminProtectedRoute>
+            <AdminDashboardPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'events',
+        element: (
+          <AdminProtectedRoute>
+            <AdminEventsListPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'events/new',
+        element: (
+          <AdminProtectedRoute>
+            <AdminEventEditorPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'events/:id/edit',
+        element: (
+          <AdminProtectedRoute>
+            <AdminEventEditorPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'categories',
+        element: (
+          <AdminProtectedRoute>
+            <AdminCategoriesPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'speakers',
+        element: (
+          <AdminProtectedRoute>
+            <AdminSpeakersPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'organizers',
+        element: (
+          <AdminProtectedRoute>
+            <AdminOrganizersPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'venues',
+        element: (
+          <AdminProtectedRoute>
+            <AdminVenuesPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'media',
+        element: (
+          <AdminProtectedRoute>
+            <AdminMediaPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'menus/header',
+        element: (
+          <AdminProtectedRoute>
+            <AdminHeaderMenuPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'menus/footer',
+        element: (
+          <AdminProtectedRoute>
+            <AdminFooterMenuPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <AdminProtectedRoute allowedRoles={['super_admin', 'administrator']}>
+            <AdminSettingsPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'users',
+        element: (
+          <AdminProtectedRoute allowedRoles={['super_admin', 'administrator']}>
+            <AdminUsersPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: 'activity',
+        element: (
+          <AdminProtectedRoute>
+            <AdminActivityLogPage />
+          </AdminProtectedRoute>
+        ),
+      },
+    ],
+  },
+
+  // Public Website Routes
   {
     path: '/',
     element: <Layout />,
