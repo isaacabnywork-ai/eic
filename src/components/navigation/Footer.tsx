@@ -91,9 +91,6 @@ export function Footer() {
               />
               <span className="sr-only">{site.name} - Equipping the Church</span>
             </Link>
-            <p className="text-sm leading-relaxed text-body max-w-md">
-              {site.mission}
-            </p>
             {env.contactEmail && (
               <p className="text-xs text-muted">
                 Contact:{' '}

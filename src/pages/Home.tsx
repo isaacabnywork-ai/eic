@@ -808,8 +808,9 @@ function ExpositoryVideosPlayer({ videos }: { videos: ExpositoryVideoItem[] }) {
         >
           <iframe
             key={mainVideo.id}
-            src={`https://www.youtube-nocookie.com/embed/${mainVideo.youtubeId}?autoplay=${hasInteracted ? 1 : 0}&rel=0&modestbranding=1`}
+            src={`https://www.youtube.com/embed/${mainVideo.youtubeId}?autoplay=${hasInteracted ? 1 : 0}&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://equipindianchurches.com')}`}
             title={mainVideo.title}
+            referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             className="h-full w-full border-0"

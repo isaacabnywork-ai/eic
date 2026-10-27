@@ -25,8 +25,9 @@ export function VideoEmbed({ video, audioUrl, title, className = '' }: VideoEmbe
           {video.embedUrl ? (
             isPlaying ? (
               <iframe
-                src={`${video.embedUrl}${video.embedUrl.includes('?') ? '&' : '?'}autoplay=1`}
+                src={`${video.embedUrl}${video.embedUrl.includes('?') ? '&' : '?'}autoplay=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : 'https://equipindianchurches.com')}`}
                 title={title}
+                referrerPolicy="strict-origin-when-cross-origin"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 className="h-full w-full border-0"
