@@ -284,11 +284,11 @@ export function MobileDiscoverView() {
           {upcomingEventsList.map((event) => (
             <article
               key={event.id}
-              className="group w-72 shrink-0 rounded-2xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 snap-start select-none shadow-xs dark:shadow-none hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 transition flex flex-col justify-between"
+              className="group w-64 shrink-0 rounded-2xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 snap-start select-none shadow-xs dark:shadow-none hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 transition flex flex-col justify-between"
             >
               <div>
-                {/* Flyer Image Container */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-900 border border-black/10">
+                {/* Flyer Image Container (Portrait Rectangle like a Book / Flyer) */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-slate-900 border border-black/10 shadow-xs">
                   <Img
                     image={event.image}
                     alt={event.title}
@@ -304,7 +304,7 @@ export function MobileDiscoverView() {
                   </div>
 
                   {/* Bottom Date Pill */}
-                  <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-md bg-black/85 backdrop-blur-md px-2 py-0.5 text-[11px] font-semibold text-white border border-white/15">
+                  <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-md bg-black/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-semibold text-white border border-white/15">
                     <CalendarIcon size={12} className="text-amber-400" />
                     <span>{event.formattedDate}</span>
                   </div>
@@ -320,12 +320,6 @@ export function MobileDiscoverView() {
                   <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
                     <Link to={event.registrationUrl}>{event.title}</Link>
                   </h4>
-
-                  {event.excerpt && (
-                    <p className="mt-1.5 text-xs text-slate-600 dark:text-white/60 line-clamp-2 leading-relaxed">
-                      {event.excerpt}
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -383,22 +377,19 @@ export function MobileDiscoverView() {
               <Link
                 key={art.id}
                 to={itemPath('article', art.slug)}
-                className="group w-64 shrink-0 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-4 snap-start select-none transition hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 shadow-xs dark:shadow-none"
+                className="group w-64 shrink-0 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-4 snap-start select-none transition hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50 shadow-xs dark:shadow-none flex flex-col justify-between"
               >
-                {art.terms.category?.[0] && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary dark:text-[#F0F6FB] block mb-1">
-                    {art.terms.category[0].name}
-                  </span>
-                )}
-                <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
-                  {art.title}
-                </h4>
-                {art.excerpt && (
-                  <p className="mt-1.5 text-xs text-slate-600 dark:text-white/60 line-clamp-2 leading-relaxed">
-                    {art.excerpt}
-                  </p>
-                )}
-                <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-white/40 pt-2 border-t border-[#D0E1F0] dark:border-white/10">
+                <div>
+                  {art.terms.category?.[0] && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary dark:text-[#F0F6FB] block mb-1">
+                      {art.terms.category[0].name}
+                    </span>
+                  )}
+                  <h4 className="font-serif text-sm font-bold text-[#182541] dark:text-white line-clamp-2 leading-snug group-hover:text-primary dark:group-hover:text-[#F0F6FB] transition-colors">
+                    {art.title}
+                  </h4>
+                </div>
+                <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-white/40 pt-2.5 border-t border-[#D0E1F0] dark:border-white/10">
                   <span>{art.date ? formatDateShort(art.date) : 'Equip Article'}</span>
                   <span className="font-semibold text-[#182541] dark:text-white/70">Read &rarr;</span>
                 </div>
