@@ -45,7 +45,7 @@ export function MobileEventsView() {
         eventDate: ce.date,
         excerpt: ce.excerpt,
         venue: ce.venue,
-        href: ce.registrationUrl,
+        href: `/events/${ce.slug}`,
         image: ce.image,
       }));
       return customMapped;
@@ -152,13 +152,24 @@ export function MobileEventsView() {
                   className="group relative flex flex-col rounded-2xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-4 shadow-xs dark:shadow-none transition hover:border-[#182541]/40 dark:hover:border-[#F0F6FB]/50"
                 >
                   <div className="flex items-start gap-3.5">
-                    {/* Date Block */}
-                    <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-xl bg-[#F0F6FB] dark:bg-white/10 border border-[#D0E1F0] dark:border-white/10 text-[#182541] dark:text-white font-bold">
-                      <span className="text-lg leading-none font-bold">{day}</span>
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-white/70 mt-0.5">
-                        {month}
-                      </span>
-                    </div>
+                    {/* Flyer / Book Poster Thumb */}
+                    <Link to={href} className="relative w-16 sm:w-20 aspect-[3/4] shrink-0 rounded-xl overflow-hidden bg-slate-950 border border-[#D0E1F0] dark:border-white/10 shadow-xs">
+                      {event.image?.src ? (
+                        <img
+                          src={event.image.src}
+                          alt={event.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full w-full bg-[#F0F6FB] dark:bg-white/10 text-[#182541] dark:text-white font-bold">
+                          <span className="text-base font-bold">{day}</span>
+                          <span className="text-[9px] uppercase font-bold text-slate-500">{month}</span>
+                        </div>
+                      )}
+                      <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-xs text-[9px] font-extrabold text-white">
+                        {day} {month}
+                      </div>
+                    </Link>
 
                     {/* Event Summary */}
                     <div className="flex-1 min-w-0">

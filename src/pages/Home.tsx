@@ -1194,10 +1194,10 @@ export function HomePage() {
   // Events tab switcher state (Upcoming vs Past)
   const [eventsTab, setEventsTab] = useState<'upcoming' | 'past'>('upcoming');
 
-  // Main featured latest event for the left column (Prefers latest published custom event)
+  // Main featured latest event for the left column (Prefers first upcoming custom event, or latest custom event)
   const mainLatestEvent = useMemo(() => {
     if (customEvents.length > 0) {
-      const top = customEvents[0];
+      const top = customEvents.find((e) => e.isUpcoming) || customEvents[0];
       return {
         id: top.id,
         title: top.title,
@@ -1205,7 +1205,7 @@ export function HomePage() {
         formattedDate: top.formattedDate,
         date: top.date,
         venue: top.venue,
-        badge: 'Latest Main Event',
+        badge: top.isUpcoming ? 'Latest Main Event' : 'Concluded Event',
         excerpt: top.excerpt,
         image: top.image,
         registrationUrl: top.registrationUrl || `/events/${top.slug}`,
@@ -1213,89 +1213,49 @@ export function HomePage() {
       };
     }
     const liveFirst = events?.items?.[0];
+    if (liveFirst) {
+      const isPast = new Date(liveFirst.eventDate || liveFirst.date).getTime() < Date.now() - 86400000;
+      return {
+        id: String(liveFirst.id),
+        title: liveFirst.title,
+        slug: liveFirst.slug,
+        formattedDate: formatDateShort(liveFirst.eventDate || liveFirst.date),
+        date: liveFirst.eventDate || liveFirst.date,
+        venue: typeof liveFirst.meta?.venue === 'string' ? String(liveFirst.meta.venue) : 'National Gathering',
+        badge: isPast ? 'Concluded Event' : 'Latest Main Event',
+        excerpt: liveFirst.excerpt,
+        image: liveFirst.image || {
+          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
+          alt: liveFirst.title,
+        },
+        registrationUrl: typeof liveFirst.meta?.registrationUrl === 'string' ? liveFirst.meta.registrationUrl : `/events/${liveFirst.slug}`,
+        isUpcoming: !isPast,
+      };
+    }
     return {
-      id: liveFirst?.id || 'aipc-2026-main',
-      title: 'All India Pastors Conference (AIPC) 2026: Proclaiming Christ Faithfully',
-      slug: liveFirst?.slug || 'all-india-pastors-conference-2026',
-      formattedDate: 'November 12 – 14, 2026',
+      id: 'default-main-event',
+      title: 'Equip Indian Churches Conferences & Gatherings',
+      slug: 'events',
+      formattedDate: 'Upcoming Assembly',
       date: '2026-11-12',
-      venue: 'New Delhi, India',
-      badge: 'Latest Main Event',
-      excerpt:
-        liveFirst?.excerpt ||
-        'Gathering pastors, church planters, elders, and ministry leaders from across India for three days of rigorous expository preaching, theological grounding, and pastoral fellowship.',
-      image: liveFirst?.image || {
+      venue: 'All India Gathering',
+      badge: 'National Assembly',
+      excerpt: 'Equipping the local church through sound biblical doctrine, expository preaching, and meaningful pastoral fellowship.',
+      image: {
         src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
-        alt: 'All India Pastors Conference 2026',
+        alt: 'Equip Indian Churches Conferences',
       },
-      registrationUrl: liveFirst ? itemPath('event', liveFirst.slug) : '/events/all-india-pastors-conference-2026',
-      isUpcoming: true,
+      registrationUrl: '/events',
+      isUpcoming: false,
     };
   }, [events, customEvents]);
 
-  // Upcoming events list for the right column (4 events)
+  // Upcoming events list for the right column (ONLY real events from admin panel, no dummy items)
   const upcomingEventsList = useMemo(() => {
-    const DEFAULT_EVENTS = [
-      {
-        id: 'upcoming-1',
-        title: 'All India Pastors Conference 2026',
-        slug: 'all-india-pastors-conference-2026',
-        formattedDate: 'Nov 12 – 14, 2026',
-        date: '2026-11-12',
-        venue: 'New Delhi • National Summit',
-        image: {
-          src: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'AIPC 2026',
-        },
-        registrationUrl: '/events/all-india-pastors-conference-2026',
-        isUpcoming: true,
-      },
-      {
-        id: 'upcoming-2',
-        title: 'Regional Pastors Roundtable: South India',
-        slug: 'regional-pastors-roundtable-south-india',
-        formattedDate: 'Aug 22, 2026',
-        date: '2026-08-22',
-        venue: 'Bangalore, Karnataka',
-        image: {
-          src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'Regional Pastors Roundtable',
-        },
-        registrationUrl: '/events/regional-pastors-roundtable-south-india',
-        isUpcoming: true,
-      },
-      {
-        id: 'upcoming-3',
-        title: 'Expository Preaching Seminar & Workshop',
-        slug: 'expository-preaching-seminar-workshop-2026',
-        formattedDate: 'Oct 5 – 7, 2026',
-        date: '2026-10-05',
-        venue: 'Mumbai, Maharashtra',
-        image: {
-          src: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'Expository Preaching Seminar',
-        },
-        registrationUrl: '/events/expository-preaching-seminar-workshop-2026',
-        isUpcoming: true,
-      },
-      {
-        id: 'upcoming-4',
-        title: 'Church Leaders Theological Colloquium',
-        slug: 'church-leaders-theological-colloquium',
-        formattedDate: 'Dec 4 – 6, 2026',
-        date: '2026-12-04',
-        venue: 'Kolkata, West Bengal',
-        image: {
-          src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'Theological Colloquium',
-        },
-        registrationUrl: '/events/church-leaders-theological-colloquium',
-        isUpcoming: true,
-      },
-    ];
-
-    if (customEvents.length > 1) {
-      const items = customEvents.slice(1, 5).map((ev) => ({
+    return customEvents
+      .filter((ev) => ev.isUpcoming && ev.id !== mainLatestEvent?.id)
+      .slice(0, 4)
+      .map((ev) => ({
         id: ev.id,
         title: ev.title,
         slug: ev.slug,
@@ -1304,110 +1264,73 @@ export function HomePage() {
         venue: ev.venue,
         image: ev.image,
         registrationUrl: ev.registrationUrl || `/events/${ev.slug}`,
-        isUpcoming: ev.isUpcoming,
+        isUpcoming: true,
       }));
-      // Pad with defaults if fewer than 4
-      if (items.length < 4) {
-        const needed = 4 - items.length;
-        items.push(...DEFAULT_EVENTS.slice(items.length, items.length + needed));
-      }
-      return items;
-    } else if (customEvents.length === 1) {
-      return [
-        {
-          id: customEvents[0].id,
-          title: customEvents[0].title,
-          slug: customEvents[0].slug,
-          formattedDate: customEvents[0].formattedDate,
-          date: customEvents[0].date,
-          venue: customEvents[0].venue,
-          image: customEvents[0].image,
-          registrationUrl: customEvents[0].registrationUrl || `/events/${customEvents[0].slug}`,
-          isUpcoming: customEvents[0].isUpcoming,
-        },
-        ...DEFAULT_EVENTS.slice(1),
-      ];
-    }
-    return DEFAULT_EVENTS;
-  }, [customEvents]);
+  }, [customEvents, mainLatestEvent]);
 
-  // Past events list from live API data (4 events)
+  // Past events list (ONLY real events that have concluded, no dummy items)
   const pastEventsList = useMemo(() => {
-    if (events?.items && events.items.length >= 4) {
-      return events.items.slice(0, 4).map((item) => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        formattedDate: formatDateShort(item.eventDate || item.date),
-        date: item.eventDate || item.date,
-        venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
-        image: item.image || {
-          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: item.title,
-        },
-        registrationUrl: `/events/${item.slug}`,
-        isUpcoming: false,
-      }));
+    const list: Array<{
+      id: string;
+      title: string;
+      slug: string;
+      formattedDate: string;
+      date: string;
+      venue: string;
+      image: { src: string; alt: string };
+      registrationUrl: string;
+      isUpcoming: boolean;
+    }> = [];
+
+    // Real past events from custom admin database
+    customEvents
+      .filter((ev) => !ev.isUpcoming && ev.id !== mainLatestEvent?.id)
+      .forEach((ev) => {
+        list.push({
+          id: ev.id,
+          title: ev.title,
+          slug: ev.slug,
+          formattedDate: ev.formattedDate,
+          date: ev.date,
+          venue: ev.venue,
+          image: ev.image,
+          registrationUrl: `/events/${ev.slug}`,
+          isUpcoming: false,
+        });
+      });
+
+    // Real past events from WordPress API if available
+    if (events?.items) {
+      events.items.forEach((item) => {
+        const isPast = new Date(item.eventDate || item.date).getTime() < Date.now() - 86400000;
+        if (isPast && !list.some((l) => l.slug === item.slug) && item.slug !== mainLatestEvent?.slug) {
+          list.push({
+            id: String(item.id),
+            title: item.title,
+            slug: item.slug,
+            formattedDate: formatDateShort(item.eventDate || item.date),
+            date: item.eventDate || item.date,
+            venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
+            image: item.image || {
+              src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=800&q=80',
+              alt: item.title,
+            },
+            registrationUrl: `/events/${item.slug}`,
+            isUpcoming: false,
+          });
+        }
+      });
     }
-    return [
-      {
-        id: 'past-1',
-        title: 'Day 2 at AIPC 2023: Faithful Shepherding',
-        slug: 'aipc-2023-day-2',
-        formattedDate: 'Sep 28, 2023',
-        date: '2023-09-28',
-        venue: 'National Conference Assembly',
-        image: {
-          src: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'AIPC 2023',
-        },
-        registrationUrl: '/events/aipc-2023-day-2',
-        isUpcoming: false,
-      },
-      {
-        id: 'past-2',
-        title: 'Day 1 at AIPC 2023: The Sufficiency of Scripture',
-        slug: 'aipc-2023-day-1',
-        formattedDate: 'Sep 27, 2023',
-        date: '2023-09-27',
-        venue: 'National Conference Assembly',
-        image: {
-          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'AIPC 2023',
-        },
-        registrationUrl: '/events/aipc-2023-day-1',
-        isUpcoming: false,
-      },
-      {
-        id: 'past-3',
-        title: 'AIPC 2022: Pastoral Fellowship in Christ',
-        slug: 'aipc-2022',
-        formattedDate: 'Dec 24, 2022',
-        date: '2022-12-24',
-        venue: 'Annual Assembly',
-        image: {
-          src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'AIPC 2022',
-        },
-        registrationUrl: '/events/aipc-2022',
-        isUpcoming: false,
-      },
-      {
-        id: 'past-4',
-        title: 'AIPC 2021: Suffering and Sovereignty of God',
-        slug: 'aipc-2021',
-        formattedDate: 'Oct 25, 2021',
-        date: '2021-10-25',
-        venue: 'Pastoral Exposition',
-        image: {
-          src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&h=800&q=80',
-          alt: 'AIPC 2021',
-        },
-        registrationUrl: '/events/aipc-2021',
-        isUpcoming: false,
-      },
-    ];
-  }, [events]);
+
+    return list.slice(0, 4);
+  }, [customEvents, events, mainLatestEvent]);
+
+  // Auto-switch to tab that has items if upcoming is empty
+  useEffect(() => {
+    if (upcomingEventsList.length === 0 && pastEventsList.length > 0) {
+      setEventsTab('past');
+    }
+  }, [upcomingEventsList.length, pastEventsList.length]);
 
 
   return (
@@ -1723,33 +1646,35 @@ export function HomePage() {
                       </div>
                     </div>
 
-                    {/* Registration CTA Below */}
+                    {/* Registration CTA Below (Only for upcoming events) */}
                     <div className="mt-5 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-3">
-                      {mainLatestEvent.registrationUrl && (mainLatestEvent.registrationUrl.startsWith('http://') || mainLatestEvent.registrationUrl.startsWith('https://')) ? (
-                        <a
-                          href={mainLatestEvent.registrationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-                        >
-                          <span>Register for Conference</span>
-                          <ArrowRightIcon size={13} />
-                        </a>
-                      ) : (
-                        <Link
-                          to={`/events/${mainLatestEvent.slug}`}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-                        >
-                          <span>Register for Conference</span>
-                          <ArrowRightIcon size={13} />
-                        </Link>
-                      )}
+                      {mainLatestEvent.isUpcoming && mainLatestEvent.registrationUrl ? (
+                        mainLatestEvent.registrationUrl.startsWith('http://') || mainLatestEvent.registrationUrl.startsWith('https://') ? (
+                          <a
+                            href={mainLatestEvent.registrationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                          >
+                            <span>Register for Conference</span>
+                            <ArrowRightIcon size={13} />
+                          </a>
+                        ) : (
+                          <Link
+                            to={`/events/${mainLatestEvent.slug}`}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+                          >
+                            <span>Register for Conference</span>
+                            <ArrowRightIcon size={13} />
+                          </Link>
+                        )
+                      ) : null}
 
                       <Link
                         to={`/events/${mainLatestEvent.slug}`}
                         className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
                       >
-                        <span>All Details</span>
+                        <span>{mainLatestEvent.isUpcoming ? 'All Details' : 'View Details'}</span>
                         <ArrowRightIcon size={11} />
                       </Link>
                     </div>
@@ -1757,8 +1682,7 @@ export function HomePage() {
                 </div>
 
                 {/* ---------------------------------------------------- */}
-                {/* RIGHT COLUMN (7 cols): 4 Event Flyers in 2x2 Grid    */}
-                {/* Small flyer book style aligned with left section     */}
+                {/* RIGHT COLUMN (7 cols): Real events from admin db     */}
                 {/* ---------------------------------------------------- */}
                 <div className="lg:col-span-7 flex flex-col justify-between h-full">
                   {/* Switcher Tabs: Upcoming vs Past */}
@@ -1773,7 +1697,7 @@ export function HomePage() {
                             : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
                         }`}
                       >
-                        Upcoming Events (4)
+                        Upcoming Events ({upcomingEventsList.length})
                       </button>
                       <button
                         type="button"
@@ -1784,7 +1708,7 @@ export function HomePage() {
                             : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
                         }`}
                       >
-                        Past Events (4)
+                        Past Events ({pastEventsList.length})
                       </button>
                     </div>
 
@@ -1797,74 +1721,96 @@ export function HomePage() {
                     </Link>
                   </div>
 
-                  {/* 4 Events in 2x2 Grid: Small Book/Flyer Size */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                    {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
-                      <article
-                        key={ev.id}
-                        className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
-                      >
-                        <div>
-                          {/* Flyer Poster Container (Never cut off, object-contain on dark canvas) */}
-                          <div className="relative h-44 sm:h-52 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-all duration-300">
-                            <Link to={`/events/${ev.slug}`} className="block h-full w-full">
-                              <Img
-                                image={ev.image}
-                                alt={ev.title}
-                                thumb
-                                wrapperClassName="h-full w-full"
-                                className="h-full w-full object-contain"
-                              />
-                            </Link>
-
-                            {/* Date Badge over poster */}
-                            <div className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1 rounded bg-black/85 backdrop-blur-xs py-0.5 px-1.5 text-[10px] font-semibold text-white/95 border border-white/10">
-                              <CalendarIcon size={10} className="text-amber-400 shrink-0" />
-                              <span className="truncate">{ev.formattedDate}</span>
-                            </div>
-                          </div>
-
-                          {/* Event Details Below Flyer */}
-                          <div className="pt-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1 text-[11px] text-muted mb-1 truncate">
-                              <MapPinIcon size={11} className="shrink-0 text-accent-text" />
-                              <span className="truncate">{ev.venue}</span>
-                            </div>
-
-                            <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
-                              <Link to={`/events/${ev.slug}`}>
-                                {ev.title}
+                  {/* Real Events in Grid or Empty State */}
+                  {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-line/60 bg-bg/50 text-center flex-1 min-h-[240px]">
+                      <CalendarIcon size={32} className="text-muted/60 mb-2" />
+                      <p className="text-sm font-semibold text-ink">
+                        No other {eventsTab === 'upcoming' ? 'upcoming' : 'concluded'} events.
+                      </p>
+                      <p className="text-xs text-muted mt-1">
+                        All official gatherings are managed in the admin console.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                      {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
+                        <article
+                          key={ev.id}
+                          className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
+                        >
+                          <div>
+                            {/* Flyer Poster Container */}
+                            <div className="relative h-44 sm:h-52 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-all duration-300">
+                              <Link to={`/events/${ev.slug}`} className="block h-full w-full">
+                                <Img
+                                  image={ev.image}
+                                  alt={ev.title}
+                                  thumb
+                                  wrapperClassName="h-full w-full"
+                                  className="h-full w-full object-contain"
+                                />
                               </Link>
-                            </h4>
-                          </div>
-                        </div>
 
-                        {/* Registration Button Below */}
-                        <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
-                          {ev.registrationUrl && (ev.registrationUrl.startsWith('http://') || ev.registrationUrl.startsWith('https://')) ? (
-                            <a
-                              href={ev.registrationUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs cursor-pointer"
-                            >
-                              <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
-                              <ArrowRightIcon size={10} />
-                            </a>
-                          ) : (
-                            <Link
-                              to={`/events/${ev.slug}`}
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
-                            >
-                              <span>{ev.isUpcoming ? 'Register' : 'Details'}</span>
-                              <ArrowRightIcon size={10} />
-                            </Link>
-                          )}
-                          <span className="text-[10px] text-muted font-medium">Conference</span>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
+                              {/* Date Badge over poster */}
+                              <div className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1 rounded bg-black/85 backdrop-blur-xs py-0.5 px-1.5 text-[10px] font-semibold text-white/95 border border-white/10">
+                                <CalendarIcon size={10} className="text-amber-400 shrink-0" />
+                                <span className="truncate">{ev.formattedDate}</span>
+                              </div>
+                            </div>
+
+                            {/* Event Details Below Flyer */}
+                            <div className="pt-2.5 text-center">
+                              <div className="flex items-center justify-center gap-1 text-[11px] text-muted mb-1 truncate">
+                                <MapPinIcon size={11} className="shrink-0 text-accent-text" />
+                                <span className="truncate">{ev.venue}</span>
+                              </div>
+
+                              <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
+                                <Link to={`/events/${ev.slug}`}>
+                                  {ev.title}
+                                </Link>
+                              </h4>
+                            </div>
+                          </div>
+
+                          {/* Action Button Below (Only register if upcoming) */}
+                          <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
+                            {ev.isUpcoming && ev.registrationUrl ? (
+                              ev.registrationUrl.startsWith('http://') || ev.registrationUrl.startsWith('https://') ? (
+                                <a
+                                  href={ev.registrationUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs cursor-pointer"
+                                >
+                                  <span>Register</span>
+                                  <ArrowRightIcon size={10} />
+                                </a>
+                              ) : (
+                                <Link
+                                  to={`/events/${ev.slug}`}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
+                                >
+                                  <span>Register</span>
+                                  <ArrowRightIcon size={10} />
+                                </Link>
+                              )
+                            ) : (
+                              <Link
+                                to={`/events/${ev.slug}`}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-line hover:border-accent text-body hover:text-ink text-xs font-semibold transition shadow-xs"
+                              >
+                                <span>Details</span>
+                                <ArrowRightIcon size={10} />
+                              </Link>
+                            )}
+                            <span className="text-[10px] text-muted font-medium">Conference</span>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
               </div>

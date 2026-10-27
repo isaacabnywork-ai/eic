@@ -596,8 +596,8 @@ export function EventSinglePage() {
                   </div>
                 )}
 
-                {/* Primary Registration Action Button */}
-                {event.registrationUrl ? (
+                {/* Primary Registration Action Button (Hidden when event has expired / concluded) */}
+                {!event.isExpired && event.registrationAvailable && event.registrationUrl ? (
                   <div className="pt-2">
                     <a
                       href={event.registrationUrl}
