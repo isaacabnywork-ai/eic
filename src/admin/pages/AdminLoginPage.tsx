@@ -1,9 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, KeyRound, Globe, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Globe, ArrowRight } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useAdminToast } from '../context/AdminToastContext';
-import { DEFAULT_ADMIN_PASSWORD } from '../db/seed';
 
 export function AdminLoginPage() {
   const { login, isAuthenticated } = useAdminAuth();
@@ -42,12 +41,6 @@ export function AdminLoginPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleQuickFillEmergency = () => {
-    setUsernameOrEmail('admin@equipindianchurches.com');
-    setPassword(DEFAULT_ADMIN_PASSWORD);
-    setErrorMessage(null);
   };
 
   return (
@@ -151,18 +144,6 @@ export function AdminLoginPage() {
               )}
             </button>
           </form>
-
-          {/* Emergency Offline Access / Staging Demo */}
-          <div className="mt-6 border-t border-slate-100 pt-3 text-center">
-            <button
-              type="button"
-              onClick={handleQuickFillEmergency}
-              className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-[#094899] transition cursor-pointer"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Use local emergency backup account</span>
-            </button>
-          </div>
         </div>
 
         {/* Public site link */}
