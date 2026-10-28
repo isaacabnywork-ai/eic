@@ -247,3 +247,94 @@ export interface AuditLog {
   ipAddress?: string;
   timestamp: string;
 }
+
+export interface FormFieldConfig {
+  id: string;
+  name: string; // 'name' | 'lastName' | 'email' | 'phone' | 'gender' | 'age' | 'address' | 'city' | 'pincode' | 'state' | 'churchName' | 'churchRole' | 'howHeard' | 'attendedBefore'
+  label: string;
+  type: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select';
+  required: boolean;
+  enabled: boolean;
+  placeholder?: string;
+  options?: string[]; // for select dropdowns
+  helpText?: string;
+  displayOrder: number;
+}
+
+export interface EventRegistrationForm {
+  id: string;
+  title: string;                 // e.g. "Payment Details"
+  subtitle?: string;              // e.g. "AIPC 2026 Conference Registration"
+  eventId: string;               // linked CustomEvent ID
+  eventTitle: string;            // cached event title
+  slug: string;                  // URL slug for public sharing
+  status: 'active' | 'draft' | 'closed';
+  
+  // Pricing & Payment Details
+  currency: string;              // 'INR'
+  currencySymbol: string;        // '₹'
+  baseAmount: number;            // e.g. 300
+  allowQuantity: boolean;        // e.g. true for "- 1 +" counter
+  maxQuantity: number;           // e.g. 10
+  allowDonation: boolean;        // e.g. true for "Donation: ₹ Enter Amount"
+  donationPlaceholder: string;   // e.g. "Enter Amount"
+  
+  // Attendee fields
+  fields: FormFieldConfig[];
+
+  // Payment UI
+  payButtonText: string;         // e.g. "Pay ₹ {total}"
+  showPaymentLogos: boolean;     // UPI, Visa, RuPay, etc.
+  paymentInstructions?: string;  // UPI ID, QR notes, etc.
+
+  // Post-submission
+  successMessage?: string;
+
+  // Metadata
+  submissionsCount: number;
+  totalCollected: number;
+  createdAt: string;
+  updatedAt: string;
+  createdById: string;
+}
+
+export interface FormSubmission {
+  id: string;
+  formId: string;
+  eventId: string;
+  eventTitle: string;
+  
+  // Attendee details
+  name: string;
+  lastName?: string;
+  email: string;
+  phone: string;
+  gender?: string;
+  age?: string;
+  address?: string;
+  city?: string;
+  pincode?: string;
+  state?: string;
+  churchName?: string;
+  churchRole?: string;
+  howHeard?: string;
+  attendedBefore?: string;
+  
+  // Financial breakdown
+  quantity: number;
+  unitAmount: number;
+  ticketTotal: number;
+  donationAmount: number;
+  totalAmount: number;
+  currency: string;
+  
+  // Custom response key-values
+  customResponses?: Record<string, string>;
+  
+  // Status
+  paymentStatus: 'paid' | 'pending' | 'failed';
+  paymentMethod?: string;
+  transactionId?: string;
+  
+  createdAt: string;
+}

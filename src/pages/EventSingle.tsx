@@ -7,6 +7,7 @@ import { ErrorState } from '@/components/ui/States';
 import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import { eventRepository } from '@/admin/db/repositories/eventRepository';
 import { taxonomyRepository } from '@/admin/db/repositories/taxonomyRepository';
+import { formRepository } from '@/admin/db/repositories/formRepository';
 import { usePublishedEvents } from '@/lib/publicEvents';
 import type { CustomEvent, Venue, Organizer, EventCategory } from '@/admin/db/types';
 import { 
@@ -213,9 +214,16 @@ export function EventSinglePage() {
         venueCity: venue?.city || '',
         venueState: venue?.state || '',
         googleMapsUrl: undefined,
-        registrationUrl: rawCustomEvent.registrationUrl || '',
-        registrationButtonLabel: rawCustomEvent.registrationButtonLabel || 'Register Now',
-        registrationAvailable: rawCustomEvent.registrationAvailable && !isPast,
+        registrationUrl:
+          rawCustomEvent.registrationUrl ||
+          (formRepository.getFormByEventId(rawCustomEvent.id)
+            ? `/events/${rawCustomEvent.slug}/register`
+            : ''),
+        registrationButtonLabel: rawCustomEvent.registrationButtonLabel || 'Register for Event',
+        registrationAvailable:
+          (rawCustomEvent.registrationAvailable ||
+            !!formRepository.getFormByEventId(rawCustomEvent.id)) &&
+          !isPast,
         schedules: rawCustomEvent.schedules || [],
         faqs: rawCustomEvent.faqs || [],
       };

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { eventRepository } from '../db/repositories/eventRepository';
+import { formRepository } from '../db/repositories/formRepository';
 import { useState, useEffect } from 'react';
 import { adminDb } from '../db/storage';
 import { 
@@ -15,7 +16,8 @@ import {
   LogOut, 
   ChevronLeft, 
   ChevronRight, 
-  X 
+  X,
+  ClipboardList,
 } from 'lucide-react';
 
 interface NavItem {
@@ -39,10 +41,12 @@ export function AdminSidebar({
 }) {
   const { user, logout, hasRole } = useAdminAuth();
   const [stats, setStats] = useState(eventRepository.getStats());
+  const [formsStats, setFormsStats] = useState(formRepository.getStats());
 
   useEffect(() => {
     return adminDb.subscribe(() => {
       setStats(eventRepository.getStats());
+      setFormsStats(formRepository.getStats());
     });
   }, []);
 
@@ -57,6 +61,7 @@ export function AdminSidebar({
       section: 'Content & Navigation',
       items: [
         { label: 'Events Hub', to: '/admin/events', icon: Calendar, badge: stats.total },
+        { label: 'Registration Forms', to: '/admin/forms', icon: ClipboardList, badge: formsStats.totalForms },
         { label: 'Media Library', to: '/admin/media', icon: ImageIcon },
         { label: 'Header Menu', to: '/admin/menus/header', icon: Compass },
         { label: 'Footer Menu', to: '/admin/menus/footer', icon: FileText },

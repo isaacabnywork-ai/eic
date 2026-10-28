@@ -13,6 +13,7 @@ import { BookReviewsArchivePage } from '@/pages/BookReviewsArchive';
 import { BookReviewSinglePage } from '@/pages/BookReviewSingle';
 import { EventsArchivePage } from '@/pages/EventsArchive';
 import { EventSinglePage } from '@/pages/EventSingle';
+import { EventRegisterPage } from '@/pages/EventRegisterPage';
 import { AuthorsArchivePage } from '@/pages/AuthorsArchive';
 import { AuthorSinglePage } from '@/pages/AuthorSingle';
 import { SearchPage } from '@/pages/SearchPage';
@@ -33,6 +34,7 @@ import { AdminProtectedRoute } from '@/admin/components/AdminProtectedRoute';
 import { AdminLoginPage } from '@/admin/pages/AdminLoginPage';
 import { AdminDashboardPage } from '@/admin/pages/AdminDashboardPage';
 import { AdminEventsListPage } from '@/admin/pages/AdminEventsListPage';
+import { AdminFormsPage } from '@/admin/pages/AdminFormsPage';
 import { AdminMediaPage } from '@/admin/pages/AdminMediaPage';
 import { AdminHeaderMenuPage } from '@/admin/pages/AdminHeaderMenuPage';
 import { AdminFooterMenuPage } from '@/admin/pages/AdminFooterMenuPage';
@@ -92,6 +94,15 @@ const router = createBrowserRouter([
       {
         path: 'venues',
         element: <Navigate to="/admin/events?tab=venues" replace />,
+      },
+      // Dedicated Registration Forms Management Section
+      {
+        path: 'forms',
+        element: (
+          <AdminProtectedRoute>
+            <AdminFormsPage />
+          </AdminProtectedRoute>
+        ),
       },
       {
         path: 'media',
@@ -171,6 +182,8 @@ const router = createBrowserRouter([
       // Events
       { path: 'events', element: <EventsArchivePage /> },
       { path: 'events/:slug', element: <EventSinglePage /> },
+      { path: 'events/:slug/register', element: <EventRegisterPage /> },
+      { path: 'register/:formId', element: <EventRegisterPage /> },
       // Authors
       { path: 'authors', element: <AuthorsArchivePage /> },
       { path: 'authors/:id', element: <AuthorSinglePage /> },

@@ -11,6 +11,8 @@ import {
   SEED_SETTINGS,
   SEED_MEDIA,
   SEED_AUDIT_LOGS,
+  SEED_FORMS,
+  SEED_SUBMISSIONS,
 } from './seed';
 import type {
   AdminUser,
@@ -25,6 +27,8 @@ import type {
   ApplicationSettings,
   MediaRecord,
   AuditLog,
+  EventRegistrationForm,
+  FormSubmission,
 } from './types';
 
 const STORAGE_PREFIX = 'eic_admin_v1_';
@@ -42,6 +46,8 @@ export interface AdminDatabaseState {
   settings: ApplicationSettings;
   media: MediaRecord[];
   auditLogs: AuditLog[];
+  forms: EventRegistrationForm[];
+  submissions: FormSubmission[];
 }
 
 type Listener = () => void;
@@ -186,11 +192,20 @@ class AdminStorageEngine {
             const missingSeed = SEED_EVENTS.filter((e) => !existingSlugs.has(e.slug));
             if (missingSeed.length > 0) {
               parsed.events = [...parsed.events, ...missingSeed];
-              try {
-                localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(parsed));
-              } catch {
-                // ignore
-              }
+            }
+
+            // Ensure forms and submissions collections exist
+            if (!parsed.forms || !Array.isArray(parsed.forms) || parsed.forms.length === 0) {
+              parsed.forms = [...SEED_FORMS];
+            }
+            if (!parsed.submissions || !Array.isArray(parsed.submissions)) {
+              parsed.submissions = [...SEED_SUBMISSIONS];
+            }
+
+            try {
+              localStorage.setItem(`${STORAGE_PREFIX}state`, JSON.stringify(parsed));
+            } catch {
+              // ignore
             }
 
             this.memoryCache = parsed;
@@ -217,6 +232,8 @@ class AdminStorageEngine {
       settings: { ...SEED_SETTINGS },
       media: [...SEED_MEDIA],
       auditLogs: [...SEED_AUDIT_LOGS],
+      forms: [...SEED_FORMS],
+      submissions: [...SEED_SUBMISSIONS],
     };
 
     this.memoryCache = freshState;
@@ -296,6 +313,8 @@ class AdminStorageEngine {
           timestamp: new Date().toISOString(),
         },
       ],
+      forms: [...SEED_FORMS],
+      submissions: [...SEED_SUBMISSIONS],
     };
     this.saveState(freshState);
     return freshState;
