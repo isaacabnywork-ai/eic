@@ -20,13 +20,17 @@ export function Footer() {
               <img
                 src={site.logoUrl}
                 alt={site.name}
-                className="h-10 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
+                className="h-14 sm:h-16 w-auto object-contain transition-all group-hover:opacity-90 invert hue-rotate-180 dark:invert-0 dark:hue-rotate-0"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = site.logoFallback;
                 }}
               />
               <span className="sr-only">{site.name} - Equipping the Church</span>
             </Link>
+
+            <p className="text-sm text-body leading-relaxed max-w-sm">
+              A ministry in which several pastors have partnered together to help provide a direction &amp; momentum to the Biblical gospel growth to the Indian Church.
+            </p>
 
             {/* Social Icons */}
             <div className="flex items-center gap-2.5 pt-2">

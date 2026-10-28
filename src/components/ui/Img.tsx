@@ -43,6 +43,7 @@ function ImgInner({
 
   const base = thumb ? (image?.thumb ?? image?.src) : image?.src;
   const current = src ?? base;
+  const fitClass = className?.includes('object-') ? '' : 'object-cover';
 
   return (
     <div className={cn('relative overflow-hidden bg-surface-2', wrapperClassName)}>
@@ -63,7 +64,8 @@ function ImgInner({
             else setFailed(true);
           }}
           className={cn(
-            'h-full w-full object-cover transition-opacity duration-500',
+            'h-full w-full transition-opacity duration-500',
+            fitClass,
             loaded ? 'opacity-100' : 'opacity-0',
             className,
           )}

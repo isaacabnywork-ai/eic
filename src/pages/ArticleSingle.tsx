@@ -2,14 +2,15 @@ import { useParams, Link } from 'react-router-dom';
 import { useContentItem, useRelated } from '@/hooks/queries';
 import { formatDate } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
-import { termPath } from '@/lib/routes';
+import { termPath, authorPath } from '@/lib/routes';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { RichContent } from '@/components/content/RichContent';
 import { Img } from '@/components/ui/Img';
 import { ArticleCard } from '@/components/cards/ArticleCard';
+import { AuthorCard } from '@/components/cards/AuthorCard';
 import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/States';
-import { ClockIcon, ShareIcon } from '@/components/ui/Icons';
+import { ClockIcon, ShareIcon, UserIcon } from '@/components/ui/Icons';
 import { useState } from 'react';
 
 export function ArticleSinglePage() {
@@ -38,14 +39,14 @@ export function ArticleSinglePage() {
 
   if (isLoading) {
     return (
-      <div className="container-page max-w-4xl py-12 space-y-6">
+      <div className="container-page max-w-3xl py-10 sm:py-16 space-y-6">
+        <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
         <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-12 w-full" />
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
+        <Skeleton className="h-10 sm:h-12 w-full" />
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-8 w-8 rounded-full" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <Skeleton className="aspect-[16/10] w-full rounded-2xl" />
         <SkeletonText lines={8} />
       </div>
     );
@@ -83,25 +84,44 @@ export function ArticleSinglePage() {
 
       <article className="py-10 sm:py-16">
         <div className="container-page max-w-3xl">
+          {/* Featured Image */}
+          {article.image && (
+            <figure className="mb-8 overflow-hidden rounded-2xl shadow-sm">
+              <Img
+                image={article.image}
+                alt={article.title}
+                wrapperClassName="aspect-[16/10] w-full"
+                eager
+              />
+              {article.image.caption && (
+                <figcaption className="mt-2 text-center text-xs text-muted">
+                  {article.image.caption}
+                </figcaption>
+              )}
+            </figure>
+          )}
+
           {/* Taxonomy badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            {series && (
-              <Link
-                to={termPath('series', series, 'article')}
-                className="text-xs font-semibold uppercase tracking-wider text-accent-text hover:underline"
-              >
-                Series: {series.name}
-              </Link>
-            )}
-            {category && (
-              <Link
-                to={termPath('category', category, 'article')}
-                className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-link"
-              >
-                {category.name}
-              </Link>
-            )}
-          </div>
+          {(series || category) && (
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {series && (
+                <Link
+                  to={termPath('series', series, 'article')}
+                  className="text-xs font-semibold uppercase tracking-wider text-accent-text hover:underline"
+                >
+                  Series: {series.name}
+                </Link>
+              )}
+              {category && (
+                <Link
+                  to={termPath('category', category, 'article')}
+                  className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-link"
+                >
+                  {category.name}
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Title */}
           <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-ink">
@@ -109,8 +129,30 @@ export function ArticleSinglePage() {
           </h1>
 
           {/* Meta line */}
-          <div className="mt-6 flex items-center justify-between gap-3 border-y border-line py-3.5 sm:py-4">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-line py-3.5 sm:py-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted">
+              {article.author && (
+                <>
+                  <Link
+                    to={authorPath(article.author.id)}
+                    className="flex items-center gap-2 font-medium text-ink hover:text-link transition-colors"
+                  >
+                    {article.author.avatar ? (
+                      <img
+                        src={article.author.avatar}
+                        alt={article.author.name}
+                        className="h-7 w-7 rounded-full object-cover border border-line"
+                      />
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
+                        <UserIcon size={14} />
+                      </span>
+                    )}
+                    <span>{article.author.name}</span>
+                  </Link>
+                  <span>•</span>
+                </>
+              )}
               <time dateTime={article.date}>{formatDate(article.date)}</time>
               <span>•</span>
               <span className="inline-flex items-center gap-1">
@@ -130,23 +172,6 @@ export function ArticleSinglePage() {
               <span>{copied ? 'Copied URL!' : 'Share'}</span>
             </button>
           </div>
-
-          {/* Featured Image */}
-          {article.image && (
-            <figure className="my-8 overflow-hidden rounded-2xl shadow-sm">
-              <Img
-                image={article.image}
-                alt={article.title}
-                wrapperClassName="aspect-[16/10] w-full"
-                eager
-              />
-              {article.image.caption && (
-                <figcaption className="mt-2 text-center text-xs text-muted">
-                  {article.image.caption}
-                </figcaption>
-              )}
-            </figure>
-          )}
 
           {/* Article Body */}
           <div className="mt-8">
@@ -170,6 +195,16 @@ export function ArticleSinglePage() {
                   </Link>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Author Profile */}
+          {article.author && (
+            <div className="mt-12 border-t border-line pt-8">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted mb-4">
+                About the Author
+              </h4>
+              <AuthorCard person={article.author} />
             </div>
           )}
         </div>

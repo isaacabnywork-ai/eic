@@ -1,16 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { contentTypes, homeConfig, type ContentKey } from '@/config/content';
 import { site } from '@/config/site';
 import {
   useContentList,
   useFeatured,
+  useSeriesCards,
 } from '@/hooks/queries';
 import type { ContentItem, ImageInfo } from '@/api/types';
+import type { SeriesCard as SeriesCardType } from '@/api/series';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { CardGridSkeleton } from '@/components/ui/Skeleton';
 import { Img } from '@/components/ui/Img';
 import { MobileDiscoverView } from '@/components/mobile/MobileDiscoverView';
+import { SeriesCard } from '@/components/cards/SeriesCard';
 import {
   ArrowRightIcon,
   CalendarIcon,
@@ -907,6 +910,410 @@ function ExpositoryVideosPlayer({ videos }: { videos: ExpositoryVideoItem[] }) {
   );
 }
 
+/* ==================================================================== */
+/* EVENTS & CONFERENCES INTERACTIVE SWAP GRID (TGC STYLE)               */
+/* ==================================================================== */
+
+interface HomeEventItem {
+  id: string;
+  title: string;
+  slug: string;
+  formattedDate: string;
+  date: string;
+  venue: string;
+  badge: string;
+  excerpt?: string;
+  image: ImageInfo;
+  registrationUrl: string;
+  isUpcoming: boolean;
+}
+
+function EventsInteractivePlayer({
+  upcomingEvents,
+  pastEvents,
+}: {
+  upcomingEvents: HomeEventItem[];
+  pastEvents: HomeEventItem[];
+}) {
+  const [eventsTab, setEventsTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [upcomingPool, setUpcomingPool] = useState<HomeEventItem[]>(upcomingEvents);
+  const [pastPool, setPastPool] = useState<HomeEventItem[]>(pastEvents);
+  const [isSwapping, setIsSwapping] = useState(false);
+  const [activeSlot, setActiveSlot] = useState<number | null>(null);
+
+  useEffect(() => {
+    setUpcomingPool(upcomingEvents);
+  }, [upcomingEvents]);
+
+  useEffect(() => {
+    setPastPool(pastEvents);
+  }, [pastEvents]);
+
+  const currentPool = eventsTab === 'upcoming' ? upcomingPool : pastPool;
+  const mainEvent = currentPool[0];
+  const queueEvents = currentPool.slice(1, 5);
+
+  const handleSwap = (queueIndex: number) => {
+    if (isSwapping) return;
+    const poolIndex = queueIndex + 1;
+    setIsSwapping(true);
+    setActiveSlot(queueIndex);
+
+    setTimeout(() => {
+      const setter = eventsTab === 'upcoming' ? setUpcomingPool : setPastPool;
+      setter((prev) => {
+        const next = [...prev];
+        const temp = next[0];
+        next[0] = next[poolIndex];
+        next[poolIndex] = temp;
+        return next;
+      });
+      setIsSwapping(false);
+      setActiveSlot(null);
+    }, 280);
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      {/* -------------------------------------------------------- */}
+      {/* LEFT COLUMN (5 cols): Main Featured Event                */}
+      {/* -------------------------------------------------------- */}
+      <div className="lg:col-span-5 flex flex-col">
+        {mainEvent ? (
+          <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
+            <div
+              className={`transition-all duration-300 ease-out flex flex-col ${
+                isSwapping ? 'opacity-40 scale-[0.98]' : 'opacity-100 scale-100'
+              }`}
+            >
+              {/* 1. Flyer Image (Full flyer displayed, never cut off) */}
+              <div className="relative w-full overflow-hidden rounded-2xl border border-line/60 bg-slate-950 flex items-center justify-center p-2 sm:p-3 shadow-md group-hover:shadow-xl transition-all">
+                <Link to={`/events/${mainEvent.slug}`} className="block w-full flex items-center justify-center">
+                  <Img
+                    image={mainEvent.image}
+                    alt={mainEvent.title}
+                    wrapperClassName="w-full flex items-center justify-center bg-transparent"
+                    className="w-auto h-auto max-h-[460px] max-w-full object-contain rounded-lg transition-transform duration-700 group-hover:scale-102"
+                  />
+                </Link>
+
+                {/* Top Badges */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full bg-black/75 backdrop-blur-md px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white border border-white/20">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span>{mainEvent.badge}</span>
+                </div>
+
+                <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/75 backdrop-blur-md px-2.5 py-1 text-[11px] font-semibold text-white border border-white/20">
+                  <CalendarIcon size={12} className="text-amber-400" />
+                  <span>{mainEvent.formattedDate}</span>
+                </div>
+              </div>
+
+              {/* 2. Title */}
+              <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-ink mt-4 group-hover:text-accent-text transition-colors">
+                <Link to={`/events/${mainEvent.slug}`}>
+                  {mainEvent.title}
+                </Link>
+              </h3>
+
+              {/* 3. Sub-description */}
+              {mainEvent.excerpt && (
+                <p className="mt-2 text-xs sm:text-sm text-body line-clamp-3 leading-relaxed">
+                  {mainEvent.excerpt}
+                </p>
+              )}
+
+              {/* 4. Address in small well-aligned */}
+              {mainEvent.venue && (
+                <div className="mt-3 flex items-start gap-1.5 text-xs text-muted leading-snug">
+                  <MapPinIcon size={13} className="shrink-0 mt-0.5 text-accent-text" />
+                  <span className="line-clamp-2">{mainEvent.venue}</span>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Button & Details */}
+            <div className="mt-5 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-3">
+              {mainEvent.isUpcoming && mainEvent.registrationUrl ? (
+                mainEvent.registrationUrl.startsWith('http://') || mainEvent.registrationUrl.startsWith('https://') ? (
+                  <a
+                    href={mainEvent.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+                  >
+                    <span>Register for Conference</span>
+                    <ArrowRightIcon size={13} />
+                  </a>
+                ) : (
+                  <Link
+                    to={`/events/${mainEvent.slug}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+                  >
+                    <span>Register for Conference</span>
+                    <ArrowRightIcon size={13} />
+                  </Link>
+                )
+              ) : null}
+
+              <Link
+                to={`/events/${mainEvent.slug}`}
+                className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
+              >
+                <span>{mainEvent.isUpcoming ? 'All Details' : 'View Details'}</span>
+                <ArrowRightIcon size={11} />
+              </Link>
+            </div>
+          </article>
+        ) : null}
+      </div>
+
+      {/* -------------------------------------------------------- */}
+      {/* RIGHT COLUMN (7 cols): Other events with swap            */}
+      {/* -------------------------------------------------------- */}
+      <div className="lg:col-span-7 flex flex-col justify-between h-full">
+        {/* Switcher Tabs: Upcoming vs Past */}
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-line/80">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setEventsTab('upcoming')}
+              className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
+                eventsTab === 'upcoming'
+                  ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
+                  : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
+              }`}
+            >
+              Upcoming Events ({upcomingPool.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setEventsTab('past')}
+              className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
+                eventsTab === 'past'
+                  ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
+                  : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
+              }`}
+            >
+              Past Events ({pastPool.length})
+            </button>
+          </div>
+
+          <Link
+            to="/events"
+            className="text-xs font-semibold text-accent-text hover:underline inline-flex items-center gap-1"
+          >
+            <span>View All</span>
+            <ArrowRightIcon size={12} />
+          </Link>
+        </div>
+
+        {/* Real Events in Grid or Empty State */}
+        {queueEvents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-line/60 bg-bg/50 text-center flex-1 min-h-[240px]">
+            <CalendarIcon size={32} className="text-muted/60 mb-2" />
+            <p className="text-sm font-semibold text-ink">
+              No other {eventsTab === 'upcoming' ? 'upcoming' : 'concluded'} events.
+            </p>
+            <p className="text-xs text-muted mt-1">
+              All official gatherings are managed in the admin console.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+            {queueEvents.map((ev, qIdx) => {
+              const isThisCardSwapping = isSwapping && activeSlot === qIdx;
+              return (
+                <article
+                  key={ev.id}
+                  onClick={() => handleSwap(qIdx)}
+                  className={`group flex flex-col justify-between cursor-pointer rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 ${
+                    isThisCardSwapping
+                      ? 'opacity-30 scale-95 ring-2 ring-accent'
+                      : 'hover:-translate-y-1'
+                  }`}
+                >
+                  <div>
+                    {/* 1. Flyer Poster Container (Full flyer displayed, never cut off) */}
+                    <div className="relative h-44 sm:h-52 w-full overflow-hidden rounded-xl bg-slate-950 flex items-center justify-center p-1.5 border border-line/60 shadow-sm group-hover:shadow-md transition-all">
+                      <Img
+                        image={ev.image}
+                        alt={ev.title}
+                        thumb
+                        wrapperClassName="h-full w-full flex items-center justify-center bg-transparent"
+                        className="w-auto h-auto max-h-full max-w-full object-contain rounded-md"
+                      />
+
+                      {/* Date Badge over poster */}
+                      <div className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1 rounded bg-black/85 backdrop-blur-xs py-0.5 px-1.5 text-[10px] font-semibold text-white/95 border border-white/10">
+                        <CalendarIcon size={10} className="text-amber-400 shrink-0" />
+                        <span className="truncate">{ev.formattedDate}</span>
+                      </div>
+                    </div>
+
+                    {/* 2. Title */}
+                    <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug mt-2.5 group-hover:text-accent-text transition-colors">
+                      {ev.title}
+                    </h4>
+
+                    {/* 3. Address in small well-aligned */}
+                    {ev.venue && (
+                      <div className="flex items-center gap-1 text-[11px] text-muted mt-1 truncate">
+                        <MapPinIcon size={11} className="shrink-0 text-accent-text" />
+                        <span className="truncate">{ev.venue}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. Action Button Row */}
+                  <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
+                    {ev.isUpcoming && ev.registrationUrl ? (
+                      ev.registrationUrl.startsWith('http://') || ev.registrationUrl.startsWith('https://') ? (
+                        <a
+                          href={ev.registrationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs cursor-pointer"
+                        >
+                          <span>Register</span>
+                          <ArrowRightIcon size={10} />
+                        </a>
+                      ) : (
+                        <Link
+                          to={`/events/${ev.slug}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
+                        >
+                          <span>Register</span>
+                          <ArrowRightIcon size={10} />
+                        </Link>
+                      )
+                    ) : (
+                      <Link
+                        to={`/events/${ev.slug}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-line hover:border-accent text-body hover:text-ink text-xs font-semibold transition shadow-xs"
+                      >
+                        <span>Details</span>
+                        <ArrowRightIcon size={10} />
+                      </Link>
+                    )}
+                    <span className="text-[10px] text-muted font-medium">Conference</span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ==================================================================== */
+/* TEACHING SERIES HORIZONTAL SLIDER (THEMATIC COLLECTIONS)             */
+/* ==================================================================== */
+
+function TeachingSeriesSlider({
+  seriesList,
+  isLoading,
+}: {
+  seriesList: SeriesCardType[];
+  isLoading: boolean;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = 380;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <section className="border-b border-line/80 py-16 bg-surface/30 transition-colors">
+      <div className="container-page max-w-[1400px]">
+        {/* Header + Link to All Series */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-8 border-b border-line/80 gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent-text mb-1">
+              Thematic Collections
+            </p>
+            <h2 className="font-serif text-2xl lg:text-3xl font-bold leading-tight text-ink">
+              Teaching Series
+            </h2>
+            <p className="text-xs sm:text-sm text-muted mt-1.5 max-w-2xl leading-relaxed">
+              Comprehensive collections of articles, sermons, and studies grouped together for deep and sequential study.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              to="/series"
+              className="rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent hover:text-accent-text transition shadow-xs mr-1"
+            >
+              ( View All Series → )
+            </Link>
+
+            {/* Prev / Next Slider Arrows */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => scroll('left')}
+                aria-label="Previous series"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface text-ink hover:border-accent hover:text-accent-text shadow-xs active:scale-95 transition cursor-pointer"
+              >
+                <ChevronLeftIcon size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll('right')}
+                aria-label="Next series"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface text-ink hover:border-accent hover:text-accent-text shadow-xs active:scale-95 transition cursor-pointer"
+              >
+                <ChevronRightIcon size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal Slider Track */}
+        {isLoading ? (
+          <div className="flex gap-6 overflow-hidden py-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-60 w-[300px] sm:w-[350px] shrink-0 rounded-xl bg-surface animate-pulse"
+              />
+            ))}
+          </div>
+        ) : seriesList && seriesList.length > 0 ? (
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {seriesList.map((series) => (
+              <div
+                key={series.term.id}
+                className="w-[280px] sm:w-[340px] md:w-[360px] shrink-0 snap-start"
+              >
+                <SeriesCard series={series} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted py-6">No teaching series available right now.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export function HomePage() {
   // 1. Hero / Featured Lead Article
   const { data: featuredHero, isLoading: heroLoading } = useFeatured(homeConfig.heroSource, 1);
@@ -1191,126 +1598,117 @@ export function HomePage() {
     return pageItems.length ? pageItems : filteredArticles.slice(0, 3);
   }, [filteredArticles, articlePage]);
 
-  // Events tab switcher state (Upcoming vs Past)
-  const [eventsTab, setEventsTab] = useState<'upcoming' | 'past'>('upcoming');
+  // 6b. Teaching Series for Homepage Slider
+  const { data: teachingSeriesList, isLoading: teachingSeriesLoading } = useSeriesCards({
+    count: 12,
+    coverType: 'article',
+  });
 
-  // Main featured latest event for the left column (Prefers first upcoming custom event, or latest custom event)
-  const mainLatestEvent = useMemo(() => {
-    if (customEvents.length > 0) {
-      const top = customEvents.find((e) => e.isUpcoming) || customEvents[0];
-      return {
-        id: top.id,
-        title: top.title,
-        slug: top.slug,
-        formattedDate: top.formattedDate,
-        date: top.date,
-        venue: top.venue,
-        badge: top.isUpcoming ? 'Latest Main Event' : 'Concluded Event',
-        excerpt: top.excerpt,
-        image: top.image,
-        registrationUrl: top.registrationUrl || `/events/${top.slug}`,
-        isUpcoming: top.isUpcoming,
-      };
-    }
-    const liveFirst = events?.items?.[0];
-    if (liveFirst) {
-      const isPast = new Date(liveFirst.eventDate || liveFirst.date).getTime() < Date.now() - 86400000;
-      return {
-        id: String(liveFirst.id),
-        title: liveFirst.title,
-        slug: liveFirst.slug,
-        formattedDate: formatDateShort(liveFirst.eventDate || liveFirst.date),
-        date: liveFirst.eventDate || liveFirst.date,
-        venue: typeof liveFirst.meta?.venue === 'string' ? String(liveFirst.meta.venue) : 'National Gathering',
-        badge: isPast ? 'Concluded Event' : 'Latest Main Event',
-        excerpt: liveFirst.excerpt,
-        image: liveFirst.image || {
-          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
-          alt: liveFirst.title,
-        },
-        registrationUrl: typeof liveFirst.meta?.registrationUrl === 'string' ? liveFirst.meta.registrationUrl : `/events/${liveFirst.slug}`,
-        isUpcoming: !isPast,
-      };
-    }
-    return {
-      id: 'default-main-event',
-      title: 'Equip Indian Churches Conferences & Gatherings',
-      slug: 'events',
-      formattedDate: 'Upcoming Assembly',
-      date: '2026-11-12',
-      venue: 'All India Gathering',
-      badge: 'National Assembly',
-      excerpt: 'Equipping the local church through sound biblical doctrine, expository preaching, and meaningful pastoral fellowship.',
-      image: {
-        src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
-        alt: 'Equip Indian Churches Conferences',
-      },
-      registrationUrl: '/events',
-      isUpcoming: false,
-    };
-  }, [events, customEvents]);
+  // Upcoming events list (Live WordPress + Custom Admin Database)
+  const allUpcomingEvents = useMemo<HomeEventItem[]>(() => {
+    const list: HomeEventItem[] = [];
 
-  // Upcoming events list for the right column (ONLY real events from admin panel, no dummy items)
-  const upcomingEventsList = useMemo(() => {
-    return customEvents
-      .filter((ev) => ev.isUpcoming && ev.id !== mainLatestEvent?.id)
-      .slice(0, 4)
-      .map((ev) => ({
-        id: ev.id,
-        title: ev.title,
-        slug: ev.slug,
-        formattedDate: ev.formattedDate,
-        date: ev.date,
-        venue: ev.venue,
-        image: ev.image,
-        registrationUrl: ev.registrationUrl || `/events/${ev.slug}`,
-        isUpcoming: true,
-      }));
-  }, [customEvents, mainLatestEvent]);
-
-  // Past events list (ONLY real events that have concluded, no dummy items)
-  const pastEventsList = useMemo(() => {
-    const list: Array<{
-      id: string;
-      title: string;
-      slug: string;
-      formattedDate: string;
-      date: string;
-      venue: string;
-      image: { src: string; alt: string };
-      registrationUrl: string;
-      isUpcoming: boolean;
-    }> = [];
-
-    // Real past events from custom admin database
+    // Custom events from admin panel
     customEvents
-      .filter((ev) => !ev.isUpcoming && ev.id !== mainLatestEvent?.id)
+      .filter((ev) => ev.isUpcoming)
       .forEach((ev) => {
         list.push({
-          id: ev.id,
+          id: `custom-${ev.id}`,
           title: ev.title,
           slug: ev.slug,
           formattedDate: ev.formattedDate,
           date: ev.date,
           venue: ev.venue,
+          badge: 'Latest Main Event',
+          excerpt: ev.excerpt,
+          image: ev.image,
+          registrationUrl: ev.registrationUrl || `/events/${ev.slug}`,
+          isUpcoming: true,
+        });
+      });
+
+    // WordPress live events
+    if (events?.items) {
+      events.items.forEach((item) => {
+        const isPast = new Date(item.eventDate || item.date).getTime() < Date.now() - 86400000;
+        if (!isPast && !list.some((l) => l.slug === item.slug)) {
+          list.push({
+            id: `wp-${item.id}`,
+            title: item.title,
+            slug: item.slug,
+            formattedDate: formatDateShort(item.eventDate || item.date),
+            date: item.eventDate || item.date,
+            venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
+            badge: 'Upcoming Gathering',
+            excerpt: item.excerpt,
+            image: item.image || {
+              src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
+              alt: item.title,
+            },
+            registrationUrl: typeof item.meta?.registrationUrl === 'string' ? item.meta.registrationUrl : `/events/${item.slug}`,
+            isUpcoming: true,
+          });
+        }
+      });
+    }
+
+    if (!list.length) {
+      list.push({
+        id: 'default-main-event',
+        title: 'Equip Indian Churches Conferences & Gatherings',
+        slug: 'events',
+        formattedDate: 'Upcoming Assembly',
+        date: '2026-11-12',
+        venue: 'All India Gathering',
+        badge: 'National Assembly',
+        excerpt: 'Equipping the local church through sound biblical doctrine, expository preaching, and meaningful pastoral fellowship.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&h=1067&q=80',
+          alt: 'Equip Indian Churches Conferences',
+        },
+        registrationUrl: '/events',
+        isUpcoming: true,
+      });
+    }
+
+    return list;
+  }, [customEvents, events]);
+
+  // Past events list (concluded gatherings)
+  const allPastEvents = useMemo<HomeEventItem[]>(() => {
+    const list: HomeEventItem[] = [];
+
+    customEvents
+      .filter((ev) => !ev.isUpcoming)
+      .forEach((ev) => {
+        list.push({
+          id: `custom-past-${ev.id}`,
+          title: ev.title,
+          slug: ev.slug,
+          formattedDate: ev.formattedDate,
+          date: ev.date,
+          venue: ev.venue,
+          badge: 'Concluded Event',
+          excerpt: ev.excerpt,
           image: ev.image,
           registrationUrl: `/events/${ev.slug}`,
           isUpcoming: false,
         });
       });
 
-    // Real past events from WordPress API if available
     if (events?.items) {
       events.items.forEach((item) => {
         const isPast = new Date(item.eventDate || item.date).getTime() < Date.now() - 86400000;
-        if (isPast && !list.some((l) => l.slug === item.slug) && item.slug !== mainLatestEvent?.slug) {
+        if (isPast && !list.some((l) => l.slug === item.slug)) {
           list.push({
-            id: String(item.id),
+            id: `wp-past-${item.id}`,
             title: item.title,
             slug: item.slug,
             formattedDate: formatDateShort(item.eventDate || item.date),
             date: item.eventDate || item.date,
             venue: typeof item.meta?.venue === 'string' ? String(item.meta.venue) : 'National Gathering',
+            badge: 'Concluded Event',
+            excerpt: item.excerpt,
             image: item.image || {
               src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&h=800&q=80',
               alt: item.title,
@@ -1322,15 +1720,8 @@ export function HomePage() {
       });
     }
 
-    return list.slice(0, 4);
-  }, [customEvents, events, mainLatestEvent]);
-
-  // Auto-switch to tab that has items if upcoming is empty
-  useEffect(() => {
-    if (upcomingEventsList.length === 0 && pastEventsList.length > 0) {
-      setEventsTab('past');
-    }
-  }, [upcomingEventsList.length, pastEventsList.length]);
+    return list;
+  }, [customEvents, events]);
 
 
   return (
@@ -1579,234 +1970,24 @@ export function HomePage() {
               </Link>
             </div>
 
-            {eventsLoading ? (
+            {eventsLoading && !allUpcomingEvents.length ? (
               <CardGridSkeleton variant="event" count={3} />
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                {/* ---------------------------------------------------- */}
-                {/* LEFT COLUMN (5 cols): Latest Main Event Flyer        */}
-                {/* Book / Flyer shaped with details placed below        */}
-                {/* ---------------------------------------------------- */}
-                <div className="lg:col-span-5 flex flex-col">
-                  <article className="group flex flex-col justify-between rounded-3xl border border-line/80 bg-bg p-5 sm:p-6 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300 h-full">
-                    <div>
-                      {/* Flyer / Book Shaped Image (Height-controlled so whole section fits on screen, never cut off) */}
-                      <div className="relative aspect-[3/4] max-h-[440px] w-auto mx-auto overflow-hidden rounded-2xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-shadow duration-300">
-                        <Link to={`/events/${mainLatestEvent.slug}`} className="block h-full w-full">
-                          <Img
-                            image={mainLatestEvent.image}
-                            alt={mainLatestEvent.title}
-                            wrapperClassName="h-full w-full"
-                            className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
-                          />
-                        </Link>
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                        {/* Top Badge */}
-                        <div className="absolute top-3.5 left-3.5 flex items-center gap-2 rounded-full bg-black/80 backdrop-blur-md px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/20">
-                          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-                          <span>{mainLatestEvent.badge}</span>
-                        </div>
-
-                        {/* Bottom Date Pill */}
-                        <div className="absolute bottom-3.5 left-3.5 flex items-center gap-2 rounded-lg bg-black/85 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white border border-white/20">
-                          <CalendarIcon size={14} className="text-amber-400" />
-                          <span>{mainLatestEvent.formattedDate}</span>
-                        </div>
-                      </div>
-
-                      {/* Event Details Below Flyer */}
-                      <div className="pt-5">
-                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-text mb-2">
-                          <MapPinIcon size={14} />
-                          <span>{mainLatestEvent.venue}</span>
-                        </div>
-
-                        <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-ink group-hover:text-accent-text transition-colors">
-                          <Link to={`/events/${mainLatestEvent.slug}`}>
-                            {mainLatestEvent.title}
-                          </Link>
-                        </h3>
-
-                        {mainLatestEvent.excerpt && (
-                          <p className="mt-2.5 text-xs sm:text-sm text-body line-clamp-3 leading-relaxed">
-                            {mainLatestEvent.excerpt}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Registration CTA Below (Only for upcoming events) */}
-                    <div className="mt-5 pt-4 border-t border-line/60 flex flex-wrap items-center justify-between gap-3">
-                      {mainLatestEvent.isUpcoming && mainLatestEvent.registrationUrl ? (
-                        mainLatestEvent.registrationUrl.startsWith('http://') || mainLatestEvent.registrationUrl.startsWith('https://') ? (
-                          <a
-                            href={mainLatestEvent.registrationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-                          >
-                            <span>Register for Conference</span>
-                            <ArrowRightIcon size={13} />
-                          </a>
-                        ) : (
-                          <Link
-                            to={`/events/${mainLatestEvent.slug}`}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
-                          >
-                            <span>Register for Conference</span>
-                            <ArrowRightIcon size={13} />
-                          </Link>
-                        )
-                      ) : null}
-
-                      <Link
-                        to={`/events/${mainLatestEvent.slug}`}
-                        className="text-xs font-semibold text-muted hover:text-ink inline-flex items-center gap-1 transition"
-                      >
-                        <span>{mainLatestEvent.isUpcoming ? 'All Details' : 'View Details'}</span>
-                        <ArrowRightIcon size={11} />
-                      </Link>
-                    </div>
-                  </article>
-                </div>
-
-                {/* ---------------------------------------------------- */}
-                {/* RIGHT COLUMN (7 cols): Real events from admin db     */}
-                {/* ---------------------------------------------------- */}
-                <div className="lg:col-span-7 flex flex-col justify-between h-full">
-                  {/* Switcher Tabs: Upcoming vs Past */}
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-line/80">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEventsTab('upcoming')}
-                        className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
-                          eventsTab === 'upcoming'
-                            ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
-                            : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
-                        }`}
-                      >
-                        Upcoming Events ({upcomingEventsList.length})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEventsTab('past')}
-                        className={`px-3.5 py-1 text-xs rounded-full font-bold transition-all cursor-pointer ${
-                          eventsTab === 'past'
-                            ? 'bg-[#182541] dark:bg-white text-white dark:text-[#182541] shadow-xs'
-                            : 'border border-line bg-surface text-body hover:text-ink hover:border-accent'
-                        }`}
-                      >
-                        Past Events ({pastEventsList.length})
-                      </button>
-                    </div>
-
-                    <Link
-                      to="/events"
-                      className="text-xs font-semibold text-accent-text hover:underline inline-flex items-center gap-1"
-                    >
-                      <span>View All</span>
-                      <ArrowRightIcon size={12} />
-                    </Link>
-                  </div>
-
-                  {/* Real Events in Grid or Empty State */}
-                  {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-line/60 bg-bg/50 text-center flex-1 min-h-[240px]">
-                      <CalendarIcon size={32} className="text-muted/60 mb-2" />
-                      <p className="text-sm font-semibold text-ink">
-                        No other {eventsTab === 'upcoming' ? 'upcoming' : 'concluded'} events.
-                      </p>
-                      <p className="text-xs text-muted mt-1">
-                        All official gatherings are managed in the admin console.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                      {(eventsTab === 'upcoming' ? upcomingEventsList : pastEventsList).map((ev) => (
-                        <article
-                          key={ev.id}
-                          className="group flex flex-col justify-between rounded-2xl border border-line/80 bg-bg p-3.5 shadow-xs hover:border-accent hover:shadow-md transition-all duration-300"
-                        >
-                          <div>
-                            {/* Flyer Poster Container */}
-                            <div className="relative h-44 sm:h-52 aspect-[3/4] mx-auto overflow-hidden rounded-xl shadow-md border border-line/60 bg-slate-950 group-hover:shadow-xl transition-all duration-300">
-                              <Link to={`/events/${ev.slug}`} className="block h-full w-full">
-                                <Img
-                                  image={ev.image}
-                                  alt={ev.title}
-                                  thumb
-                                  wrapperClassName="h-full w-full"
-                                  className="h-full w-full object-contain"
-                                />
-                              </Link>
-
-                              {/* Date Badge over poster */}
-                              <div className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1 rounded bg-black/85 backdrop-blur-xs py-0.5 px-1.5 text-[10px] font-semibold text-white/95 border border-white/10">
-                                <CalendarIcon size={10} className="text-amber-400 shrink-0" />
-                                <span className="truncate">{ev.formattedDate}</span>
-                              </div>
-                            </div>
-
-                            {/* Event Details Below Flyer */}
-                            <div className="pt-2.5 text-center">
-                              <div className="flex items-center justify-center gap-1 text-[11px] text-muted mb-1 truncate">
-                                <MapPinIcon size={11} className="shrink-0 text-accent-text" />
-                                <span className="truncate">{ev.venue}</span>
-                              </div>
-
-                              <h4 className="font-serif text-xs sm:text-sm font-bold text-ink line-clamp-2 leading-snug group-hover:text-accent-text transition-colors">
-                                <Link to={`/events/${ev.slug}`}>
-                                  {ev.title}
-                                </Link>
-                              </h4>
-                            </div>
-                          </div>
-
-                          {/* Action Button Below (Only register if upcoming) */}
-                          <div className="mt-2.5 pt-2 border-t border-line/50 flex items-center justify-between">
-                            {ev.isUpcoming && ev.registrationUrl ? (
-                              ev.registrationUrl.startsWith('http://') || ev.registrationUrl.startsWith('https://') ? (
-                                <a
-                                  href={ev.registrationUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs cursor-pointer"
-                                >
-                                  <span>Register</span>
-                                  <ArrowRightIcon size={10} />
-                                </a>
-                              ) : (
-                                <Link
-                                  to={`/events/${ev.slug}`}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent hover:bg-accent-hover text-accent-ink text-xs font-bold transition shadow-xs"
-                                >
-                                  <span>Register</span>
-                                  <ArrowRightIcon size={10} />
-                                </Link>
-                              )
-                            ) : (
-                              <Link
-                                to={`/events/${ev.slug}`}
-                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-line hover:border-accent text-body hover:text-ink text-xs font-semibold transition shadow-xs"
-                              >
-                                <span>Details</span>
-                                <ArrowRightIcon size={10} />
-                              </Link>
-                            )}
-                            <span className="text-[10px] text-muted font-medium">Conference</span>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-              </div>
+              <EventsInteractivePlayer
+                upcomingEvents={allUpcomingEvents}
+                pastEvents={allPastEvents}
+              />
             )}
           </div>
         </section>
+
+        {/* ------------------------------------------------------------ */}
+        {/* SECTION: TEACHING SERIES (Thematic Collections Slider)       */}
+        {/* ------------------------------------------------------------ */}
+        <TeachingSeriesSlider
+          seriesList={teachingSeriesList || []}
+          isLoading={teachingSeriesLoading}
+        />
 
         {/* ------------------------------------------------------------ */}
         {/* SECTION 4: EXPOSITORY VIDEOS (Interactive TGC Style Player)  */}
