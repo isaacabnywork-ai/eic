@@ -1529,7 +1529,58 @@ export function HomePage() {
   const heroSlides = useMemo<HeroNotificationSlide[]>(() => {
     const slides: HeroNotificationSlide[] = [];
 
-    // 1. Latest Event (Prefers published custom event from Admin panel)
+    // 1. Latest Sermon
+    const latestSermon = sermonsList[0];
+    if (latestSermon) {
+      slides.push({
+        id: `sermon-${latestSermon.id}`,
+        category: 'Latest Sermon',
+        categoryDot: 'bg-red-500',
+        badge: 'Expository Preaching',
+        title: latestSermon.title,
+        excerpt: latestSermon.excerpt,
+        date: latestSermon.date,
+        metaExtra: latestSermon.speaker ? `Speaker: ${latestSermon.speaker}` : 'Expository Sermon',
+        image: latestSermon.image,
+        url: itemPath('sermon', latestSermon.slug),
+      });
+    }
+
+    // 2. Latest Article
+    const leadArticle = heroItem || articlesList[0];
+    if (leadArticle) {
+      slides.push({
+        id: `article-${leadArticle.id}`,
+        category: 'Latest Article',
+        categoryDot: 'bg-emerald-400',
+        badge: 'Theological Essay',
+        title: leadArticle.title,
+        excerpt: leadArticle.excerpt,
+        date: leadArticle.date,
+        metaExtra: `${readingTimeMinutes(leadArticle.html || leadArticle.excerpt)} min read`,
+        image: leadArticle.image,
+        url: itemPath('article', leadArticle.slug),
+      });
+    }
+
+    // 3. Latest Video & Podcast
+    const latestVideo = videosList[0] || sermonsList[1];
+    if (latestVideo) {
+      slides.push({
+        id: `video-${latestVideo.id}`,
+        category: 'Latest Video & Podcast',
+        categoryDot: 'bg-sky-400',
+        badge: 'Media & Discussion',
+        title: latestVideo.title,
+        excerpt: latestVideo.excerpt,
+        date: latestVideo.date,
+        metaExtra: latestVideo.speaker || latestVideo.author?.name || 'Equip Indian Churches',
+        image: latestVideo.image,
+        url: itemPath(latestVideo.type, latestVideo.slug),
+      });
+    }
+
+    // 4. Latest Event (Placed in the last position of the slider)
     const latestCustom = customEvents[0];
     const latestEvent = events?.items?.[0];
     if (latestCustom) {
@@ -1575,59 +1626,8 @@ export function HomePage() {
       });
     }
 
-    // 2. Latest Sermon
-    const latestSermon = sermonsList[0];
-    if (latestSermon) {
-      slides.push({
-        id: `sermon-${latestSermon.id}`,
-        category: 'Latest Sermon',
-        categoryDot: 'bg-red-500',
-        badge: 'Expository Preaching',
-        title: latestSermon.title,
-        excerpt: latestSermon.excerpt,
-        date: latestSermon.date,
-        metaExtra: latestSermon.speaker ? `Speaker: ${latestSermon.speaker}` : 'Expository Sermon',
-        image: latestSermon.image,
-        url: itemPath('sermon', latestSermon.slug),
-      });
-    }
-
-    // 3. Latest Video & Podcast
-    const latestVideo = videosList[0] || sermonsList[1];
-    if (latestVideo) {
-      slides.push({
-        id: `video-${latestVideo.id}`,
-        category: 'Latest Video & Podcast',
-        categoryDot: 'bg-sky-400',
-        badge: 'Media & Discussion',
-        title: latestVideo.title,
-        excerpt: latestVideo.excerpt,
-        date: latestVideo.date,
-        metaExtra: latestVideo.speaker || latestVideo.author?.name || 'Equip Indian Churches',
-        image: latestVideo.image,
-        url: itemPath(latestVideo.type, latestVideo.slug),
-      });
-    }
-
-    // 4. Latest Article
-    const leadArticle = heroItem || articlesList[0];
-    if (leadArticle) {
-      slides.push({
-        id: `article-${leadArticle.id}`,
-        category: 'Latest Article',
-        categoryDot: 'bg-emerald-400',
-        badge: 'Theological Essay',
-        title: leadArticle.title,
-        excerpt: leadArticle.excerpt,
-        date: leadArticle.date,
-        metaExtra: `${readingTimeMinutes(leadArticle.html || leadArticle.excerpt)} min read`,
-        image: leadArticle.image,
-        url: itemPath('article', leadArticle.slug),
-      });
-    }
-
     return slides;
-  }, [events, sermonsList, videosList, heroItem, articlesList]);
+  }, [events, customEvents, sermonsList, videosList, heroItem, articlesList]);
 
   // Latest Articles filter and pagination state
   type ArticleFilterCategory = 'all' | 'theology' | 'living' | 'pastoral' | 'family';
