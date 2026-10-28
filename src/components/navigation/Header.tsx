@@ -17,7 +17,11 @@ import {
 } from '@/components/ui/Icons';
 import { cn } from '@/lib/format';
 
-export function Header() {
+interface HeaderProps {
+  onOpenMenu?: () => void;
+}
+
+export function Header({ onOpenMenu }: HeaderProps = {}) {
   const { theme, toggle } = useTheme();
   const { count: savedCount } = useBookmarks();
   const location = useLocation();
@@ -147,7 +151,13 @@ export function Header() {
           {/* Tablet Menu Toggle Button (lg:hidden) */}
           <button
             type="button"
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() => {
+              if (onOpenMenu) {
+                onOpenMenu();
+              } else {
+                setMobileOpen(!mobileOpen);
+              }
+            }}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             className="flex h-9 w-9 items-center justify-center rounded-md text-ink lg:hidden hover:bg-surface-2 transition-colors cursor-pointer border border-line/70 ml-1"
           >
@@ -261,7 +271,11 @@ export function Header() {
         <div className="fixed inset-x-0 top-20 bottom-0 z-50 overflow-y-auto bg-surface border-t border-line p-6 lg:hidden animate-in slide-in-from-top-4 duration-200 shadow-2xl">
           <nav className="flex flex-col gap-2.5 pb-12" aria-label="Mobile Navigation">
             {navItems.map((item) => (
-              <MobileNavItemRenderer key={item.label} item={item} />
+              <MobileNavItemRenderer
+                key={item.label}
+                item={item}
+                onClose={() => setMobileOpen(false)}
+              />
             ))}
           </nav>
         </div>
@@ -270,7 +284,13 @@ export function Header() {
   );
 }
 
-function MegaColumnRenderer({ column }: { column: MegaColumn }) {
+function MegaColumnRenderer({
+  column,
+  onClose,
+}: {
+  column: MegaColumn;
+  onClose?: () => void;
+}) {
   return (
     <div className="space-y-3">
       <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-text border-b border-line/60 pb-1.5">
@@ -287,6 +307,7 @@ function MegaColumnRenderer({ column }: { column: MegaColumn }) {
                   href={link.to}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={onClose}
                   className="inline-flex items-center gap-1.5 font-medium text-ink/90 hover:text-accent-text transition-colors"
                 >
                   <span>{link.label}</span>
@@ -295,6 +316,7 @@ function MegaColumnRenderer({ column }: { column: MegaColumn }) {
               ) : (
                 <Link
                   to={link.to}
+                  onClick={onClose}
                   className="font-medium text-ink/90 hover:text-accent-text hover:underline transition-colors block py-0.5"
                 >
                   {link.label}
@@ -309,16 +331,17 @@ function MegaColumnRenderer({ column }: { column: MegaColumn }) {
       {column.source && (
         <div className="pt-0.5">
           {column.source.kind === 'sermonCategories' && (
-            <DynamicTermsList taxonomy="videoCategory" filterFor="sermon" />
+            <DynamicTermsList taxonomy="videoCategory" filterFor="sermon" onItemClick={onClose} />
           )}
           {column.source.kind === 'videoCategories' && (
-            <DynamicTermsList taxonomy="videoCategory" filterFor="video" />
+            <DynamicTermsList taxonomy="videoCategory" filterFor="video" onItemClick={onClose} />
           )}
           {column.source.kind === 'terms' && (
             <DynamicTermsList
               taxonomy={column.source.taxonomy}
               limit={column.source.limit}
               orderby={column.source.orderby}
+              onItemClick={onClose}
             />
           )}
         </div>
@@ -332,11 +355,13 @@ function DynamicTermsList({
   limit = 6,
   orderby = 'count',
   filterFor,
+  onItemClick,
 }: {
   taxonomy: 'category' | 'series' | 'videoCategory' | 'topic';
   limit?: number;
   orderby?: 'count' | 'name';
   filterFor?: 'sermon' | 'video';
+  onItemClick?: () => void;
 }) {
   const { data: regularTerms } = useTerms(taxonomy, { perPage: limit, orderby }, !filterFor);
   const { data: filteredTerms } = useFilterTerms(
@@ -361,6 +386,7 @@ function DynamicTermsList({
         <li key={term.id}>
           <Link
             to={getUrl(term)}
+            onClick={onItemClick}
             className="hover:text-ink hover:underline truncate block py-0.5 transition-colors"
           >
             {term.name}
@@ -372,13 +398,20 @@ function DynamicTermsList({
   );
 }
 
-function MobileNavItemRenderer({ item }: { item: NavItem }) {
+function MobileNavItemRenderer({
+  item,
+  onClose,
+}: {
+  item: NavItem;
+  onClose?: () => void;
+}) {
   const [open, setOpen] = useState(false);
 
   if (!item.mega) {
     return (
       <Link
         to={item.to || '#'}
+        onClick={onClose}
         className="rounded-lg px-4 py-3 text-base font-medium text-ink hover:bg-surface-2 transition-colors"
       >
         {item.label}
@@ -402,6 +435,7 @@ function MobileNavItemRenderer({ item }: { item: NavItem }) {
           {item.to && (
             <Link
               to={item.to}
+              onClick={onClose}
               className="inline-flex items-center gap-1 text-sm font-semibold text-ink hover:text-accent-text"
             >
               <span>Explore All {item.label}</span>
@@ -409,7 +443,7 @@ function MobileNavItemRenderer({ item }: { item: NavItem }) {
             </Link>
           )}
           {item.mega.columns.map((col, idx) => (
-            <MegaColumnRenderer key={idx} column={col} />
+            <MegaColumnRenderer key={idx} column={col} onClose={onClose} />
           ))}
         </div>
       )}

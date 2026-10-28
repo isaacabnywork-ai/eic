@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   CloseIcon,
   SunIcon,
@@ -12,19 +12,20 @@ import {
   InstagramIcon,
   XIcon,
   WatchScreenIcon,
-  SailboatIcon,
   BookmarkIcon,
   ExternalLinkIcon,
   ChevronDownIcon,
-  MapPinIcon,
   MailIcon,
+  StarIcon,
+  UserIcon,
+  ArrowRightIcon,
 } from '@/components/ui/Icons';
 import { useTheme } from '@/hooks/useTheme';
 import { useBookmarks } from '@/lib/bookmarks';
-import { useTerms } from '@/hooks/queries';
+import { useTerms, useFilterTerms } from '@/hooks/queries';
 import { env } from '@/config/env';
-import { site, wpLink } from '@/config/site';
-import { wpPages } from '@/config/content';
+import { site, navItems } from '@/config/site';
+import type { MegaColumn, NavItem } from '@/config/site';
 
 interface MobileProfileDrawerProps {
   open: boolean;
@@ -34,13 +35,39 @@ interface MobileProfileDrawerProps {
 export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps) {
   const { theme, toggle } = useTheme();
   const { count: savedCount } = useBookmarks();
-  const { data: categories } = useTerms('category', { perPage: 12, orderby: 'count' });
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+
+  // Auto-expand the accordion matching the current route or default to Articles
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const path = location.pathname;
+    const initial: Record<string, boolean> = {};
+    if (path.startsWith('/articles') || path.startsWith('/book-reviews') || path.startsWith('/series')) {
+      initial['Articles'] = true;
+    } else if (path.startsWith('/sermons') || path.startsWith('/videos')) {
+      initial['Sermons & Media'] = true;
+    } else if (path.startsWith('/events')) {
+      initial['Events'] = true;
+    } else if (path.startsWith('/seminaries') || path.startsWith('/bookstores')) {
+      initial['Recommendations'] = true;
+    } else if (path.startsWith('/about') || path.startsWith('/statement-of-faith') || path.startsWith('/contact')) {
+      initial['About'] = true;
+    } else {
+      initial['Articles'] = true;
+    }
+    return initial;
+  });
+
+  const toggleSection = (label: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
 
   // Prevent background scrolling when drawer is open
   useEffect(() => {
@@ -69,12 +96,8 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
     setNewsletterSubscribed(true);
   };
 
-  const displayedCategories = showAllCategories
-    ? categories?.items || []
-    : (categories?.items || []).slice(0, 6);
-
   return (
-    <div className="fixed inset-0 z-50 flex md:hidden">
+    <div className="fixed inset-0 z-50 flex">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
@@ -82,8 +105,8 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
         aria-hidden="true"
       />
 
-      {/* Drawer Content */}
-      <div className="relative z-10 flex h-full w-[88%] max-w-sm flex-col bg-[#F0F6FB] dark:bg-[#090D14] border-r border-[#D0E1F0] dark:border-white/10 text-[#182541] dark:text-white shadow-2xl animate-in slide-in-from-left duration-250 transition-colors">
+      {/* Drawer Content - Responsive for Mobile & Tablet */}
+      <div className="relative z-10 flex h-full w-[88%] max-w-sm sm:max-w-md flex-col bg-[#F0F6FB] dark:bg-[#090D14] border-r border-[#D0E1F0] dark:border-white/10 text-[#182541] dark:text-white shadow-2xl animate-in slide-in-from-left duration-250 transition-colors">
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-[#D0E1F0] dark:border-white/10 p-4 sm:p-5">
           <Link to="/" onClick={onClose} className="flex flex-col gap-1 focus:outline-none">
@@ -109,8 +132,8 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
-          {/* Feature 1: Fast Quick Search */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+          {/* Quick Search */}
           <form onSubmit={handleSearch} className="relative">
             <SearchIcon
               size={16}
@@ -125,136 +148,46 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
             />
           </form>
 
-          {/* Mission Capsule */}
-          <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 text-xs leading-relaxed text-slate-600 dark:text-white/80 shadow-2xs dark:shadow-none">
-            <span className="font-serif font-bold text-[#182541] dark:text-white block mb-0.5">Our Mission</span>
-            Equipping pastors, leaders, and churches across India with sound biblical theology and gospel-centered preaching.
-          </div>
-
-          {/* Section 1: Media & Streaming */}
-          <div className="space-y-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              Watch, Listen & Events
-            </span>
-            <DrawerLink to="/videos" icon={WatchScreenIcon} label="Watch & Listen (Media)" onClick={onClose} />
-            <DrawerLink to="/events" icon={CalendarIcon} label="Events & Conferences" onClick={onClose} />
-            <DrawerLink to="/series" icon={SailboatIcon} label="Teaching Series & Expositions" onClick={onClose} />
-            <DrawerLink
+          {/* Quick Actions Bar: Library & Saved */}
+          <div className="flex items-center gap-2">
+            <Link
               to="/library"
-              icon={BookmarkIcon}
-              label="Saved in My Library"
               onClick={onClose}
-              badge={savedCount > 0 ? `${savedCount}` : undefined}
-            />
-          </div>
-
-          {/* Section 2: Articles & Publications with Sub-Categories */}
-          <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              Theological Library & Publications
-            </span>
-            <DrawerLink to="/articles" icon={BookIcon} label="All Articles & Essays" onClick={onClose} />
-            <DrawerLink to="/book-reviews" icon={BookIcon} label="Book Reviews" onClick={onClose} />
-
-            {/* Sub-categories & Theological Topics */}
-            {categories?.items && categories.items.length > 0 && (
-              <div className="mt-2.5 rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white/70 dark:bg-white/5 p-3">
-                <span className="text-[11px] font-semibold text-ink dark:text-white block mb-2">
-                  Browse by Theological Category:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {displayedCategories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={`/articles?category=${cat.id}`}
-                      onClick={onClose}
-                      className="inline-flex items-center gap-1 rounded-lg border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/10 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:text-white/85 hover:border-primary hover:text-primary dark:hover:border-[#F0F6FB] dark:hover:text-[#F0F6FB] shadow-2xs transition"
-                    >
-                      <span>{cat.name}</span>
-                      {cat.count !== undefined && (
-                        <span className="text-[9px] text-slate-400 dark:text-white/40">({cat.count})</span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-
-                {categories.items.length > 6 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllCategories((prev) => !prev)}
-                    className="mt-2.5 flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-[#F0F6FB] hover:underline cursor-pointer"
-                  >
-                    <span>{showAllCategories ? 'Show fewer topics' : `+ Show ${categories.items.length - 6} more topics`}</span>
-                    <ChevronDownIcon size={12} className={`transition-transform ${showAllCategories ? 'rotate-180' : ''}`} />
-                  </button>
-                )}
+              className="flex-1 flex items-center justify-between rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-xs font-semibold text-[#182541] dark:text-white shadow-2xs hover:border-primary dark:hover:border-white/30 transition"
+            >
+              <div className="flex items-center gap-2">
+                <BookmarkIcon size={15} className="text-primary dark:text-[#F0F6FB]" />
+                <span>My Saved Library</span>
               </div>
-            )}
+              {savedCount > 0 ? (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#182541] dark:bg-[#F0F6FB] px-1.5 text-[10px] font-bold text-white dark:text-[#070A0F]">
+                  {savedCount}
+                </span>
+              ) : (
+                <span className="text-[10px] text-slate-400 dark:text-white/40">0 saved</span>
+              )}
+            </Link>
           </div>
 
-          {/* Section 3: Fellowship & Community */}
-          <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              Fellowship & Ministry Network
+          {/* All Desktop Navigation Menus */}
+          <div className="space-y-2 pt-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40 px-1 block">
+              Navigation Menu
             </span>
-            <DrawerLink to="/events" icon={CalendarIcon} label="Conferences & Events" onClick={onClose} />
-            <DrawerLink to="/churches" icon={MapPinIcon} label="Church Directory" onClick={onClose} />
+
+            {navItems.map((item) => (
+              <DrawerNavItem
+                key={item.label}
+                item={item}
+                isOpen={!!openSections[item.label]}
+                onToggle={() => toggleSection(item.label)}
+                onClose={onClose}
+              />
+            ))}
           </div>
 
-          {/* Section 4: Recommendations (Seminaries & Bookstores) */}
-          <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              Recommendations
-            </span>
-            <DrawerLink to="/seminaries" icon={BookIcon} label="Recommended Seminaries" onClick={onClose} />
-            <div className="pl-7 space-y-1 pb-1">
-              <Link to="/seminaries/calvary-baptist-bible-college" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • Calvary Baptist Bible College
-              </Link>
-              <Link to="/seminaries/evangelical-theological-seminary" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • Evangelical Theological Seminary
-              </Link>
-              <Link to="/seminaries/satya-vachan-seminary" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • Satya Vachan Seminary
-              </Link>
-            </div>
-
-            <DrawerLink to="/bookstores" icon={BookIcon} label="Recommended Bookstores" onClick={onClose} />
-            <div className="pl-7 space-y-1 pb-1">
-              <Link to="/bookstores/for-the-truth" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • For The Truth
-              </Link>
-              <Link to="/bookstores/sola-books" onClick={onClose} className="text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] block py-1 transition-colors">
-                • Sola Books
-              </Link>
-            </div>
-          </div>
-
-          {/* Section 5: About & Statement of Faith */}
-          <div className="space-y-1 border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-1.5">
-              About EIC & Doctrine
-            </span>
-            <DrawerExternalLink
-              href={wpLink(wpPages.whatWeBelieve)}
-              label="What We Believe (Statement of Faith)"
-            />
-            <DrawerExternalLink
-              href={wpLink(wpPages.about)}
-              label="About Equip Indian Churches"
-            />
-            <DrawerExternalLink
-              href={wpLink(wpPages.whatIsEic)}
-              label="What is EIC? (Our Vision & Story)"
-            />
-            <DrawerExternalLink
-              href={wpLink(wpPages.contact)}
-              label="Contact & Inquiries"
-            />
-          </div>
-
-          {/* Feature 2: Weekly Gospel Digest Newsletter */}
-          <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 shadow-2xs dark:shadow-none">
+          {/* Weekly Gospel Digest Newsletter */}
+          <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 shadow-2xs dark:shadow-none mt-2">
             <div className="flex items-center gap-2 mb-1.5 text-primary dark:text-[#F0F6FB]">
               <MailIcon size={16} />
               <span className="font-serif text-xs font-bold text-ink dark:text-white">
@@ -290,20 +223,20 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
           </div>
 
           {/* Quick Preferences */}
-          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-2">
+          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-1 block mb-1.5">
               Display Preferences
             </span>
             <button
               type="button"
               onClick={toggle}
-              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-[#182541] dark:text-white/90 hover:bg-white/70 dark:hover:bg-white/5 active:bg-white dark:active:bg-white/10 transition cursor-pointer"
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-[#182541] dark:text-white/90 bg-white/60 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 active:bg-white dark:active:bg-white/10 transition cursor-pointer border border-[#D0E1F0]/70 dark:border-white/5"
             >
               <div className="flex items-center gap-3">
                 {theme === 'dark' ? (
-                  <SunIcon size={18} className="text-primary dark:text-[#F0F6FB]" />
+                  <SunIcon size={17} className="text-primary dark:text-[#F0F6FB]" />
                 ) : (
-                  <MoonIcon size={18} className="text-primary dark:text-[#F0F6FB]" />
+                  <MoonIcon size={17} className="text-primary dark:text-[#F0F6FB]" />
                 )}
                 <span>Appearance</span>
               </div>
@@ -312,17 +245,17 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
           </div>
 
           {/* Social Links */}
-          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-4">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-2 block mb-3">
+          <div className="border-t border-[#D0E1F0] dark:border-white/10 pt-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/40 px-1 block mb-2.5">
               Connect With Us
             </span>
-            <div className="flex items-center gap-2.5 px-1">
+            <div className="flex items-center gap-2 px-1">
               {env.social.youtube && (
                 <a
                   href={env.social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
                   aria-label="YouTube"
                 >
                   <YoutubeIcon size={18} />
@@ -333,7 +266,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
                   aria-label="Facebook"
                 >
                   <FacebookIcon size={18} />
@@ -344,7 +277,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
                   aria-label="Instagram"
                 >
                   <InstagramIcon size={18} />
@@ -355,7 +288,7 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                   href={env.social.x}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-transparent text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-white/5 border border-[#D0E1F0] dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-[#182541] hover:text-white dark:hover:bg-[#F0F6FB] dark:hover:text-[#070A0F] shadow-2xs dark:shadow-none transition"
                   aria-label="X"
                 >
                   <XIcon size={16} />
@@ -374,54 +307,234 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
   );
 }
 
-function DrawerLink({
-  to,
-  icon: Icon,
-  label,
-  onClick,
-  badge,
+function getNavItemIcon(label: string) {
+  switch (label.toLowerCase()) {
+    case 'articles':
+      return BookIcon;
+    case 'sermons & media':
+      return WatchScreenIcon;
+    case 'events':
+      return CalendarIcon;
+    case 'recommendations':
+      return StarIcon;
+    case 'about':
+      return UserIcon;
+    default:
+      return BookIcon;
+  }
+}
+
+function DrawerNavItem({
+  item,
+  isOpen,
+  onToggle,
+  onClose,
 }: {
-  to: string;
-  icon: any;
-  label: string;
-  onClick: () => void;
-  badge?: string;
+  item: NavItem;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
 }) {
+  const Icon = getNavItemIcon(item.label);
+
+  if (!item.mega) {
+    return (
+      <Link
+        to={item.to || '#'}
+        onClick={onClose}
+        className="flex items-center justify-between rounded-xl px-3.5 py-3 text-sm font-semibold text-[#182541] dark:text-white/90 hover:bg-white dark:hover:bg-white/10 transition border border-[#D0E1F0]/70 dark:border-white/5 bg-white/60 dark:bg-white/5"
+      >
+        <div className="flex items-center gap-3">
+          <Icon size={18} className="text-primary dark:text-[#F0F6FB] shrink-0" />
+          <span>{item.label}</span>
+        </div>
+        <ArrowRightIcon size={14} className="text-slate-400 dark:text-white/40" />
+      </Link>
+    );
+  }
+
   return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className="flex items-center justify-between rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-[#182541] dark:text-white/85 hover:bg-white/70 dark:hover:bg-white/5 hover:text-[#182541] dark:hover:text-white active:bg-white dark:active:bg-white/10 transition"
-    >
-      <div className="flex items-center gap-3">
-        <Icon size={17} className="text-slate-400 dark:text-white/60 shrink-0" />
-        <span>{label}</span>
-      </div>
-      {badge && (
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#182541] dark:bg-[#F0F6FB] px-1.5 text-[10px] font-bold text-white dark:text-[#070A0F]">
-          {badge}
-        </span>
+    <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white/60 dark:bg-white/5 overflow-hidden shadow-2xs transition-all">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="flex w-full items-center justify-between px-3.5 py-3 text-sm font-bold text-[#182541] dark:text-white hover:bg-white/80 dark:hover:bg-white/10 transition cursor-pointer"
+      >
+        <div className="flex items-center gap-3">
+          <Icon size={18} className="text-primary dark:text-[#F0F6FB] shrink-0" />
+          <span>{item.label}</span>
+        </div>
+        <ChevronDownIcon
+          size={16}
+          className={`transition-transform duration-200 text-slate-500 dark:text-white/60 ${
+            isOpen ? 'rotate-180 text-primary dark:text-[#F0F6FB]' : ''
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="border-t border-[#D0E1F0] dark:border-white/10 p-3.5 bg-white/80 dark:bg-black/20 space-y-4 animate-in fade-in duration-200">
+          {item.mega.blurb && (
+            <p className="text-[11px] leading-relaxed text-slate-600 dark:text-white/70 italic px-1">
+              "{item.mega.blurb}"
+            </p>
+          )}
+
+          {item.to && (
+            <Link
+              to={item.to}
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary dark:text-[#F0F6FB] hover:underline px-1"
+            >
+              <span>Explore All {item.label}</span>
+              <span>→</span>
+            </Link>
+          )}
+
+          <div className="space-y-4 pt-1">
+            {item.mega.columns.map((col, idx) => (
+              <DrawerColumnRenderer key={idx} column={col} onClose={onClose} />
+            ))}
+          </div>
+
+          {item.mega.cta && (
+            <div className="pt-2 border-t border-[#D0E1F0]/70 dark:border-white/10">
+              <Link
+                to={item.mega.cta.to}
+                onClick={onClose}
+                className="flex items-center justify-between text-xs font-semibold text-primary dark:text-[#F0F6FB] hover:underline px-1 py-0.5"
+              >
+                <span>{item.mega.cta.label}</span>
+                <span>→</span>
+              </Link>
+            </div>
+          )}
+        </div>
       )}
-    </Link>
+    </div>
   );
 }
 
-function DrawerExternalLink({
-  href,
-  label,
+function DrawerColumnRenderer({
+  column,
+  onClose,
 }: {
-  href: string;
-  label: string;
+  column: MegaColumn;
+  onClose: () => void;
 }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center justify-between rounded-lg px-3 py-2 text-xs sm:text-sm font-medium text-[#182541] dark:text-white/85 hover:bg-white/70 dark:hover:bg-white/5 hover:text-[#182541] dark:hover:text-white transition"
-    >
-      <span>{label}</span>
-      <ExternalLinkIcon size={14} className="text-slate-400 dark:text-white/50 shrink-0" />
-    </a>
+    <div className="space-y-2">
+      <h4 className="text-[11px] font-bold uppercase tracking-wider text-primary dark:text-[#F0F6FB] pb-1 border-b border-[#D0E1F0]/70 dark:border-white/10">
+        {column.title}
+      </h4>
+
+      {column.links && column.links.length > 0 && (
+        <div className="space-y-1">
+          {column.links.map((link) =>
+            link.external ? (
+              <a
+                key={link.to}
+                href={link.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onClose}
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition"
+              >
+                <span>{link.label}</span>
+                <ExternalLinkIcon size={12} className="text-slate-400 dark:text-white/40 shrink-0" />
+              </a>
+            ) : (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={onClose}
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition"
+              >
+                <span>{link.label}</span>
+                <ArrowRightIcon size={11} className="text-slate-400 dark:text-white/30 shrink-0" />
+              </Link>
+            ),
+          )}
+        </div>
+      )}
+
+      {column.source && <DrawerDynamicTerms source={column.source} onClose={onClose} />}
+    </div>
+  );
+}
+
+function DrawerDynamicTerms({
+  source,
+  onClose,
+}: {
+  source: MegaColumn['source'];
+  onClose: () => void;
+}) {
+  if (!source) return null;
+
+  const taxonomy = source.kind === 'terms' ? source.taxonomy : 'videoCategory';
+  const filterFor =
+    source.kind === 'sermonCategories' ? 'sermon' : source.kind === 'videoCategories' ? 'video' : undefined;
+  const limit = source.kind === 'terms' ? source.limit || 6 : 6;
+  const orderby = source.kind === 'terms' ? source.orderby || 'count' : 'count';
+
+  const { data: regularTerms } = useTerms(taxonomy, { perPage: limit, orderby }, !filterFor);
+  const { data: filteredTerms } = useFilterTerms(
+    filterFor === 'sermon' ? 'sermon' : 'video',
+    taxonomy,
+    !!filterFor,
+  );
+
+  const list = filterFor ? filteredTerms?.slice(0, limit) || [] : regularTerms?.items || [];
+
+  if (!list || list.length === 0) {
+    return null;
+  }
+
+  const getUrl = (t: { id: number; slug: string }) => {
+    if (taxonomy === 'series') return `/series/${t.slug}`;
+    if (taxonomy === 'category') return `/articles?category=${t.id}`;
+    if (taxonomy === 'topic') return `/articles?topic=${t.id}`;
+    if (filterFor === 'sermon') return `/sermons?videoCategory=${t.id}`;
+    return `/videos?videoCategory=${t.id}`;
+  };
+
+  // For category / topic, render as neat compact interactive chips
+  if (taxonomy === 'category' || taxonomy === 'topic') {
+    return (
+      <div className="flex flex-wrap gap-1.5 pt-1">
+        {list.map((term) => (
+          <Link
+            key={term.id}
+            to={getUrl(term)}
+            onClick={onClose}
+            className="inline-flex items-center gap-1 rounded-md border border-[#D0E1F0] dark:border-white/10 bg-white/80 dark:bg-white/10 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:text-white/85 hover:border-primary hover:text-primary dark:hover:border-[#F0F6FB] dark:hover:text-[#F0F6FB] transition shadow-2xs"
+          >
+            <span className="truncate max-w-[130px]">{term.name}</span>
+            {'count' in term && typeof term.count === 'number' && term.count > 0 && (
+              <span className="text-[9px] text-slate-400 dark:text-white/40">({term.count})</span>
+            )}
+          </Link>
+        ))}
+      </div>
+    );
+  }
+
+  // For series / sermon / video categories, render as clean sub-links
+  return (
+    <div className="space-y-1 pt-1">
+      {list.map((term) => (
+        <Link
+          key={term.id}
+          to={getUrl(term)}
+          onClick={onClose}
+          className="flex items-center justify-between text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] hover:underline py-0.5 transition-colors pl-1"
+        >
+          <span className="truncate">{term.name}</span>
+          <span className="text-slate-400 dark:text-white/30 text-[10px]">→</span>
+        </Link>
+      ))}
+    </div>
   );
 }

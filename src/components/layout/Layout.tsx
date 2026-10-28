@@ -39,7 +39,7 @@ export function Layout() {
 
       {/* Desktop Header (>= md) */}
       <div className="hidden md:block">
-        <Header />
+        <Header onOpenMenu={() => setProfileOpen(true)} />
       </div>
 
       {/* Main Content View */}
