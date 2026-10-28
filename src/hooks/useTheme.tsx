@@ -13,7 +13,14 @@ const Ctx = createContext<ThemeCtx | null>(null);
 
 function initialTheme(): Theme {
   if (typeof document === 'undefined') return 'light';
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'dark') return 'dark';
+    if (saved === 'light') return 'light';
+  } catch {
+    /* private mode */
+  }
+  return 'light';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -25,16 +32,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'dark' ? '#0B1120' : '#F0F6FB');
   }, [theme]);
-
-  // Follow the OS setting until the visitor makes an explicit choice.
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem(STORAGE_KEY)) setThemeState(e.matches ? 'dark' : 'light');
-    };
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
 
   const setTheme = useCallback((t: Theme) => {
     try {

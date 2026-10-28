@@ -39,6 +39,7 @@ interface HeroNotificationSlide {
   metaExtra?: string;
   image?: ContentItem['image'];
   url: string;
+  isFlyer?: boolean;
 }
 
 export function getArticleCategory(item: ContentItem): string {
@@ -146,6 +147,8 @@ function HeroAutoSlider({ slides }: { slides: HeroNotificationSlide[] }) {
       {/* Slides with Crossfade Transition */}
       {slides.map((slide, idx) => {
         const isActive = idx === currentSlide;
+        const isFlyerSlide = slide.isFlyer || slide.category.toLowerCase().includes('event');
+
         return (
           <div
             key={slide.id}
@@ -153,61 +156,160 @@ function HeroAutoSlider({ slides }: { slides: HeroNotificationSlide[] }) {
               isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
-            {/* Background Image */}
-            <div className="absolute inset-0 h-full w-full">
-              <Img
-                image={slide.image}
-                alt={slide.title}
-                wrapperClassName="h-full w-full"
-                className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                eager={idx === 0}
-              />
-            </div>
-
-            {/* Gradient Overlays for Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20" />
-
-            {/* Slide Content (Bottom Aligned) */}
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 lg:p-10 z-10">
-              <div className="max-w-2xl">
-                {/* Category Pill with Colored Indicator Dot */}
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/95 dark:bg-[#111A2E]/95 backdrop-blur-md px-3.5 py-1 text-xs font-bold text-ink shadow-sm border border-white/20">
-                  <span className={`h-2 w-2 rounded-full ${slide.categoryDot} animate-pulse`} />
-                  <span className="tracking-wide">{slide.category}</span>
-                </div>
-
-                {/* Big Headline */}
-                <h2 className="mt-3.5 font-serif text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-[1.18] text-white transition-colors hover:text-[#F3E6BE]">
-                  <Link to={slide.url}>{slide.title}</Link>
-                </h2>
-
-                {/* Excerpt */}
-                {slide.excerpt && (
-                  <p className="mt-2.5 text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed">
-                    {slide.excerpt}
-                  </p>
+            {isFlyerSlide ? (
+              <>
+                {/* Ambient Blurred Background (Glow matching natural flyer palette) */}
+                {slide.image && (
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <img
+                      src={slide.image.src}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-full w-full object-cover blur-3xl opacity-25 scale-125 saturate-150"
+                    />
+                  </div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#070C18]/95 via-[#070C18]/85 to-[#070C18]/70" />
 
-                {/* Metadata Line */}
-                <div className="mt-3.5 flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-white/70">
-                  <time dateTime={slide.date}>{formatDateShort(slide.date)}</time>
-                  {slide.metaExtra && (
-                    <>
-                      <span>•</span>
-                      <span className="text-white/90 font-medium">{slide.metaExtra}</span>
-                    </>
-                  )}
-                  <span>•</span>
-                  <Link
-                    to={slide.url}
-                    className="font-semibold text-[#D9A62E] hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>Explore</span>
-                    <ArrowRightIcon size={12} />
-                  </Link>
+                {/* Content: Left Info + Right Natural Flyer Poster */}
+                <div className="absolute inset-0 z-10 flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+                  {/* Top: Category Pill & Optional Badge */}
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/95 dark:bg-[#111A2E]/95 backdrop-blur-md px-3.5 py-1 text-xs font-bold text-ink shadow-sm border border-white/20">
+                      <span className={`h-2 w-2 rounded-full ${slide.categoryDot} animate-pulse`} />
+                      <span className="tracking-wide">{slide.category}</span>
+                    </div>
+                    {slide.badge && (
+                      <span className="rounded-full bg-accent/20 border border-accent/40 px-3 py-0.5 text-[11px] font-bold text-accent-text uppercase tracking-wider">
+                        {slide.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Middle: Split Layout */}
+                  <div className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between gap-6 my-auto">
+                    {/* Left Details */}
+                    <div className="flex-1 min-w-0 max-w-xl">
+                      <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-[1.18] text-white transition-colors hover:text-[#F3E6BE]">
+                        <Link to={slide.url}>{slide.title}</Link>
+                      </h2>
+
+                      {slide.excerpt && (
+                        <p className="mt-2.5 text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed">
+                          {slide.excerpt}
+                        </p>
+                      )}
+
+                      {/* Date & Location */}
+                      <div className="mt-3.5 flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-white/80">
+                        <span className="inline-flex items-center gap-1.5 text-white/90 font-medium">
+                          <CalendarIcon size={13} className="text-amber-400" />
+                          <time dateTime={slide.date}>{formatDateShort(slide.date)}</time>
+                        </span>
+                        {slide.metaExtra && (
+                          <>
+                            <span className="text-white/40">•</span>
+                            <span className="inline-flex items-center gap-1.5 text-white/90 line-clamp-1">
+                              <MapPinIcon size={13} className="text-accent-text shrink-0" />
+                              <span className="truncate">{slide.metaExtra}</span>
+                            </span>
+                          </>
+                        )}
+                      </div>
+
+                      {/* CTA Button */}
+                      <div className="mt-5">
+                        <Link
+                          to={slide.url}
+                          className="inline-flex items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-accent-ink font-bold text-xs sm:text-sm px-5 py-2.5 shadow-md transition-all active:scale-95 cursor-pointer"
+                        >
+                          <span>Register for Event</span>
+                          <ArrowRightIcon size={13} />
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Right: Crisp, Uncropped Flyer Poster */}
+                    {slide.image && (
+                      <div className="shrink-0 self-center sm:self-auto">
+                        <Link
+                          to={slide.url}
+                          className="block relative h-48 sm:h-64 md:h-72 lg:h-80 xl:h-[340px] aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-white/20 bg-slate-950 p-1 transition-transform duration-500 hover:scale-105"
+                        >
+                          <Img
+                            image={slide.image}
+                            alt={slide.title}
+                            wrapperClassName="h-full w-full flex items-center justify-center bg-transparent"
+                            className="w-auto h-auto max-h-full max-w-full object-contain rounded-xl"
+                          />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom spacer so dots don't overlap content */}
+                  <div className="h-4" />
                 </div>
-              </div>
-            </div>
+              </>
+            ) : (
+              <>
+                {/* Background Image for landscape slides */}
+                <div className="absolute inset-0 h-full w-full">
+                  <Img
+                    image={slide.image}
+                    alt={slide.title}
+                    wrapperClassName="h-full w-full"
+                    className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    eager={idx === 0}
+                  />
+                </div>
+
+                {/* Gradient Overlays for Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20" />
+
+                {/* Slide Content (Bottom Aligned) */}
+                <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 lg:p-10 z-10">
+                  <div className="max-w-2xl">
+                    {/* Category Pill with Colored Indicator Dot */}
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/95 dark:bg-[#111A2E]/95 backdrop-blur-md px-3.5 py-1 text-xs font-bold text-ink shadow-sm border border-white/20">
+                      <span className={`h-2 w-2 rounded-full ${slide.categoryDot} animate-pulse`} />
+                      <span className="tracking-wide">{slide.category}</span>
+                    </div>
+
+                    {/* Big Headline */}
+                    <h2 className="mt-3.5 font-serif text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-[1.18] text-white transition-colors hover:text-[#F3E6BE]">
+                      <Link to={slide.url}>{slide.title}</Link>
+                    </h2>
+
+                    {/* Excerpt */}
+                    {slide.excerpt && (
+                      <p className="mt-2.5 text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed">
+                        {slide.excerpt}
+                      </p>
+                    )}
+
+                    {/* Metadata Line */}
+                    <div className="mt-3.5 flex flex-wrap items-center gap-2.5 text-xs sm:text-sm text-white/70">
+                      <time dateTime={slide.date}>{formatDateShort(slide.date)}</time>
+                      {slide.metaExtra && (
+                        <>
+                          <span>•</span>
+                          <span className="text-white/90 font-medium">{slide.metaExtra}</span>
+                        </>
+                      )}
+                      <span>•</span>
+                      <Link
+                        to={slide.url}
+                        className="font-semibold text-[#D9A62E] hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>Explore</span>
+                        <ArrowRightIcon size={12} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         );
       })}
@@ -1442,6 +1544,7 @@ export function HomePage() {
         metaExtra: latestCustom.venue,
         image: latestCustom.image,
         url: latestCustom.registrationUrl,
+        isFlyer: true,
       });
     } else if (latestEvent) {
       slides.push({
@@ -1455,6 +1558,7 @@ export function HomePage() {
         metaExtra: typeof latestEvent.meta?.venue === 'string' ? String(latestEvent.meta.venue) : 'National Gathering',
         image: latestEvent.image,
         url: itemPath('event', latestEvent.slug),
+        isFlyer: true,
       });
     } else {
       slides.push({
