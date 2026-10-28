@@ -6,7 +6,12 @@ import { adminDb } from '../db/storage';
 import { useAdminToast } from '../context/AdminToastContext';
 import { EventRegistrationFormCard } from '@/components/forms/EventRegistrationFormCard';
 import { DEFAULT_REGISTRATION_FIELDS } from '../db/seed';
-import type { EventRegistrationForm, FormSubmission, FormFieldConfig } from '../db/types';
+import type {
+  EventRegistrationForm,
+  FormSubmission,
+  FormFieldConfig,
+  FormFieldType,
+} from '../db/types';
 import {
   FileText,
   Plus,
@@ -26,7 +31,148 @@ import {
   Sliders,
   X,
   Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Settings,
+  Type,
+  AlignLeft,
+  ListFilter,
+  CheckSquare,
+  Radio,
+  Hash,
+  Clock,
+  Mail,
+  Phone,
+  Link2,
 } from 'lucide-react';
+
+const FIELD_TYPE_OPTIONS: {
+  type: FormFieldType;
+  label: string;
+  badge: string;
+  category: 'Standard' | 'Choice & Options' | 'Data & Date' | 'Contact & Web';
+  icon: any;
+  defaultPlaceholder?: string;
+  defaultHelpText?: string;
+  defaultOptions?: string[];
+}[] = [
+  {
+    type: 'text',
+    label: 'Single Line Text',
+    badge: 'Text',
+    category: 'Standard',
+    icon: Type,
+    defaultPlaceholder: 'Enter your answer',
+  },
+  {
+    type: 'textarea',
+    label: 'Paragraph Text',
+    badge: 'Paragraph',
+    category: 'Standard',
+    icon: AlignLeft,
+    defaultPlaceholder: 'Enter detailed response...',
+  },
+  {
+    type: 'select',
+    label: 'Dropdown Menu',
+    badge: 'Dropdown',
+    category: 'Choice & Options',
+    icon: ListFilter,
+    defaultOptions: ['Option 1', 'Option 2', 'Option 3'],
+  },
+  {
+    type: 'radio',
+    label: 'Radio Buttons',
+    badge: 'Single Choice',
+    category: 'Choice & Options',
+    icon: Radio,
+    defaultOptions: ['Option 1', 'Option 2'],
+  },
+  {
+    type: 'checkbox',
+    label: 'Checkboxes (Multi-select)',
+    badge: 'Multi-select',
+    category: 'Choice & Options',
+    icon: CheckSquare,
+    defaultOptions: ['Choice A', 'Choice B', 'Choice C'],
+  },
+  {
+    type: 'number',
+    label: 'Number Input',
+    badge: 'Number',
+    category: 'Data & Date',
+    icon: Hash,
+    defaultPlaceholder: '0',
+  },
+  {
+    type: 'date',
+    label: 'Date Picker',
+    badge: 'Date',
+    category: 'Data & Date',
+    icon: Calendar,
+  },
+  {
+    type: 'time',
+    label: 'Time Picker',
+    badge: 'Time',
+    category: 'Data & Date',
+    icon: Clock,
+  },
+  {
+    type: 'email',
+    label: 'Email Address',
+    badge: 'Email',
+    category: 'Contact & Web',
+    icon: Mail,
+    defaultPlaceholder: 'user@example.com',
+  },
+  {
+    type: 'tel',
+    label: 'Phone Number',
+    badge: 'Phone',
+    category: 'Contact & Web',
+    icon: Phone,
+    defaultPlaceholder: '+91 98765 43210',
+  },
+  {
+    type: 'url',
+    label: 'Website / Profile URL',
+    badge: 'URL',
+    category: 'Contact & Web',
+    icon: Link2,
+    defaultPlaceholder: 'https://',
+  },
+];
+
+const CHOICE_PRESETS = [
+  { label: 'Yes / No', options: ['Yes', 'No'] },
+  { label: 'Diet (Veg / Non-Veg)', options: ['Vegetarian', 'Non-Vegetarian', 'Jain', 'Vegan'] },
+  { label: 'T-Shirt Sizes', options: ['S', 'M', 'L', 'XL', '2XL', '3XL'] },
+  { label: 'Accommodation', options: ['Required', 'Not Required', 'Arranging Own Stay'] },
+  {
+    label: 'Ministry Role',
+    options: [
+      'Senior Pastor',
+      'Associate Pastor',
+      'Elder / Deacon',
+      'Youth Pastor / Leader',
+      'Worship Leader',
+      'Seminary Student',
+      'Church Member / Layperson',
+    ],
+  },
+  {
+    label: 'How Heard',
+    options: [
+      'Church Announcement',
+      'Friend / Colleague',
+      'WhatsApp Group',
+      'Instagram / Social Media',
+      'Equip Indian Churches Website',
+      'Attended Past Conference',
+    ],
+  },
+];
 
 type FormTab = 'roster' | 'builder' | 'submissions';
 
@@ -76,6 +222,8 @@ export function AdminFormsPage() {
   const [copiedFormId, setCopiedFormId] = useState<string | null>(null);
 
   // Form Builder state
+  const [expandedFieldId, setExpandedFieldId] = useState<string | null>(null);
+  const [showAddPalette, setShowAddPalette] = useState<boolean>(false);
   const [formData, setFormData] = useState<Partial<EventRegistrationForm>>({
     title: 'Payment Details',
     subtitle: '',
@@ -196,11 +344,119 @@ export function AdminFormsPage() {
     setTimeout(() => setCopiedFormId(null), 2500);
   };
 
+  const handleAddField = (type: FormFieldType) => {
+    const meta = FIELD_TYPE_OPTIONS.find((t) => t.type === type);
+    const newId = `custom_${Date.now()}`;
+    const newField: FormFieldConfig = {
+      id: newId,
+      name: newId,
+      label: meta ? `Custom ${meta.label}` : 'New Question',
+      type: type,
+      required: false,
+      enabled: true,
+      placeholder: meta?.defaultPlaceholder || '',
+      helpText: meta?.defaultHelpText || '',
+      options: meta?.defaultOptions ? [...meta.defaultOptions] : undefined,
+      isCustom: true,
+    };
+
+    const currentFields = formData.fields || [];
+    setFormData({
+      ...formData,
+      fields: [...currentFields, newField],
+    });
+    setExpandedFieldId(newId);
+    setShowAddPalette(false);
+    toast(`Added new "${meta?.label || type}" question`, 'success');
+  };
+
+  const handleUpdateField = (index: number, updates: Partial<FormFieldConfig>) => {
+    const updated = [...(formData.fields || [])];
+    if (!updated[index]) return;
+    updated[index] = { ...updated[index], ...updates };
+    setFormData({ ...formData, fields: updated });
+  };
+
+  const handleDeleteField = (index: number) => {
+    const target = formData.fields?.[index];
+    if (!target) return;
+    const updated = (formData.fields || []).filter((_, i) => i !== index);
+    setFormData({ ...formData, fields: updated });
+    if (expandedFieldId === target.id) {
+      setExpandedFieldId(null);
+    }
+    toast(`Field "${target.label}" removed`, 'info');
+  };
+
+  const handleDuplicateField = (index: number) => {
+    const source = formData.fields?.[index];
+    if (!source) return;
+    const newId = `custom_${Date.now()}`;
+    const copy: FormFieldConfig = {
+      ...source,
+      id: newId,
+      name: newId,
+      label: `${source.label} (Copy)`,
+      isCustom: true,
+      options: source.options ? [...source.options] : undefined,
+    };
+    const updated = [...(formData.fields || [])];
+    updated.splice(index + 1, 0, copy);
+    setFormData({ ...formData, fields: updated });
+    setExpandedFieldId(newId);
+    toast(`Duplicated "${source.label}"`, 'success');
+  };
+
+  const handleMoveField = (index: number, direction: 'up' | 'down') => {
+    const list = [...(formData.fields || [])];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= list.length) return;
+    const [moved] = list.splice(index, 1);
+    list.splice(targetIndex, 0, moved);
+    setFormData({ ...formData, fields: list });
+  };
+
+  const handleAddOption = (fieldIndex: number) => {
+    const field = formData.fields?.[fieldIndex];
+    if (!field) return;
+    const currentOptions = field.options || [];
+    handleUpdateField(fieldIndex, {
+      options: [...currentOptions, `Choice ${currentOptions.length + 1}`],
+    });
+  };
+
+  const handleUpdateOption = (fieldIndex: number, optIndex: number, val: string) => {
+    const field = formData.fields?.[fieldIndex];
+    if (!field || !field.options) return;
+    const newOptions = [...field.options];
+    newOptions[optIndex] = val;
+    handleUpdateField(fieldIndex, { options: newOptions });
+  };
+
+  const handleDeleteOption = (fieldIndex: number, optIndex: number) => {
+    const field = formData.fields?.[fieldIndex];
+    if (!field || !field.options) return;
+    const newOptions = field.options.filter((_, i) => i !== optIndex);
+    handleUpdateField(fieldIndex, { options: newOptions });
+  };
+
+  const handleApplyPreset = (fieldIndex: number, presetOptions: string[]) => {
+    handleUpdateField(fieldIndex, { options: [...presetOptions] });
+    toast('Preset choices applied to question', 'success');
+  };
+
   const handleExportCSV = () => {
     if (submissions.length === 0) {
       toast('No registration submissions to export', 'error');
       return;
     }
+
+    // Dynamic extraction of all custom response question keys
+    const customQuestionKeys = Array.from(
+      new Set(
+        submissions.flatMap((s) => (s.customResponses ? Object.keys(s.customResponses) : []))
+      )
+    );
 
     const headers = [
       'Registration ID',
@@ -219,6 +475,7 @@ export function AdminFormsPage() {
       'Pincode',
       'How Heard',
       'Attended Before',
+      ...customQuestionKeys.map((k) => `"${k.replace(/"/g, '""')}"`),
       'Quantity',
       'Unit Price',
       'Donation',
@@ -246,6 +503,7 @@ export function AdminFormsPage() {
       s.pincode || '',
       `"${(s.howHeard || '').replace(/"/g, '""')}"`,
       s.attendedBefore || '',
+      ...customQuestionKeys.map((k) => `"${(s.customResponses?.[k] || '').replace(/"/g, '""')}"`),
       s.quantity,
       s.unitAmount,
       s.donationAmount,
@@ -764,60 +1022,405 @@ export function AdminFormsPage() {
                 </div>
               </div>
 
-              {/* Attendee Fields Configuration */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              {/* Attendee Fields & Custom Question Builder */}
+              <div className="space-y-4 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 pb-3">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      Attendee Questions & Fields
-                    </span>
-                    <p className="text-[11px] text-slate-500">
-                      Toggle fields on/off and mark which ones are required.
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                        Attendee Questions & Fields
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                        {formData.fields?.filter((f) => f.enabled).length || 0} active / {formData.fields?.length || 0} total
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Configure standard fields or add custom questions, dropdowns, radio options, and checkboxes for delegates.
                     </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddPalette(!showAddPalette)}
+                      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold shadow-2xs transition cursor-pointer ${
+                        showAddPalette
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                          : 'bg-[#094899] text-white hover:bg-[#073877]'
+                      }`}
+                    >
+                      {showAddPalette ? (
+                        <>
+                          <X className="w-3.5 h-3.5" />
+                          <span>Close Palette</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Add Question / Field</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-                  {formData.fields?.map((field: FormFieldConfig, index: number) => (
-                    <div
-                      key={field.id}
-                      className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 text-xs"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={field.enabled}
-                          onChange={(e) => {
-                            const updated = [...(formData.fields || [])];
-                            updated[index].enabled = e.target.checked;
-                            setFormData({ ...formData, fields: updated });
-                          }}
-                          className="rounded border-slate-300 text-[#094899] focus:ring-[#094899]"
-                        />
-                        <span className={`font-semibold ${field.enabled ? 'text-slate-800' : 'text-slate-400 line-through'}`}>
-                          {field.label}
+                {/* Add Field Palette Drawer */}
+                {showAddPalette && (
+                  <div className="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-white p-4 space-y-3.5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#094899]" />
+                        <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                          Select Question / Field Type
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">({field.type})</span>
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-1.5 text-[11px] text-slate-600 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            disabled={!field.enabled}
-                            checked={field.required}
-                            onChange={(e) => {
-                              const updated = [...(formData.fields || [])];
-                              updated[index].required = e.target.checked;
-                              setFormData({ ...formData, fields: updated });
-                            }}
-                            className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
-                          />
-                          <span className={field.required ? 'font-bold text-rose-600' : ''}>Required *</span>
-                        </label>
-                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        Click a type to add it to your registration form
+                      </span>
                     </div>
-                  ))}
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {FIELD_TYPE_OPTIONS.map((opt) => {
+                        const Icon = opt.icon;
+                        return (
+                          <button
+                            key={opt.type}
+                            type="button"
+                            onClick={() => handleAddField(opt.type)}
+                            className="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-200/90 bg-white hover:border-[#094899] hover:bg-blue-50/50 hover:shadow-xs transition text-left cursor-pointer group"
+                          >
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600 group-hover:bg-[#094899] group-hover:text-white transition">
+                              <Icon className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs font-semibold text-slate-800 group-hover:text-[#094899] truncate">
+                                {opt.label}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-medium truncate">
+                                {opt.category}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fields List */}
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  {formData.fields?.map((field: FormFieldConfig, index: number) => {
+                    const isExpanded = expandedFieldId === field.id;
+                    const meta = FIELD_TYPE_OPTIONS.find((t) => t.type === field.type);
+                    const Icon = meta?.icon || Type;
+                    const isChoiceType = ['select', 'radio', 'checkbox'].includes(field.type);
+
+                    return (
+                      <div
+                        key={field.id}
+                        className={`rounded-xl border transition ${
+                          field.enabled
+                            ? isExpanded
+                              ? 'border-[#094899] bg-white shadow-xs'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                            : 'border-slate-200/60 bg-slate-50/60 opacity-70'
+                        }`}
+                      >
+                        {/* Header Row */}
+                        <div className="flex items-center justify-between p-3 gap-2">
+                          {/* Left: Reorder & Enable & Label */}
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            {/* Reorder Buttons */}
+                            <div className="flex flex-col gap-0.5 shrink-0">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => handleMoveField(index, 'up')}
+                                className="p-0.5 rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                                title="Move Up"
+                              >
+                                <ChevronUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === (formData.fields?.length || 0) - 1}
+                                onClick={() => handleMoveField(index, 'down')}
+                                className="p-0.5 rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                                title="Move Down"
+                              >
+                                <ChevronDown className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {/* Enable Checkbox */}
+                            <input
+                              type="checkbox"
+                              checked={field.enabled}
+                              onChange={(e) => handleUpdateField(index, { enabled: e.target.checked })}
+                              className="rounded border-slate-300 text-[#094899] focus:ring-[#094899] cursor-pointer"
+                              title={field.enabled ? 'Enabled' : 'Disabled'}
+                            />
+
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
+                              <Icon className="w-3.5 h-3.5" />
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span
+                                  className={`text-xs font-semibold truncate ${
+                                    field.enabled ? 'text-slate-900' : 'text-slate-400 line-through'
+                                  }`}
+                                >
+                                  {field.label}
+                                </span>
+                                {field.required && (
+                                  <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200">
+                                    Required
+                                  </span>
+                                )}
+                                {field.isCustom && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">
+                                    Custom
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {meta?.badge || field.type}
+                                {field.options ? ` (${field.options.length} options)` : ''}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Right: Quick Actions */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {/* Required toggle */}
+                            <label className="hidden sm:flex items-center gap-1 text-[11px] text-slate-600 cursor-pointer px-2 py-1 rounded hover:bg-slate-50">
+                              <input
+                                type="checkbox"
+                                disabled={!field.enabled}
+                                checked={field.required}
+                                onChange={(e) => handleUpdateField(index, { required: e.target.checked })}
+                                className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                              />
+                              <span className={field.required ? 'font-bold text-rose-600 text-[10px]' : 'text-slate-500 text-[10px]'}>
+                                Required *
+                              </span>
+                            </label>
+
+                            {/* Duplicate */}
+                            <button
+                              type="button"
+                              onClick={() => handleDuplicateField(index)}
+                              className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                              title="Duplicate Field"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Settings toggle */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedFieldId(isExpanded ? null : field.id)}
+                              className={`p-1.5 rounded-md transition cursor-pointer flex items-center gap-1 text-xs font-semibold ${
+                                isExpanded
+                                  ? 'bg-[#094899] text-white'
+                                  : 'text-slate-600 hover:bg-slate-100'
+                              }`}
+                              title="Field Settings"
+                            >
+                              <Settings className="w-3.5 h-3.5" />
+                              <span className="hidden md:inline text-[11px]">{isExpanded ? 'Done' : 'Edit'}</span>
+                            </button>
+
+                            {/* Delete button */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteField(index)}
+                              className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                              title="Delete Field"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Expanded Field Editor Panel */}
+                        {isExpanded && (
+                          <div className="border-t border-slate-200 bg-slate-50/70 p-4 rounded-b-xl space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                              {/* Label */}
+                              <div>
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                  Field Label / Question <span className="text-rose-500">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  value={field.label}
+                                  onChange={(e) => handleUpdateField(index, { label: e.target.value })}
+                                  className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-[#094899] focus:outline-none"
+                                  placeholder="e.g. Do you require accommodation?"
+                                />
+                              </div>
+
+                              {/* Field Type Selector */}
+                              <div>
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                  Field Type
+                                </label>
+                                <select
+                                  value={field.type}
+                                  onChange={(e) => {
+                                    const newType = e.target.value as FormFieldType;
+                                    const newMeta = FIELD_TYPE_OPTIONS.find((t) => t.type === newType);
+                                    handleUpdateField(index, {
+                                      type: newType,
+                                      options:
+                                        ['select', 'radio', 'checkbox'].includes(newType) &&
+                                        (!field.options || field.options.length === 0)
+                                          ? newMeta?.defaultOptions || ['Option 1', 'Option 2']
+                                          : field.options,
+                                    });
+                                  }}
+                                  className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-[#094899] focus:outline-none"
+                                >
+                                  {FIELD_TYPE_OPTIONS.map((opt) => (
+                                    <option key={opt.type} value={opt.type}>
+                                      {opt.label} ({opt.category})
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Placeholder (for text, email, tel, number, url, textarea) */}
+                              {!isChoiceType && (
+                                <div>
+                                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Placeholder Text
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={field.placeholder || ''}
+                                    onChange={(e) => handleUpdateField(index, { placeholder: e.target.value })}
+                                    className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-[#094899] focus:outline-none"
+                                    placeholder="e.g. Type your answer here..."
+                                  />
+                                </div>
+                              )}
+
+                              {/* Help Text / Description */}
+                              <div className={!isChoiceType ? '' : 'sm:col-span-2'}>
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                  Help Text / Guidance (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={field.helpText || ''}
+                                  onChange={(e) => handleUpdateField(index, { helpText: e.target.value })}
+                                  className="w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 focus:border-[#094899] focus:outline-none"
+                                  placeholder="Small explanatory note shown beneath the input"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Required checkbox toggle */}
+                            <div className="flex items-center gap-2 pt-1">
+                              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={field.required}
+                                  onChange={(e) => handleUpdateField(index, { required: e.target.checked })}
+                                  className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                                />
+                                <span>Mark this question as mandatory (Required *)</span>
+                              </label>
+                            </div>
+
+                            {/* Choices / Options Editor for select, radio, checkbox */}
+                            {isChoiceType && (
+                              <div className="space-y-3 pt-2 border-t border-slate-200">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                                  <div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-800">
+                                      Answer Options / Choices ({field.options?.length || 0})
+                                    </span>
+                                    <p className="text-[10px] text-slate-500">
+                                      Define the available choices for delegates to choose from.
+                                    </p>
+                                  </div>
+
+                                  {/* Quick Presets */}
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Presets:</span>
+                                    {CHOICE_PRESETS.map((preset) => (
+                                      <button
+                                        key={preset.label}
+                                        type="button"
+                                        onClick={() => handleApplyPreset(index, preset.options)}
+                                        className="rounded bg-white border border-slate-200 px-2 py-0.5 text-[10px] font-medium text-slate-700 hover:border-[#094899] hover:text-[#094899] transition cursor-pointer"
+                                        title={`Load "${preset.label}" options`}
+                                      >
+                                        {preset.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Options List */}
+                                <div className="space-y-2 bg-white p-3 rounded-lg border border-slate-200">
+                                  {(field.options || []).map((opt, optIndex) => (
+                                    <div key={optIndex} className="flex items-center gap-2">
+                                      <span className="text-[10px] font-mono font-bold text-slate-400 w-5 text-right">
+                                        {optIndex + 1}.
+                                      </span>
+                                      <input
+                                        type="text"
+                                        value={opt}
+                                        onChange={(e) => handleUpdateOption(index, optIndex, e.target.value)}
+                                        className="flex-1 rounded border border-slate-200 px-2.5 py-1 text-xs text-slate-900 focus:border-[#094899] focus:outline-none"
+                                        placeholder={`Option ${optIndex + 1}`}
+                                      />
+                                      <button
+                                        type="button"
+                                        disabled={(field.options?.length || 0) <= 1}
+                                        onClick={() => handleDeleteOption(index, optIndex)}
+                                        className="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+                                        title="Delete Option"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  ))}
+
+                                  <div className="pt-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddOption(index)}
+                                      className="inline-flex items-center gap-1.5 rounded border border-dashed border-slate-300 bg-slate-50/50 hover:bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-[#094899] transition cursor-pointer w-full justify-center"
+                                    >
+                                      <Plus className="w-3.5 h-3.5" />
+                                      <span>+ Add Another Option Choice</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Close settings */}
+                            <div className="flex justify-end pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setExpandedFieldId(null)}
+                                className="rounded bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 text-xs font-semibold transition cursor-pointer"
+                              >
+                                Done Editing Field
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1111,6 +1714,36 @@ export function AdminFormsPage() {
                 <span className="font-medium text-slate-800">{selectedSubmission.howHeard || '—'}</span>
               </div>
             </div>
+
+            {/* Custom Question Responses */}
+            {selectedSubmission.customResponses &&
+              Object.keys(selectedSubmission.customResponses).length > 0 && (
+                <div className="border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs bg-slate-50/80">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                    <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                      Custom Questions & Responses
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold">
+                      {Object.keys(selectedSubmission.customResponses).length} questions
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {Object.entries(selectedSubmission.customResponses).map(([qKey, qVal]) => (
+                      <div
+                        key={qKey}
+                        className="bg-white p-2.5 rounded-lg border border-slate-200/80 shadow-2xs"
+                      >
+                        <span className="text-slate-500 block text-[11px] font-medium mb-0.5">
+                          {qKey}:
+                        </span>
+                        <span className="font-semibold text-slate-900 break-words">
+                          {String(qVal || '—')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             {/* Payment Details */}
             <div className="border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">

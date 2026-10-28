@@ -248,17 +248,31 @@ export interface AuditLog {
   timestamp: string;
 }
 
+export type FormFieldType =
+  | 'text'
+  | 'email'
+  | 'tel'
+  | 'number'
+  | 'textarea'
+  | 'select'
+  | 'radio'
+  | 'checkbox'
+  | 'date'
+  | 'time'
+  | 'url';
+
 export interface FormFieldConfig {
   id: string;
-  name: string; // 'name' | 'lastName' | 'email' | 'phone' | 'gender' | 'age' | 'address' | 'city' | 'pincode' | 'state' | 'churchName' | 'churchRole' | 'howHeard' | 'attendedBefore'
+  name: string; // identifier key e.g. 'name', 'email', 'custom_tshirt', etc.
   label: string;
-  type: 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'select';
+  type: FormFieldType;
   required: boolean;
   enabled: boolean;
   placeholder?: string;
-  options?: string[]; // for select dropdowns
+  options?: string[]; // for select, radio, and checkbox choices
   helpText?: string;
-  displayOrder: number;
+  displayOrder?: number;
+  isCustom?: boolean;
 }
 
 export interface EventRegistrationForm {

@@ -53,6 +53,31 @@ export function EventRegistrationFormCard({
       }
     }
 
+    // Extract custom question responses
+    const standardKeys = [
+      'name',
+      'lastName',
+      'email',
+      'phone',
+      'gender',
+      'age',
+      'address',
+      'city',
+      'pincode',
+      'state',
+      'churchName',
+      'churchRole',
+      'howHeard',
+      'attendedBefore',
+    ];
+
+    const customResponses: Record<string, string> = {};
+    for (const field of enabledFields) {
+      if (formData[field.name] && (!standardKeys.includes(field.name) || field.isCustom)) {
+        customResponses[field.label] = formData[field.name];
+      }
+    }
+
     if (isPreview) {
       // In preview mode inside admin panel, simulate success
       const mockSubmission: FormSubmission = {
@@ -80,6 +105,7 @@ export function EventRegistrationFormCard({
         donationAmount: Number(donation) || 0,
         totalAmount,
         currency: form.currency || 'INR',
+        customResponses,
         paymentStatus: 'paid',
         paymentMethod: 'UPI',
         transactionId: `PREVIEW-TXN-${Date.now().toString(36).toUpperCase()}`,
@@ -117,6 +143,7 @@ export function EventRegistrationFormCard({
         donationAmount: Number(donation) || 0,
         totalAmount,
         currency: form.currency || 'INR',
+        customResponses,
         paymentStatus: 'paid',
         paymentMethod: 'UPI / NetBanking',
         transactionId: `EIC-PAY-${Date.now().toString(36).toUpperCase()}`,
@@ -175,6 +202,20 @@ export function EventRegistrationFormCard({
                 {form.currencySymbol} {submittedData.totalAmount.toFixed(2)}
               </span>
             </div>
+
+            {submittedData.customResponses && Object.keys(submittedData.customResponses).length > 0 && (
+              <div className="border-t border-slate-200/80 pt-2 space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Additional Information
+                </span>
+                {Object.entries(submittedData.customResponses).map(([q, ans]) => (
+                  <div key={q} className="flex justify-between text-xs">
+                    <span className="text-slate-500">{q}:</span>
+                    <span className="font-medium text-slate-800 text-right max-w-[200px] truncate">{ans}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="text-center pt-2">
@@ -320,8 +361,62 @@ export function EventRegistrationFormCard({
                       </option>
                     ))}
                   </select>
+                ) : field.type === 'radio' ? (
+                  /* Radio Options List */
+                  <div className="space-y-1.5 pt-0.5">
+                    {field.options?.map((opt) => (
+                      <label key={opt} className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 cursor-pointer select-none">
+                        <input
+                          type="radio"
+                          name={field.name}
+                          required={field.required}
+                          value={opt}
+                          checked={formData[field.name] === opt}
+                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                          className="text-[#094899] focus:ring-[#094899]"
+                        />
+                        <span>{opt}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : field.type === 'checkbox' ? (
+                  /* Checkboxes */
+                  <div className="space-y-1.5 pt-0.5">
+                    {field.options && field.options.length > 0 ? (
+                      field.options.map((opt) => {
+                        const currentVals = formData[field.name] ? formData[field.name].split(', ') : [];
+                        const isChecked = currentVals.includes(opt);
+                        return (
+                          <label key={opt} className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 cursor-pointer select-none">
+                            <input
+                              type="checkbox"
+                              value={opt}
+                              checked={isChecked}
+                              onChange={() => {
+                                const updated = isChecked ? currentVals.filter((v) => v !== opt) : [...currentVals, opt];
+                                setFormData({ ...formData, [field.name]: updated.join(', ') });
+                              }}
+                              className="rounded border-slate-300 text-[#094899] focus:ring-[#094899]"
+                            />
+                            <span>{opt}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <label className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          required={field.required}
+                          checked={formData[field.name] === 'Yes'}
+                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.checked ? 'Yes' : '' })}
+                          className="rounded border-slate-300 text-[#094899] focus:ring-[#094899]"
+                        />
+                        <span>{field.placeholder || 'Yes, I confirm'}</span>
+                      </label>
+                    )}
+                  </div>
                 ) : field.type === 'textarea' ? (
-                  /* Textarea (Address) */
+                  /* Textarea (Address / Paragraph) */
                   <textarea
                     rows={2}
                     required={field.required}
@@ -331,15 +426,18 @@ export function EventRegistrationFormCard({
                     className="w-full px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs resize-y"
                   />
                 ) : (
-                  /* Standard text / number / email inputs */
+                  /* Standard inputs (text, number, email, date, time, url, tel) */
                   <input
-                    type={field.type === 'number' ? 'number' : field.type === 'email' ? 'email' : 'text'}
+                    type={field.type}
                     required={field.required}
                     value={formData[field.name] || ''}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder || ''}
                     className="w-full px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
                   />
+                )}
+                {field.helpText && (
+                  <p className="text-[11px] text-slate-400 mt-1">{field.helpText}</p>
                 )}
               </div>
             </div>
