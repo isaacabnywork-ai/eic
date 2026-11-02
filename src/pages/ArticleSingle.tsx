@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useContentItem, useRelated } from '@/hooks/queries';
 import { formatDate } from '@/lib/format';
 import { readingTimeMinutes } from '@/lib/html';
-import { termPath, authorPath } from '@/lib/routes';
+import { termPath } from '@/lib/routes';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { RichContent } from '@/components/content/RichContent';
 import { Img } from '@/components/ui/Img';
@@ -164,31 +164,9 @@ export function ArticleSinglePage() {
             {article.title}
           </h1>
 
-          {/* Desktop Meta line (hidden on mobile so on mobile content comes directly after title) */}
+          {/* Desktop Meta line (Date, Read Time, and Share button) */}
           <div className="hidden sm:flex mt-6 flex-wrap items-center justify-between gap-4 border-y border-line py-3.5 sm:py-4">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted">
-              {article.author && (
-                <>
-                  <Link
-                    to={authorPath(article.author.id)}
-                    className="flex items-center gap-2 font-medium text-ink hover:text-link transition-colors"
-                  >
-                    {article.author.avatar ? (
-                      <img
-                        src={article.author.avatar}
-                        alt={article.author.name}
-                        className="h-7 w-7 rounded-full object-cover border border-line"
-                      />
-                    ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-soft text-link border border-line">
-                        <UserIcon size={14} />
-                      </span>
-                    )}
-                    <span>{article.author.name}</span>
-                  </Link>
-                  <span>•</span>
-                </>
-              )}
+            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted">
               <time dateTime={article.date}>{formatDate(article.date)}</time>
               <span>•</span>
               <span className="inline-flex items-center gap-1">
