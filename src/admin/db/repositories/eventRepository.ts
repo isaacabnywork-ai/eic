@@ -11,6 +11,32 @@ export interface EventFilterParams {
   perPage?: number;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+function ensureUniqueSlug(desiredSlug: string, currentEventId?: string, fallbackTitle?: string): string {
+  const state = adminDb.getState();
+  const base = slugify(desiredSlug) || slugify(fallbackTitle || 'event') || 'event';
+  let candidate = base;
+  let counter = 2;
+
+  while (
+    state.events.some(
+      (e) => e.id !== currentEventId && e.slug.trim().toLowerCase() === candidate.toLowerCase()
+    )
+  ) {
+    candidate = `${base}-${counter}`;
+    counter++;
+  }
+
+  return candidate;
+}
+
 export const eventRepository = {
   getAllEvents(): CustomEvent[] {
     return adminDb.getState().events;
@@ -70,13 +96,19 @@ export const eventRepository = {
   getBySlug(slug: string): CustomEvent | null {
     const state = adminDb.getState();
     const clean = slug.trim().toLowerCase();
-    return state.events.find((e) => e.slug.trim().toLowerCase() === clean) || null;
+    return (
+      state.events.find((e) => e.slug.trim().toLowerCase() === clean) ||
+      state.events.find((e) => e.id.toLowerCase() === clean) ||
+      null
+    );
   },
 
   create(eventData: Omit<CustomEvent, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'createdByEmail'>): CustomEvent {
     const session = authRepository.getCurrentSession();
+    const finalSlug = ensureUniqueSlug(eventData.slug, undefined, eventData.title);
     const newEvent: CustomEvent = {
       ...eventData,
+      slug: finalSlug,
       id: `event-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       createdById: session?.user.id || 'system',
       createdByEmail: session?.user.email || 'system@equipindianchurches.com',
@@ -104,9 +136,18 @@ export const eventRepository = {
     const existing = state.events.find((e) => e.id === id);
     if (!existing) return null;
 
+    const sanitizedUpdates = { ...updates };
+    if (sanitizedUpdates.slug !== undefined) {
+      sanitizedUpdates.slug = ensureUniqueSlug(
+        sanitizedUpdates.slug,
+        id,
+        sanitizedUpdates.title || existing.title,
+      );
+    }
+
     const updated: CustomEvent = {
       ...existing,
-      ...updates,
+      ...sanitizedUpdates,
       updatedAt: new Date().toISOString(),
     };
 

@@ -156,7 +156,10 @@ export function AdminEventEditorPage() {
     }
 
     const finalStatus = targetStatus || status;
-    const finalSlug = slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const finalSlug = (slug.trim() || title)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
 
     const eventPayload: Omit<CustomEvent, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'createdByEmail'> = {
       title: title.trim(),

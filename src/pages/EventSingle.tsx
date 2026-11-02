@@ -127,7 +127,13 @@ export function EventSinglePage() {
   const customEvent = useMemo(() => {
     if (!slug) return null;
     const clean = slug.trim().toLowerCase();
-    return customEvents.find((e) => e.slug.trim().toLowerCase() === clean) || null;
+    return (
+      customEvents.find(
+        (e) =>
+          e.slug.trim().toLowerCase() === clean ||
+          e.id.toLowerCase() === clean
+      ) || null
+    );
   }, [customEvents, slug]);
 
   // Direct DB lookup for full entity relational data (re-evaluates on live sync)
