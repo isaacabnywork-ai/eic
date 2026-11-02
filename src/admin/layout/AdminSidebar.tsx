@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { eventRepository } from '../db/repositories/eventRepository';
 import { formRepository } from '../db/repositories/formRepository';
@@ -95,21 +95,31 @@ export function AdminSidebar({
       >
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-white/10 bg-[#10182E]">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#094899] text-white font-black shadow-md border border-white/15">
-              EIC
+          <Link
+            to="/admin"
+            className="flex items-center gap-3 overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9A62E] rounded-lg"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-md border border-white/15 p-1.5 overflow-hidden group-hover:scale-105 transition-transform">
+              <img
+                src="/favicon.png"
+                alt="Equip Indian Churches Logo"
+                className="h-full w-full object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/logo.png';
+                }}
+              />
             </div>
             {!isCollapsed && (
               <div className="flex flex-col min-w-0">
-                <span className="font-serif text-sm font-bold text-white tracking-wide truncate">
-                  Admin Console
-                </span>
-                <span className="text-[10px] uppercase font-semibold tracking-wider text-[#D9A62E]">
+                <span className="font-serif text-[13px] font-bold text-white tracking-tight truncate leading-tight group-hover:text-white/90 transition-colors" title="Equip Indian Churches">
                   Equip Indian Churches
+                </span>
+                <span className="text-[10px] uppercase font-semibold tracking-wider text-[#D9A62E] mt-0.5">
+                  Admin Console
                 </span>
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Desktop Collapse Toggle */}
           <button
@@ -187,8 +197,26 @@ export function AdminSidebar({
         <div className="p-3 border-t border-white/10 bg-[#10182E]/70">
           <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#094899] text-white text-xs font-bold">
-                {user?.name?.charAt(0) || 'U'}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white p-1 shadow-xs overflow-hidden">
+                {user?.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/favicon.png';
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="/favicon.png"
+                    alt="Equip Indian Churches"
+                    className="h-full w-full object-contain"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/logo.png';
+                    }}
+                  />
+                )}
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0">

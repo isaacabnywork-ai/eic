@@ -69,11 +69,25 @@ export function AdminTopbar({
 
         {/* Profile Pill */}
         <div className="flex items-center gap-2.5 pl-3 border-l border-[#D0E1F0]">
-          <div className="h-8 w-8 rounded-full bg-[#094899] text-white flex items-center justify-center text-xs font-bold shadow-xs overflow-hidden">
+          <div className="h-8 w-8 rounded-full bg-white border border-[#D0E1F0] flex items-center justify-center shadow-xs overflow-hidden p-1">
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/favicon.png';
+                }}
+              />
             ) : (
-              user?.name?.charAt(0) || 'A'
+              <img
+                src="/favicon.png"
+                alt="Equip Indian Churches"
+                className="h-full w-full object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/logo.png';
+                }}
+              />
             )}
           </div>
           <div className="hidden md:flex flex-col text-left">
