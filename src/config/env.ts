@@ -33,9 +33,11 @@ export const env = {
   newsletterEmailField: str(raw.VITE_NEWSLETTER_EMAIL_FIELD) || 'email',
   contactEmail: str(raw.VITE_CONTACT_EMAIL),
   social: {
-    youtube: str(raw.VITE_SOCIAL_YOUTUBE),
-    facebook: str(raw.VITE_SOCIAL_FACEBOOK),
-    instagram: str(raw.VITE_SOCIAL_INSTAGRAM),
-    x: str(raw.VITE_SOCIAL_X),
+    youtube: str(raw.VITE_SOCIAL_YOUTUBE) || 'https://www.youtube.com/@EquipIndianChurches',
+    facebook: str(raw.VITE_SOCIAL_FACEBOOK) || 'https://www.facebook.com/equipindianchurches/',
+    instagram: str(raw.VITE_SOCIAL_INSTAGRAM) || 'https://www.instagram.com/equipindianchurches/',
+    x: str(raw.VITE_SOCIAL_X) || 'https://x.com/equipindian',
+    spotify: str(raw.VITE_SOCIAL_SPOTIFY) || 'https://open.spotify.com/show/7LiuOHVkEbjnfOsa2cn8OR',
+    whatsapp: str(raw.VITE_SOCIAL_WHATSAPP) || 'https://www.whatsapp.com/channel/0029Vaf0eQ3BA1expVm0gT3a',
   },
 } as const;

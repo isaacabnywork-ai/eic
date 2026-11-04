@@ -227,5 +227,7 @@ export const socialLinks = (
     { id: 'facebook', label: 'Facebook', url: env.social.facebook },
     { id: 'instagram', label: 'Instagram', url: env.social.instagram },
     { id: 'x', label: 'X (Twitter)', url: env.social.x },
+    { id: 'spotify', label: 'Spotify', url: env.social.spotify },
+    { id: 'whatsapp', label: 'WhatsApp Channel', url: env.social.whatsapp },
   ] as const
 ).filter((s) => s.url);

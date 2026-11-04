@@ -6,6 +6,8 @@ import {
   InstagramIcon,
   XIcon,
   YoutubeIcon,
+  SpotifyIcon,
+  WhatsAppIcon,
 } from '@/components/ui/Icons';
 
 export function Footer() {
@@ -47,6 +49,8 @@ export function Footer() {
                   {s.id === 'facebook' && <FacebookIcon size={17} />}
                   {s.id === 'instagram' && <InstagramIcon size={17} />}
                   {s.id === 'x' && <XIcon size={17} />}
+                  {s.id === 'spotify' && <SpotifyIcon size={17} />}
+                  {s.id === 'whatsapp' && <WhatsAppIcon size={17} />}
                 </a>
               ))}
             </div>
