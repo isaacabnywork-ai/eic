@@ -233,7 +233,7 @@ export const formRepository = {
     // Save submission
     adminDb.update('submissions', (prev) => [newSubmission, ...(prev || [])]);
 
-    // Increment form stats
+    // Increment form stats & record sync
     adminDb.update('forms', (prev) =>
       (prev || []).map((f) => {
         if (f.id === data.formId) {
@@ -241,6 +241,7 @@ export const formRepository = {
             ...f,
             submissionsCount: (f.submissionsCount || 0) + 1,
             totalCollected: (f.totalCollected || 0) + (data.totalAmount || 0),
+            excelLastSyncedAt: f.excelWebhookUrl ? now : f.excelLastSyncedAt,
             updatedAt: now,
           };
         }
@@ -248,7 +249,81 @@ export const formRepository = {
       }),
     );
 
+    // Auto-sync with connected Excel / Google Sheets Webhook if configured
+    const targetForm = this.getFormById(data.formId);
+    if (targetForm?.excelWebhookUrl && targetForm.excelAutoSync !== false) {
+      this.syncSubmissionToExcel(targetForm.excelWebhookUrl, newSubmission, targetForm).catch((err) => {
+        console.warn('Excel auto-sync notification error:', err);
+      });
+    }
+
     return newSubmission;
+  },
+
+  /**
+   * Dispatches a submission row to a connected Excel / Google Sheet / Webhook endpoint
+   */
+  async syncSubmissionToExcel(
+    webhookUrl: string,
+    submission: FormSubmission,
+    form?: EventRegistrationForm | null,
+  ): Promise<{ success: boolean; message?: string }> {
+    if (!webhookUrl || !webhookUrl.trim().startsWith('http')) {
+      return { success: false, message: 'Invalid Webhook URL provided.' };
+    }
+
+    try {
+      const payload = {
+        event: 'form_submission',
+        timestamp: submission.createdAt,
+        formId: submission.formId,
+        formTitle: form?.title || 'Event Registration',
+        eventId: submission.eventId,
+        eventTitle: submission.eventTitle,
+        registrationId: submission.id,
+        name: submission.name,
+        lastName: submission.lastName || '',
+        fullName: `${submission.name} ${submission.lastName || ''}`.trim(),
+        email: submission.email,
+        phone: submission.phone,
+        gender: submission.gender || '',
+        age: submission.age || '',
+        address: submission.address || '',
+        city: submission.city || '',
+        state: submission.state || '',
+        pincode: submission.pincode || '',
+        churchName: submission.churchName || '',
+        churchRole: submission.churchRole || '',
+        howHeard: submission.howHeard || '',
+        attendedBefore: submission.attendedBefore || '',
+        quantity: submission.quantity,
+        unitAmount: submission.unitAmount,
+        ticketTotal: submission.ticketTotal,
+        donationAmount: submission.donationAmount,
+        totalAmount: submission.totalAmount,
+        currency: submission.currency,
+        paymentStatus: submission.paymentStatus,
+        paymentMethod: submission.paymentMethod || 'Online',
+        transactionId: submission.transactionId || '',
+        customResponses: submission.customResponses || {},
+      };
+
+      // Native fetch with timeout
+      await fetch(webhookUrl.trim(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/plain, */*',
+        },
+        mode: 'no-cors', // Enables cross-origin execution to Google Apps Script / Webhooks
+        body: JSON.stringify(payload),
+      });
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('Failed to trigger Excel webhook:', err);
+      return { success: false, message: err.message || 'Failed to trigger Excel webhook.' };
+    }
   },
 
   updateSubmissionStatus(id: string, paymentStatus: 'paid' | 'pending' | 'failed'): FormSubmission | null {

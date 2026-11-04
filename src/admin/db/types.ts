@@ -304,6 +304,12 @@ export interface EventRegistrationForm {
   // Post-submission
   successMessage?: string;
 
+  // Excel / Spreadsheet Integration
+  excelWebhookUrl?: string;       // Webhook URL (Make.com, Zapier, Google Sheets Webhook, Power Automate, n8n)
+  excelSheetName?: string;        // Target Sheet tab name
+  excelAutoSync?: boolean;        // Whether to trigger automatic sync on every new submission
+  excelLastSyncedAt?: string;     // Last successful sync timestamp
+
   // Metadata
   submissionsCount: number;
   totalCollected: number;

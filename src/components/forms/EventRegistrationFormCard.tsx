@@ -8,6 +8,24 @@ interface EventRegistrationFormCardProps {
   onSuccess?: (submission: FormSubmission) => void;
 }
 
+const COUNTRY_DIAL_CODES = [
+  { code: '+91', country: 'IN', label: 'India (+91)' },
+  { code: '+1', country: 'US', label: 'USA / Canada (+1)' },
+  { code: '+44', country: 'UK', label: 'UK (+44)' },
+  { code: '+971', country: 'AE', label: 'UAE (+971)' },
+  { code: '+65', country: 'SG', label: 'Singapore (+65)' },
+  { code: '+61', country: 'AU', label: 'Australia (+61)' },
+  { code: '+977', country: 'NP', label: 'Nepal (+977)' },
+  { code: '+94', country: 'LK', label: 'Sri Lanka (+94)' },
+  { code: '+880', country: 'BD', label: 'Bangladesh (+880)' },
+  { code: '+974', country: 'QA', label: 'Qatar (+974)' },
+  { code: '+966', country: 'SA', label: 'Saudi Arabia (+966)' },
+  { code: '+965', country: 'KW', label: 'Kuwait (+965)' },
+  { code: '+968', country: 'OM', label: 'Oman (+968)' },
+  { code: '+60', country: 'MY', label: 'Malaysia (+60)' },
+  { code: '+64', country: 'NZ', label: 'New Zealand (+64)' },
+];
+
 export function EventRegistrationFormCard({
   form,
   isPreview = false,
@@ -15,6 +33,8 @@ export function EventRegistrationFormCard({
 }: EventRegistrationFormCardProps) {
   const [quantity, setQuantity] = useState(1);
   const [donation, setDonation] = useState<number>(0);
+  const [phoneCountryCode, setPhoneCountryCode] = useState('+91');
+  const [phoneNumberDigits, setPhoneNumberDigits] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedData, setSubmittedData] = useState<FormSubmission | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -47,11 +67,25 @@ export function EventRegistrationFormCard({
     // Validate required fields
     const enabledFields = (form.fields || []).filter((f) => f.enabled);
     for (const field of enabledFields) {
-      if (field.required && !formData[field.name]?.trim()) {
+      if (field.name === 'phone' || field.type === 'tel') {
+        const digits = phoneNumberDigits.trim().replace(/\D/g, '');
+        if (field.required && !digits) {
+          setErrorMsg(`Please enter a valid 10-digit mobile number for: ${field.label}`);
+          return;
+        }
+        if (digits && digits.length !== 10) {
+          setErrorMsg(`Mobile number must be exactly 10 digits (currently ${digits.length} digits entered).`);
+          return;
+        }
+      } else if (field.required && !formData[field.name]?.trim()) {
         setErrorMsg(`Please fill in the required field: ${field.label}`);
         return;
       }
     }
+
+    const fullPhoneNumber = phoneNumberDigits.trim()
+      ? `${phoneCountryCode} ${phoneNumberDigits.trim().replace(/\D/g, '')}`
+      : formData.phone;
 
     // Extract custom question responses
     const standardKeys = [
@@ -88,7 +122,7 @@ export function EventRegistrationFormCard({
         name: formData.name || 'Sample Delegate',
         lastName: formData.lastName || '',
         email: formData.email || 'delegate@example.com',
-        phone: formData.phone || '9876543210',
+        phone: fullPhoneNumber || '9876543210',
         gender: formData.gender,
         age: formData.age,
         address: formData.address,
@@ -126,7 +160,7 @@ export function EventRegistrationFormCard({
         name: formData.name,
         lastName: formData.lastName,
         email: formData.email,
-        phone: formData.phone,
+        phone: fullPhoneNumber || formData.phone,
         gender: formData.gender,
         age: formData.age,
         address: formData.address,
@@ -331,20 +365,49 @@ export function EventRegistrationFormCard({
                 {field.label} {field.required && <span className="text-rose-500 font-bold">*</span>}
               </label>
               <div className="sm:col-span-8">
-                {/* Phone Split Input */}
-                {field.name === 'phone' ? (
-                  <div className="flex rounded-md border border-slate-200 overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
-                    <div className="bg-slate-50 border-r border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 flex items-center shrink-0">
-                      IN +91
+                {/* Phone Split Input with Country Code Selector & Strict 10-digit limit */}
+                {field.name === 'phone' || field.type === 'tel' ? (
+                  <div className="space-y-1">
+                    <div className="flex rounded-md border border-slate-200 overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+                      <select
+                        value={phoneCountryCode}
+                        onChange={(e) => setPhoneCountryCode(e.target.value)}
+                        className="bg-slate-50 border-r border-slate-200 px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none cursor-pointer shrink-0 hover:bg-slate-100 transition"
+                        title="Select Country Dial Code"
+                      >
+                        {COUNTRY_DIAL_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.country} ({c.code})
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={10}
+                        required={field.required}
+                        value={phoneNumberDigits}
+                        onChange={(e) => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          setPhoneNumberDigits(digitsOnly);
+                          setFormData({
+                            ...formData,
+                            [field.name]: `${phoneCountryCode} ${digitsOnly}`.trim(),
+                          });
+                        }}
+                        placeholder={field.placeholder || '10-digit mobile number'}
+                        className="flex-1 px-3 py-1.5 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none tracking-wider"
+                      />
+                      <div className="flex items-center pr-3 text-[11px] font-mono font-medium text-slate-400 select-none shrink-0">
+                        {phoneNumberDigits.length}/10
+                      </div>
                     </div>
-                    <input
-                      type="tel"
-                      required={field.required}
-                      value={formData.phone || ''}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder={field.placeholder || ''}
-                      className="flex-1 px-3 py-1.5 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
-                    />
+                    {phoneNumberDigits && phoneNumberDigits.length < 10 && (
+                      <p className="text-[11px] text-amber-600 font-medium">
+                        Enter remaining {10 - phoneNumberDigits.length} digits (total 10 digits required)
+                      </p>
+                    )}
                   </div>
                 ) : field.type === 'select' ? (
                   /* Select Dropdown */

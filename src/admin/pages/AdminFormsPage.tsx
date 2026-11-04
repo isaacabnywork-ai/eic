@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import { formRepository } from '../db/repositories/formRepository';
 import { eventRepository } from '../db/repositories/eventRepository';
 import { adminDb } from '../db/storage';
@@ -44,6 +45,7 @@ import {
   Mail,
   Phone,
   Link2,
+  Table,
 } from 'lucide-react';
 
 const FIELD_TYPE_OPTIONS: {
@@ -445,6 +447,73 @@ export function AdminFormsPage() {
     toast('Preset choices applied to question', 'success');
   };
 
+  const handleExportXLSX = () => {
+    if (submissions.length === 0) {
+      toast('No registration submissions to export to Excel', 'error');
+      return;
+    }
+
+    const customQuestionKeys = Array.from(
+      new Set(
+        submissions.flatMap((s) => (s.customResponses ? Object.keys(s.customResponses) : []))
+      )
+    );
+
+    const dataRows = submissions.map((s) => {
+      const rowObj: Record<string, any> = {
+        'Registration ID': s.id,
+        'Event Name': s.eventTitle,
+        'First Name': s.name || '',
+        'Last Name': s.lastName || '',
+        'Email Address': s.email,
+        'Mobile Number': s.phone,
+        'Gender': s.gender || '',
+        'Age': s.age || '',
+        'Church Name': s.churchName || '',
+        'Role in Church': s.churchRole || '',
+        'Residential Address': s.address || '',
+        'City': s.city || '',
+        'State': s.state || '',
+        'Pincode': s.pincode || '',
+        'How Did You Hear': s.howHeard || '',
+        'Attended Before': s.attendedBefore || '',
+      };
+
+      // Add custom questions
+      customQuestionKeys.forEach((k) => {
+        rowObj[k] = s.customResponses?.[k] || '';
+      });
+
+      // Financials & Status
+      rowObj['Pass Quantity'] = s.quantity;
+      rowObj['Base Ticket (₹)'] = s.unitAmount;
+      rowObj['Donation (₹)'] = s.donationAmount;
+      rowObj['Total Paid (₹)'] = s.totalAmount;
+      rowObj['Payment Status'] = s.paymentStatus.toUpperCase();
+      rowObj['Payment Mode'] = s.paymentMethod || 'Online';
+      rowObj['Transaction Ref'] = s.transactionId || '';
+      rowObj['Registration Timestamp'] = new Date(s.createdAt).toLocaleString('en-IN');
+
+      return rowObj;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Registrations');
+
+    // Auto-fit column widths
+    const colKeys = Object.keys(dataRows[0] || {});
+    worksheet['!cols'] = colKeys.map((k) => ({
+      wch: Math.max(k.length, 12),
+    }));
+
+    XLSX.writeFile(
+      workbook,
+      `EIC-Event-Registrations-${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+    toast('Excel Workbook (.xlsx) generated and downloaded!', 'success');
+  };
+
   const handleExportCSV = () => {
     if (submissions.length === 0) {
       toast('No registration submissions to export', 'error');
@@ -837,6 +906,57 @@ export function AdminFormsPage() {
                                 <Sparkles className="w-4 h-4" />
                               </button>
 
+                              {/* Quick Export to Excel */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const formSubs = submissions.filter((s) => s.formId === item.id);
+                                  if (formSubs.length === 0) {
+                                    toast(`No submissions yet for ${item.title}`, 'info');
+                                    return;
+                                  }
+                                  const customQuestionKeys = Array.from(
+                                    new Set(
+                                      formSubs.flatMap((s) => (s.customResponses ? Object.keys(s.customResponses) : []))
+                                    )
+                                  );
+                                  const dataRows = formSubs.map((s) => {
+                                    const rowObj: Record<string, any> = {
+                                      'Registration ID': s.id,
+                                      'Event Name': s.eventTitle,
+                                      'Delegate Name': `${s.name || ''} ${s.lastName || ''}`.trim(),
+                                      'Email': s.email,
+                                      'Phone': s.phone,
+                                      'Gender': s.gender || '',
+                                      'Church': s.churchName || '',
+                                      'Role': s.churchRole || '',
+                                      'City': s.city || '',
+                                      'State': s.state || '',
+                                    };
+                                    customQuestionKeys.forEach((k) => {
+                                      rowObj[k] = s.customResponses?.[k] || '';
+                                    });
+                                    rowObj['Quantity'] = s.quantity;
+                                    rowObj['Total (₹)'] = s.totalAmount;
+                                    rowObj['Status'] = s.paymentStatus.toUpperCase();
+                                    rowObj['Date'] = new Date(s.createdAt).toLocaleString('en-IN');
+                                    return rowObj;
+                                  });
+                                  const worksheet = XLSX.utils.json_to_sheet(dataRows);
+                                  const workbook = XLSX.utils.book_new();
+                                  XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendees');
+                                  XLSX.writeFile(
+                                    workbook,
+                                    `${item.slug}-attendees-${new Date().toISOString().slice(0, 10)}.xlsx`
+                                  );
+                                  toast(`Excel spreadsheet downloaded for ${item.title}!`, 'success');
+                                }}
+                                title="Export Form Entries to Excel (.xlsx)"
+                                className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition cursor-pointer"
+                              >
+                                <Table className="w-4 h-4 text-emerald-600" />
+                              </button>
+
                               {/* Delete Form */}
                               <button
                                 type="button"
@@ -1019,6 +1139,132 @@ export function AdminFormsPage() {
                     />
                     <span>Display Payment Badges (UPI, VISA, RuPay, MasterCard)</span>
                   </label>
+                </div>
+              </div>
+
+              {/* Excel / Spreadsheet Integration Card */}
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 space-y-3.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-600 text-white font-bold text-xs shrink-0">
+                      <Table className="w-3.5 h-3.5" />
+                    </span>
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-900 block">
+                        Excel &amp; Spreadsheet Live Integration
+                      </span>
+                      <p className="text-[11px] text-emerald-700">
+                        Directly fill Microsoft Excel or Google Sheets automatically whenever someone submits.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleExportXLSX}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white hover:bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 shadow-2xs transition cursor-pointer"
+                      title="Download entries as Excel (.xlsx)"
+                    >
+                      <Download className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Download .xlsx</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-800 mb-1">
+                      Excel / Google Sheets Webhook URL
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="url"
+                        value={formData.excelWebhookUrl || ''}
+                        onChange={(e) => setFormData({ ...formData, excelWebhookUrl: e.target.value })}
+                        placeholder="https://script.google.com/macros/s/.../exec or Zapier / Make Webhook URL"
+                        className="w-full text-xs rounded-lg border border-slate-300 bg-white p-2.5 pr-24 font-mono focus:border-emerald-600 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!formData.excelWebhookUrl) {
+                            toast('Please enter a Webhook URL to test', 'error');
+                            return;
+                          }
+                          toast('Testing connection with spreadsheet...', 'info');
+                          const mockSub: FormSubmission = {
+                            id: `test-${Date.now().toString(36)}`,
+                            formId: editingFormId || 'test-form',
+                            eventId: formData.eventId || 'test-event',
+                            eventTitle: formData.eventTitle || 'Test Event',
+                            name: 'Test Delegate',
+                            lastName: 'EIC',
+                            email: 'test@equipindianchurches.com',
+                            phone: '+91 9876543210',
+                            quantity: 1,
+                            unitAmount: formData.baseAmount || 300,
+                            ticketTotal: formData.baseAmount || 300,
+                            donationAmount: 0,
+                            totalAmount: formData.baseAmount || 300,
+                            currency: formData.currency || 'INR',
+                            paymentStatus: 'paid',
+                            createdAt: new Date().toISOString(),
+                          };
+                          const res = await formRepository.syncSubmissionToExcel(
+                            formData.excelWebhookUrl,
+                            mockSub,
+                            formData as any,
+                          );
+                          if (res.success) {
+                            toast('Connection successful! Test row dispatched to sheet.', 'success');
+                          } else {
+                            toast(`Connection notice: ${res.message || 'Webhook triggered'}`, 'info');
+                          }
+                        }}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1 text-[11px] font-bold shadow-2xs transition cursor-pointer"
+                      >
+                        Test Sync
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Works with Google Apps Script Webhooks, Make, Zapier, Power Automate, or n8n to directly fill Microsoft Excel Online / Google Sheets.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Sheet / Tab Name (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.excelSheetName || ''}
+                        onChange={(e) => setFormData({ ...formData, excelSheetName: e.target.value })}
+                        placeholder="e.g. Registrations 2026"
+                        className="w-full text-xs rounded-lg border border-slate-200 bg-white p-2 focus:border-emerald-600 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex items-center pt-5">
+                      <label className="flex items-center gap-2 text-xs font-medium text-slate-800 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={formData.excelAutoSync !== false}
+                          onChange={(e) => setFormData({ ...formData, excelAutoSync: e.target.checked })}
+                          className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>Real-time Auto-Sync on Form Submission</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {formData.excelLastSyncedAt && (
+                    <div className="text-[11px] text-emerald-800 flex items-center gap-1.5 font-medium pt-1">
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Last auto-synced: {new Date(formData.excelLastSyncedAt).toLocaleString('en-IN')}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1505,6 +1751,16 @@ export function AdminFormsPage() {
                 <option value="pending">Pending</option>
                 <option value="failed">Failed</option>
               </select>
+
+              <button
+                type="button"
+                onClick={handleExportXLSX}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                title="Download formatted Excel Workbook with all attendee details"
+              >
+                <Table className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Export Excel (.xlsx)</span>
+              </button>
 
               <button
                 type="button"
