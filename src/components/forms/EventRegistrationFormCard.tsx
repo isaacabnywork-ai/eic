@@ -403,11 +403,6 @@ export function EventRegistrationFormCard({
                         {phoneNumberDigits.length}/10
                       </div>
                     </div>
-                    {phoneNumberDigits && phoneNumberDigits.length < 10 && (
-                      <p className="text-[11px] text-amber-600 font-medium">
-                        Enter remaining {10 - phoneNumberDigits.length} digits (total 10 digits required)
-                      </p>
-                    )}
                   </div>
                 ) : field.type === 'select' ? (
                   /* Select Dropdown */
