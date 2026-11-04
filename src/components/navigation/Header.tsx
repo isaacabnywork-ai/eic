@@ -244,13 +244,10 @@ export function Header({ onOpenMenu }: HeaderProps = {}) {
 
                       {/* Bottom CTA bar */}
                       {item.mega.cta && (
-                        <div className="mt-6 border-t border-line/80 pt-3.5 flex items-center justify-between text-xs">
-                          <span className="text-muted hidden sm:inline">
-                            Sound biblical resources freely available
-                          </span>
+                        <div className="mt-6 border-t border-line/80 pt-3.5 flex items-center justify-end text-xs">
                           <Link
                             to={item.mega.cta.to}
-                            className="font-semibold text-ink hover:text-accent-text hover:underline transition-colors ml-auto inline-flex items-center gap-1"
+                            className="font-semibold text-ink hover:text-accent-text hover:underline transition-colors inline-flex items-center gap-1"
                           >
                             <span>{item.mega.cta.label}</span>
                             <span>→</span>
