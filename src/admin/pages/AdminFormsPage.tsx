@@ -46,6 +46,7 @@ import {
   Phone,
   Link2,
   Table,
+  ChevronRight,
 } from 'lucide-react';
 
 const FIELD_TYPE_OPTIONS: {
@@ -250,7 +251,7 @@ export function AdminFormsPage() {
     setSubmissions(
       formRepository.getAllSubmissions({
         search: submissionSearch,
-        formId: submissionFormFilter,
+        formId: submissionFormFilter === '__all_entries__' ? 'all' : submissionFormFilter,
         status: submissionStatusFilter as any,
       }),
     );
@@ -1714,160 +1715,295 @@ export function AdminFormsPage() {
       {/* TAB 3: REGISTRATIONS & ATTENDEES SUBMISSIONS */}
       {activeTab === 'submissions' && (
         <div className="space-y-4">
-          {/* Submissions Filter & Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="search"
-                value={submissionSearch}
-                onChange={(e) => setSubmissionSearch(e.target.value)}
-                placeholder="Search by attendee name, email, phone, church..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-[#094899]"
-              />
-            </div>
+          {/* Form Selection Level / Breadcrumb Banner */}
+          {submissionFormFilter === 'all' ? (
+            /* LEVEL 1: DIRECTORY OF FORMS WITH "SEE ENTRIES" BUTTONS */
+            <div className="space-y-4">
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Registration Entries by Form</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Select a registration form below to inspect its attendees, delegate responses, and export Excel sheets.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSubmissionFormFilter('__all_entries__')}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  >
+                    <Users className="w-3.5 h-3.5 text-slate-500" />
+                    <span>View All Combined ({submissions.length} Entries)</span>
+                  </button>
+                </div>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-              <select
-                value={submissionFormFilter}
-                onChange={(e) => setSubmissionFormFilter(e.target.value)}
-                className="text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">All Forms</option>
-                {forms.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.title} ({f.eventTitle})
-                  </option>
-                ))}
-              </select>
+              {/* Grid of Registration Forms */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {forms.map((f) => {
+                  const formSubmissions = formRepository.getAllSubmissions({ formId: f.id });
+                  const totalPaid = formSubmissions
+                    .filter((s) => s.paymentStatus === 'paid')
+                    .reduce((sum, s) => sum + (s.totalAmount || 0), 0);
 
-              <select
-                value={submissionStatusFilter}
-                onChange={(e) => setSubmissionStatusFilter(e.target.value)}
-                className="text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-700 focus:outline-none cursor-pointer"
-              >
-                <option value="all">All Payment Statuses</option>
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
-
-              <button
-                type="button"
-                onClick={handleExportXLSX}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
-                title="Download formatted Excel Workbook with all attendee details"
-              >
-                <Table className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Export Excel (.xlsx)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleExportCSV}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
-                <span>Export CSV</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Submissions Table */}
-          {submissions.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-              <Users className="mx-auto h-12 w-12 text-slate-300 mb-3" />
-              <h3 className="text-base font-semibold text-slate-800">No registrations found</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Registrations submitted through your event forms will be recorded here automatically.
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs sm:text-sm text-slate-700">
-                  <thead className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    <tr>
-                      <th className="py-3 px-4">Delegate Name</th>
-                      <th className="py-3 px-4">Contact Info</th>
-                      <th className="py-3 px-4">Church & Role</th>
-                      <th className="py-3 px-4">Event</th>
-                      <th className="py-3 px-4">Amount</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4 text-right">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {submissions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-slate-50/50 transition">
-                        <td className="py-3.5 px-4">
-                          <span className="font-bold text-slate-900 block">
-                            {sub.name} {sub.lastName || ''}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-mono">{sub.id}</span>
-                        </td>
-
-                        <td className="py-3.5 px-4">
-                          <div className="text-slate-800 font-medium">{sub.email}</div>
-                          <div className="text-slate-500 text-[11px]">{sub.phone}</div>
-                        </td>
-
-                        <td className="py-3.5 px-4">
-                          <div className="font-medium text-slate-800">{sub.churchName || '—'}</div>
-                          <div className="text-slate-500 text-[11px]">{sub.churchRole || '—'}</div>
-                        </td>
-
-                        <td className="py-3.5 px-4 font-medium text-slate-800">
-                          <span className="truncate max-w-[160px] block">{sub.eventTitle}</span>
-                        </td>
-
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                          <span>{sub.currency === 'INR' ? '₹' : sub.currency} {sub.totalAmount.toFixed(2)}</span>
-                          {sub.donationAmount > 0 && (
-                            <div className="text-[10px] text-emerald-600 font-normal">
-                              (+₹{sub.donationAmount} donation)
-                            </div>
-                          )}
-                        </td>
-
-                        <td className="py-3.5 px-4">
+                  return (
+                    <div
+                      key={f.id}
+                      className="bg-white rounded-xl border border-slate-200/80 shadow-2xs hover:shadow-md transition-all p-5 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
                           <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                              sub.paymentStatus === 'paid'
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              f.status === 'active'
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : sub.paymentStatus === 'pending'
+                                : f.status === 'draft'
                                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >
-                            <span className="capitalize">{sub.paymentStatus}</span>
+                            <span className="capitalize">{f.status}</span>
                           </span>
-                        </td>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            {f.baseAmount === 0 ? 'Free' : `${f.currencySymbol} ${f.baseAmount}`}
+                          </span>
+                        </div>
 
-                        <td className="py-3.5 px-4 text-slate-500 text-xs">
-                          {new Date(sub.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </td>
+                        <h4 className="text-base font-bold text-slate-900 line-clamp-1">{f.title}</h4>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 mb-4">
+                          <Calendar className="w-3.5 h-3.5 text-[#094899] shrink-0" />
+                          <span className="truncate">{f.eventTitle}</span>
+                        </div>
 
-                        <td className="py-3.5 px-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedSubmission(sub)}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-slate-500" />
-                            <span>View</span>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        <div className="grid grid-cols-2 gap-2 bg-slate-50 rounded-lg p-2.5 text-xs mb-4">
+                          <div>
+                            <div className="text-[11px] text-slate-400">Total Entries</div>
+                            <div className="text-sm font-bold text-slate-800">{formSubmissions.length} delegates</div>
+                          </div>
+                          <div>
+                            <div className="text-[11px] text-slate-400">Revenue</div>
+                            <div className="text-sm font-bold text-emerald-700 font-mono">
+                              ₹ {totalPaid.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSubmissionFormFilter(f.id);
+                          }}
+                          className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#094899] hover:bg-[#073877] text-white px-3.5 py-2 text-xs font-bold shadow-2xs transition cursor-pointer"
+                        >
+                          <Users className="w-4 h-4" />
+                          <span>See Entries ({formSubmissions.length})</span>
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
+          ) : (
+            /* LEVEL 2: DETAILED SUBMISSIONS TABLE FOR SELECTED FORM */
+            <div className="space-y-4">
+              {/* Back button and Active Form Header Banner */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmissionFormFilter('all');
+                      setSubmissionSearch('');
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  >
+                    <span>← Back to All Forms</span>
+                  </button>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-slate-900">
+                        {submissionFormFilter === '__all_entries__'
+                          ? 'All Form Submissions'
+                          : forms.find((f) => f.id === submissionFormFilter)?.title || 'Registration Entries'}
+                      </h3>
+                      {submissionFormFilter !== '__all_entries__' && (
+                        <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                          {forms.find((f) => f.id === submissionFormFilter)?.eventTitle}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Showing {submissions.length} registration {submissions.length === 1 ? 'entry' : 'entries'}.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleExportXLSX}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                    title="Download formatted Excel Workbook with all attendee details"
+                  >
+                    <Table className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Export Excel (.xlsx)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Export CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search & Filter within this form */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="search"
+                    value={submissionSearch}
+                    onChange={(e) => setSubmissionSearch(e.target.value)}
+                    placeholder="Search attendee, email, phone..."
+                    className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-[#094899]"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                  <select
+                    value={submissionFormFilter}
+                    onChange={(e) => setSubmissionFormFilter(e.target.value)}
+                    className="text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-700 focus:outline-none cursor-pointer"
+                  >
+                    <option value="__all_entries__">All Combined Entries</option>
+                    {forms.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.title} ({f.eventTitle})
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={submissionStatusFilter}
+                    onChange={(e) => setSubmissionStatusFilter(e.target.value)}
+                    className="text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-700 focus:outline-none cursor-pointer"
+                  >
+                    <option value="all">All Payment Statuses</option>
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Submissions Table */}
+              {submissions.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
+                  <Users className="mx-auto h-12 w-12 text-slate-300 mb-3" />
+                  <h3 className="text-base font-semibold text-slate-800">No registrations found</h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                    {submissionSearch
+                      ? 'No entries match your search query.'
+                      : 'No delegate submissions have been recorded for this form yet.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm text-slate-700">
+                      <thead className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <tr>
+                          <th className="py-3 px-4">Delegate Name</th>
+                          <th className="py-3 px-4">Contact Info</th>
+                          <th className="py-3 px-4">Church & Role</th>
+                          <th className="py-3 px-4">Event</th>
+                          <th className="py-3 px-4">Amount</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4">Date</th>
+                          <th className="py-3 px-4 text-right">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {submissions.map((sub) => (
+                          <tr key={sub.id} className="hover:bg-slate-50/50 transition">
+                            <td className="py-3.5 px-4">
+                              <span className="font-bold text-slate-900 block">
+                                {sub.name} {sub.lastName || ''}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">{sub.id}</span>
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <div className="text-slate-800 font-medium">{sub.email}</div>
+                              <div className="text-slate-500 text-[11px]">{sub.phone}</div>
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <div className="font-medium text-slate-800">{sub.churchName || '—'}</div>
+                              <div className="text-slate-500 text-[11px]">{sub.churchRole || '—'}</div>
+                            </td>
+
+                            <td className="py-3.5 px-4 font-medium text-slate-800">
+                              <span className="truncate max-w-[160px] block">{sub.eventTitle}</span>
+                            </td>
+
+                            <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                              <span>{sub.currency === 'INR' ? '₹' : sub.currency} {sub.totalAmount.toFixed(2)}</span>
+                              {sub.donationAmount > 0 && (
+                                <div className="text-[10px] text-emerald-600 font-normal">
+                                  (+₹{sub.donationAmount} donation)
+                                </div>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                                  sub.paymentStatus === 'paid'
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : sub.paymentStatus === 'pending'
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                }`}
+                              >
+                                <span className="capitalize">{sub.paymentStatus}</span>
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-4 text-slate-500 text-xs">
+                              {new Date(sub.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </td>
+
+                            <td className="py-3.5 px-4 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedSubmission(sub)}
+                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-slate-500" />
+                                <span>View</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
