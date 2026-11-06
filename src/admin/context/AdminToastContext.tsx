@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -51,30 +52,37 @@ export function AdminToastProvider({ children }: { children: React.ReactNode }) 
     <ToastContext.Provider value={{ toasts, toast: showToast, showToast, removeToast, success, error, warning, info }}>
       {children}
       {/* Toast container (Top Right) */}
-      <div className="fixed top-5 right-5 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      <div className="fixed top-5 right-5 z-[100] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-xl text-xs sm:text-sm animate-in slide-in-from-top-2 duration-200 ${
+            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-xl text-xs sm:text-sm animate-in slide-in-from-top-2 duration-200 backdrop-blur-md ${
               t.type === 'success'
-                ? 'bg-emerald-950/95 border-emerald-500/40 text-emerald-100'
+                ? 'bg-emerald-600 border-emerald-500 text-white shadow-emerald-950/20'
                 : t.type === 'error'
-                ? 'bg-rose-950/95 border-rose-500/40 text-rose-100'
+                ? 'bg-rose-600 border-rose-500 text-white shadow-rose-950/20'
                 : t.type === 'warning'
-                ? 'bg-amber-950/95 border-amber-500/40 text-amber-100'
-                : 'bg-slate-900/95 border-slate-700 text-slate-100'
+                ? 'bg-amber-600 border-amber-500 text-white shadow-amber-950/20'
+                : 'bg-[#182541] border-slate-700 text-white shadow-slate-950/20'
             }`}
           >
+            <div className="shrink-0 mt-0.5">
+              {t.type === 'success' && <CheckCircle2 className="w-5 h-5 text-white" />}
+              {t.type === 'error' && <AlertCircle className="w-5 h-5 text-white" />}
+              {t.type === 'warning' && <AlertTriangle className="w-5 h-5 text-white" />}
+              {t.type === 'info' && <Info className="w-5 h-5 text-white" />}
+            </div>
             <div className="flex-1 min-w-0">
-              {t.title && <p className="font-bold mb-0.5">{t.title}</p>}
-              <p className="leading-snug">{t.message}</p>
+              {t.title && <p className="font-bold text-white mb-0.5">{t.title}</p>}
+              <p className="leading-snug text-white font-medium">{t.message}</p>
             </div>
             <button
               type="button"
               onClick={() => removeToast(t.id)}
-              className="text-white/60 hover:text-white p-0.5 cursor-pointer"
+              className="text-white/80 hover:text-white hover:bg-white/10 rounded-md p-1 transition cursor-pointer shrink-0"
+              aria-label="Dismiss toast"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
         ))}
