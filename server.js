@@ -18,6 +18,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -31,6 +32,10 @@ const INDEX_HTML = path.join(DIST_DIR, 'index.html');
 const DATA_DIR = path.resolve(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'admin_db.json');
 const DEFAULT_SEED_FILE = path.join(DATA_DIR, 'default_seed.json');
+
+// Razorpay Live Configuration
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TwnEreIve56uhr';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'OeaTeNHdbbeYJF4qSNsELoTQ';
 
 // Ensure database directory exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -376,6 +381,144 @@ const server = http.createServer((req, res) => {
           error: 'Could not connect to WordPress authentication service.',
           unreachable: true,
         }));
+      }
+    });
+    return;
+  }
+
+  // Razorpay Create Order Endpoint
+  if (pathname === '/api/payments/razorpay/create-order') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+      return;
+    }
+
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 64 * 1024) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload too large' }));
+        req.destroy();
+      }
+    });
+
+    req.on('end', async () => {
+      try {
+        const { amount, currency, receipt, notes } = JSON.parse(body || '{}');
+        const numAmount = Math.round(Number(amount));
+
+        if (!numAmount || numAmount <= 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid order amount' }));
+          return;
+        }
+
+        const authStr = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+        const rzpResponse = await fetch('https://api.razorpay.com/v1/orders', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${authStr}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: numAmount, // in paise (e.g. 30000 for ₹300.00)
+            currency: currency || 'INR',
+            receipt: receipt || `rcpt_${Date.now()}`,
+            notes: notes || {},
+          }),
+        });
+
+        const rzpData = await rzpResponse.json();
+
+        if (!rzpResponse.ok) {
+          console.error('Razorpay order creation failed:', rzpData);
+          res.writeHead(rzpResponse.status, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: rzpData.error?.description || 'Failed to create Razorpay order' }));
+          return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          orderId: rzpData.id,
+          amount: rzpData.amount,
+          currency: rzpData.currency,
+          keyId: RAZORPAY_KEY_ID,
+        }));
+      } catch (err) {
+        console.error('Error handling create-order:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error creating payment order' }));
+      }
+    });
+    return;
+  }
+
+  // Razorpay Verify Signature Endpoint
+  if (pathname === '/api/payments/razorpay/verify') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+      return;
+    }
+
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 64 * 1024) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload too large' }));
+        req.destroy();
+      }
+    });
+
+    req.on('end', () => {
+      try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = JSON.parse(body || '{}');
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ verified: false, error: 'Missing payment signature details' }));
+          return;
+        }
+
+        const generatedSignature = crypto
+          .createHmac('sha256', RAZORPAY_KEY_SECRET)
+          .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+          .digest('hex');
+
+        if (generatedSignature === razorpay_signature) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ verified: true, paymentId: razorpay_payment_id }));
+        } else {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ verified: false, error: 'Invalid payment signature' }));
+        }
+      } catch (err) {
+        console.error('Error verifying payment signature:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ verified: false, error: 'Internal error verifying payment' }));
       }
     });
     return;

@@ -60,12 +60,25 @@ export function EventRegistrationFormCard({
   const totalTicketAmount = form.baseAmount * quantity;
   const totalAmount = totalTicketAmount + (Number(donation) || 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
     // Validate required fields
     const enabledFields = (form.fields || []).filter((f) => f.enabled);
+
+    // Smart resolution helper of primary attendee details whether using standard field keys or custom fields
+    const resolveFieldValue = (matchKey: string, matchLabels: string[]): string => {
+      if (formData[matchKey]?.trim()) return formData[matchKey].trim();
+      for (const f of enabledFields) {
+        const l = f.label.toLowerCase().trim();
+        if (matchLabels.some((ml) => l === ml || l.startsWith(ml))) {
+          const val = formData[f.name];
+          if (val && val.trim()) return val.trim();
+        }
+      }
+      return '';
+    };
     for (const field of enabledFields) {
       if (field.name === 'phone' || field.type === 'tel') {
         const digits = phoneNumberDigits.trim().replace(/\D/g, '');
@@ -150,22 +163,68 @@ export function EventRegistrationFormCard({
       return;
     }
 
-    // Live mode: persist in repository
+    // Live mode: If total amount is 0 (Free event), register directly without payment gateway
+    if (totalAmount <= 0) {
+      try {
+        setIsSubmitting(true);
+        const resolvedName = resolveFieldValue('name', ['first name', 'delegate name', 'name', 'full name']);
+        const resolvedLastName = resolveFieldValue('lastName', ['last name', 'surname', 'family name']);
+        const resolvedEmail = resolveFieldValue('email', ['email', 'email address']);
+        const resolvedPhone = fullPhoneNumber || resolveFieldValue('phone', ['phone', 'mobile', 'contact', 'whatsapp']);
+        const resolvedGender = resolveFieldValue('gender', ['gender', 'sex']);
+        const resolvedAge = resolveFieldValue('age', ['age']);
+        const resolvedAddress = resolveFieldValue('address', ['address', 'residential address']);
+        const resolvedCity = resolveFieldValue('city', ['city']);
+        const resolvedState = resolveFieldValue('state', ['state']);
+        const resolvedPincode = resolveFieldValue('pincode', ['pincode', 'pin code', 'postal code', 'zip']);
+        const resolvedChurchName = resolveFieldValue('churchName', ['church name', 'church']);
+        const resolvedChurchRole = resolveFieldValue('churchRole', ['role in the church', 'role in church', 'church role', 'designation']);
+        const resolvedHowHeard = resolveFieldValue('howHeard', ['how did you hear', 'how heard']);
+        const resolvedAttendedBefore = resolveFieldValue('attendedBefore', ['have you attended', 'attended before', 'attended']);
+
+        const submission = formRepository.createSubmission({
+          formId: form.id,
+          eventId: form.eventId,
+          eventTitle: form.eventTitle,
+          name: resolvedName,
+          lastName: resolvedLastName,
+          email: resolvedEmail,
+          phone: resolvedPhone,
+          gender: resolvedGender || undefined,
+          age: resolvedAge || undefined,
+          address: resolvedAddress || undefined,
+          city: resolvedCity || undefined,
+          pincode: resolvedPincode || undefined,
+          state: resolvedState || undefined,
+          churchName: resolvedChurchName || undefined,
+          churchRole: resolvedChurchRole || undefined,
+          howHeard: resolvedHowHeard || undefined,
+          attendedBefore: resolvedAttendedBefore || undefined,
+          quantity,
+          unitAmount: form.baseAmount,
+          ticketTotal: totalTicketAmount,
+          donationAmount: Number(donation) || 0,
+          totalAmount: 0,
+          currency: form.currency || 'INR',
+          customResponses,
+          paymentStatus: 'paid',
+          paymentMethod: 'Free Registration',
+          transactionId: `FREE-${Date.now().toString(36).toUpperCase()}`,
+        });
+
+        setSubmittedData(submission);
+        onSuccess?.(submission);
+      } catch (err: any) {
+        setErrorMsg(err.message || 'An error occurred while submitting your registration.');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // Live mode: Paid Event via Razorpay Payment Gateway
     try {
       setIsSubmitting(true);
-
-      // Smart resolution of primary attendee details whether using standard field keys or custom fields
-      const resolveFieldValue = (matchKey: string, matchLabels: string[]): string => {
-        if (formData[matchKey]?.trim()) return formData[matchKey].trim();
-        for (const f of enabledFields) {
-          const l = f.label.toLowerCase().trim();
-          if (matchLabels.some((ml) => l === ml || l.startsWith(ml))) {
-            const val = formData[f.name];
-            if (val && val.trim()) return val.trim();
-          }
-        }
-        return '';
-      };
 
       const resolvedName = resolveFieldValue('name', ['first name', 'delegate name', 'name', 'full name']);
       const resolvedLastName = resolveFieldValue('lastName', ['last name', 'surname', 'family name']);
@@ -182,42 +241,135 @@ export function EventRegistrationFormCard({
       const resolvedHowHeard = resolveFieldValue('howHeard', ['how did you hear', 'how heard']);
       const resolvedAttendedBefore = resolveFieldValue('attendedBefore', ['have you attended', 'attended before', 'attended']);
 
-      const submission = formRepository.createSubmission({
-        formId: form.id,
-        eventId: form.eventId,
-        eventTitle: form.eventTitle,
-        name: resolvedName,
-        lastName: resolvedLastName,
-        email: resolvedEmail,
-        phone: resolvedPhone,
-        gender: resolvedGender || undefined,
-        age: resolvedAge || undefined,
-        address: resolvedAddress || undefined,
-        city: resolvedCity || undefined,
-        pincode: resolvedPincode || undefined,
-        state: resolvedState || undefined,
-        churchName: resolvedChurchName || undefined,
-        churchRole: resolvedChurchRole || undefined,
-        howHeard: resolvedHowHeard || undefined,
-        attendedBefore: resolvedAttendedBefore || undefined,
-        quantity,
-        unitAmount: form.baseAmount,
-        ticketTotal: totalTicketAmount,
-        donationAmount: Number(donation) || 0,
-        totalAmount,
-        currency: form.currency || 'INR',
-        customResponses,
-        paymentStatus: 'paid',
-        paymentMethod: 'UPI / NetBanking',
-        transactionId: `EIC-PAY-${Date.now().toString(36).toUpperCase()}`,
+      // 1. Create Order on Backend
+      const amountInPaise = Math.round(totalAmount * 100);
+      const orderRes = await fetch('/api/payments/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountInPaise,
+          currency: form.currency || 'INR',
+          receipt: `rcpt_${Date.now()}`,
+          notes: {
+            formId: form.id,
+            eventId: form.eventId,
+            eventTitle: form.eventTitle,
+            attendeeName: `${resolvedName} ${resolvedLastName}`.trim(),
+            attendeeEmail: resolvedEmail,
+            attendeePhone: resolvedPhone,
+            quantity: String(quantity),
+          },
+        }),
       });
 
-      setSubmittedData(submission);
-      onSuccess?.(submission);
+      if (!orderRes.ok) {
+        const errorJson = await orderRes.json().catch(() => ({}));
+        throw new Error(errorJson.error || 'Failed to initialize payment gateway.');
+      }
+
+      const { orderId, keyId } = await orderRes.json();
+
+      // Ensure Razorpay SDK is loaded
+      if (typeof (window as any).Razorpay === 'undefined') {
+        throw new Error('Payment gateway SDK is loading. Please try again in a few moments.');
+      }
+
+      // 2. Open Razorpay Checkout Modal
+      const rzpOptions = {
+        key: keyId || 'rzp_live_TwnEreIve56uhr',
+        amount: amountInPaise,
+        currency: form.currency || 'INR',
+        name: 'Equip Indian Churches',
+        description: `${form.eventTitle || 'Conference Registration'} (${quantity} ${quantity === 1 ? 'delegate' : 'delegates'})`,
+        image: '/favicon.png',
+        order_id: orderId,
+        prefill: {
+          name: `${resolvedName} ${resolvedLastName}`.trim(),
+          email: resolvedEmail,
+          contact: resolvedPhone.replace(/\s+/g, ''),
+        },
+        notes: {
+          event: form.eventTitle,
+          church: resolvedChurchName || '',
+        },
+        theme: {
+          color: '#094899',
+        },
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id: string;
+          razorpay_signature: string;
+        }) => {
+          try {
+            // 3. Verify Payment Signature
+            const verifyRes = await fetch('/api/payments/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(response),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyData.verified) {
+              throw new Error(verifyData.error || 'Payment signature verification failed.');
+            }
+
+            // 4. Save Confirmed Submission
+            const submission = formRepository.createSubmission({
+              formId: form.id,
+              eventId: form.eventId,
+              eventTitle: form.eventTitle,
+              name: resolvedName,
+              lastName: resolvedLastName,
+              email: resolvedEmail,
+              phone: resolvedPhone,
+              gender: resolvedGender || undefined,
+              age: resolvedAge || undefined,
+              address: resolvedAddress || undefined,
+              city: resolvedCity || undefined,
+              pincode: resolvedPincode || undefined,
+              state: resolvedState || undefined,
+              churchName: resolvedChurchName || undefined,
+              churchRole: resolvedChurchRole || undefined,
+              howHeard: resolvedHowHeard || undefined,
+              attendedBefore: resolvedAttendedBefore || undefined,
+              quantity,
+              unitAmount: form.baseAmount,
+              ticketTotal: totalTicketAmount,
+              donationAmount: Number(donation) || 0,
+              totalAmount,
+              currency: form.currency || 'INR',
+              customResponses,
+              paymentStatus: 'paid',
+              paymentMethod: 'Razorpay (Cards/UPI/NetBanking)',
+              transactionId: response.razorpay_payment_id,
+            });
+
+            setSubmittedData(submission);
+            onSuccess?.(submission);
+          } catch (verifyErr: any) {
+            console.error('Payment verification error:', verifyErr);
+            setErrorMsg(verifyErr.message || 'Payment received but confirmation failed. Please contact support.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false);
+          },
+        },
+      };
+
+      const rzpInstance = new (window as any).Razorpay(rzpOptions);
+      rzpInstance.on('payment.failed', (failedRes: any) => {
+        setIsSubmitting(false);
+        setErrorMsg(failedRes.error?.description || 'Payment was unsuccessful or cancelled. Please try again.');
+      });
+
+      rzpInstance.open();
     } catch (err: any) {
-      setErrorMsg(err.message || 'An error occurred while submitting your registration.');
-    } finally {
       setIsSubmitting(false);
+      setErrorMsg(err.message || 'An error occurred while connecting to Razorpay.');
     }
   };
 

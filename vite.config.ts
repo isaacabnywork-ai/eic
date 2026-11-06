@@ -4,12 +4,16 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 function adminDbDevPlugin(): Plugin {
   const rootDir = fileURLToPath(new URL('.', import.meta.url));
   const dataDir = path.join(rootDir, 'data');
   const dbFile = path.join(dataDir, 'admin_db.json');
   const seedFile = path.join(dataDir, 'default_seed.json');
+
+  const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_live_TwnEreIve56uhr';
+  const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'OeaTeNHdbbeYJF4qSNsELoTQ';
 
   return {
     name: 'admin-db-dev-server',
@@ -139,6 +143,139 @@ function adminDbDevPlugin(): Plugin {
                 error: 'Could not connect to WordPress authentication service.',
                 unreachable: true,
               }));
+            }
+          });
+          return;
+        }
+
+        // Razorpay Create Order Endpoint
+        if (url === '/api/payments/razorpay/create-order') {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204;
+            res.end();
+            return;
+          }
+
+          if (req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+            return;
+          }
+
+          let body = '';
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const { amount, currency, receipt, notes } = JSON.parse(body || '{}');
+              const numAmount = Math.round(Number(amount));
+
+              if (!numAmount || numAmount <= 0) {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: 'Invalid order amount' }));
+                return;
+              }
+
+              const authStr = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+              const rzpResponse = await fetch('https://api.razorpay.com/v1/orders', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Basic ${authStr}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  amount: numAmount,
+                  currency: currency || 'INR',
+                  receipt: receipt || `rcpt_${Date.now()}`,
+                  notes: notes || {},
+                }),
+              });
+
+              const rzpData = (await rzpResponse.json()) as any;
+
+              if (!rzpResponse.ok) {
+                res.statusCode = rzpResponse.status;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: rzpData.error?.description || 'Failed to create Razorpay order' }));
+                return;
+              }
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                orderId: rzpData.id,
+                amount: rzpData.amount,
+                currency: rzpData.currency,
+                keyId: RAZORPAY_KEY_ID,
+              }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: 'Internal Server Error creating payment order' }));
+            }
+          });
+          return;
+        }
+
+        // Razorpay Verify Signature Endpoint
+        if (url === '/api/payments/razorpay/verify') {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204;
+            res.end();
+            return;
+          }
+
+          if (req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+            return;
+          }
+
+          let body = '';
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', () => {
+            try {
+              const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = JSON.parse(body || '{}');
+
+              if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ verified: false, error: 'Missing payment signature details' }));
+                return;
+              }
+
+              const generatedSignature = crypto
+                .createHmac('sha256', RAZORPAY_KEY_SECRET)
+                .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+                .digest('hex');
+
+              if (generatedSignature === razorpay_signature) {
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ verified: true, paymentId: razorpay_payment_id }));
+              } else {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ verified: false, error: 'Invalid payment signature' }));
+              }
+            } catch (err) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ verified: false, error: 'Internal error verifying payment' }));
             }
           });
           return;
