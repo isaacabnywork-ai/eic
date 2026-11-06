@@ -699,32 +699,18 @@ export function EventRegistrationFormCard({
               {form.showPaymentLogos && <PaymentBadges />}
             </div>
 
-            {/* Buttons: Test Mode + Live Pay */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              {/* Test / No-Payment Direct Submission Button */}
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => processSubmission(true)}
-                title="Submits this registration entry directly to Google Sheets & database without asking for payment"
-                className="w-full sm:w-auto bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-700 border border-slate-300 active:scale-95 font-medium text-xs sm:text-[13px] px-3.5 py-2.5 rounded transition shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
-              >
-                <span>🧪 Submit Test (No Payment)</span>
-              </button>
-
-              {/* Pay Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full sm:w-auto bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
-              >
-                {isSubmitting ? (
-                  <span>Processing...</span>
-                ) : (
-                  <span>Pay {form.currencySymbol} {totalAmount.toFixed(2)}</span>
-                )}
-              </button>
-            </div>
+            {/* Pay Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+            >
+              {isSubmitting ? (
+                <span>Processing...</span>
+              ) : (
+                <span>Pay {form.currencySymbol} {totalAmount.toFixed(2)}</span>
+              )}
+            </button>
           </div>
         </form>
       </div>
