@@ -241,7 +241,7 @@ export function EventRegisterPage() {
         image={event?.featuredImage}
       />
 
-      <div className="bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen py-8 sm:py-12 transition-colors">
+      <div className="bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen pt-8 pb-24 md:pb-12 transition-colors">
         <div className="container-page max-w-7xl px-4 sm:px-6">
           {/* Breadcrumbs matching image 3 */}
           <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-white/60 mb-6">
@@ -343,7 +343,7 @@ export function EventRegisterPage() {
               )}
 
               {/* Related Events Navigation */}
-              <div className="pt-8 border-t border-[#D0E1F0] dark:border-white/10">
+              <div className="pt-8 pb-6 border-t border-[#D0E1F0] dark:border-white/10">
                 <div className="border-b-2 border-[#182541] dark:border-white pb-2 mb-6">
                   <h2 className="text-xs font-bold uppercase tracking-widest text-[#182541] dark:text-white">
                     Related Events
