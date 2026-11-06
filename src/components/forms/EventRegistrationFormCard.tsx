@@ -60,8 +60,7 @@ export function EventRegistrationFormCard({
   const totalTicketAmount = form.baseAmount * quantity;
   const totalAmount = totalTicketAmount + (Number(donation) || 0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const processSubmission = async (isTestSubmission = false) => {
     setErrorMsg(null);
 
     // Validate required fields
@@ -79,6 +78,7 @@ export function EventRegistrationFormCard({
       }
       return '';
     };
+
     for (const field of enabledFields) {
       if (field.name === 'phone' || field.type === 'tel') {
         const digits = phoneNumberDigits.trim().replace(/\D/g, '');
@@ -125,63 +125,69 @@ export function EventRegistrationFormCard({
       }
     }
 
-    if (isPreview) {
-      // In preview mode inside admin panel, simulate success
-      const mockSubmission: FormSubmission = {
-        id: `preview-sub-${Date.now()}`,
-        formId: form.id,
-        eventId: form.eventId,
-        eventTitle: form.eventTitle,
-        name: formData.name || 'Sample Delegate',
-        lastName: formData.lastName || '',
-        email: formData.email || 'delegate@example.com',
-        phone: fullPhoneNumber || '9876543210',
-        gender: formData.gender,
-        age: formData.age,
-        address: formData.address,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        churchName: formData.churchName,
-        churchRole: formData.churchRole,
-        howHeard: formData.howHeard,
-        attendedBefore: formData.attendedBefore,
-        quantity,
-        unitAmount: form.baseAmount,
-        ticketTotal: totalTicketAmount,
-        donationAmount: Number(donation) || 0,
-        totalAmount,
-        currency: form.currency || 'INR',
-        customResponses,
-        paymentStatus: 'paid',
-        paymentMethod: 'UPI',
-        transactionId: `PREVIEW-TXN-${Date.now().toString(36).toUpperCase()}`,
-        createdAt: new Date().toISOString(),
-      };
-      setSubmittedData(mockSubmission);
-      onSuccess?.(mockSubmission);
+    const resolvedName = resolveFieldValue('name', ['first name', 'delegate name', 'name', 'full name']);
+    const resolvedLastName = resolveFieldValue('lastName', ['last name', 'surname', 'family name']);
+    const resolvedEmail = resolveFieldValue('email', ['email', 'email address']);
+    const resolvedPhone = fullPhoneNumber || resolveFieldValue('phone', ['phone', 'mobile', 'contact', 'whatsapp']);
+    const resolvedGender = resolveFieldValue('gender', ['gender', 'sex']);
+    const resolvedAge = resolveFieldValue('age', ['age']);
+    const resolvedAddress = resolveFieldValue('address', ['address', 'residential address']);
+    const resolvedCity = resolveFieldValue('city', ['city']);
+    const resolvedState = resolveFieldValue('state', ['state']);
+    const resolvedPincode = resolveFieldValue('pincode', ['pincode', 'pin code', 'postal code', 'zip']);
+    const resolvedChurchName = resolveFieldValue('churchName', ['church name', 'church']);
+    const resolvedChurchRole = resolveFieldValue('churchRole', ['role in the church', 'role in church', 'church role', 'designation']);
+    const resolvedHowHeard = resolveFieldValue('howHeard', ['how did you hear', 'how heard']);
+    const resolvedAttendedBefore = resolveFieldValue('attendedBefore', ['have you attended', 'attended before', 'attended']);
+
+    // TEST SUBMISSION MODE (Direct sync without charging payment)
+    if (isTestSubmission || isPreview) {
+      try {
+        setIsSubmitting(true);
+        const testSub = formRepository.createSubmission({
+          formId: form.id,
+          eventId: form.eventId,
+          eventTitle: form.eventTitle,
+          name: resolvedName || 'Test Delegate',
+          lastName: resolvedLastName || '',
+          email: resolvedEmail || 'test@example.com',
+          phone: resolvedPhone || '+91 9876543210',
+          gender: resolvedGender || undefined,
+          age: resolvedAge || undefined,
+          address: resolvedAddress || undefined,
+          city: resolvedCity || undefined,
+          pincode: resolvedPincode || undefined,
+          state: resolvedState || undefined,
+          churchName: resolvedChurchName || undefined,
+          churchRole: resolvedChurchRole || undefined,
+          howHeard: resolvedHowHeard || undefined,
+          attendedBefore: resolvedAttendedBefore || undefined,
+          quantity,
+          unitAmount: form.baseAmount,
+          ticketTotal: totalTicketAmount,
+          donationAmount: Number(donation) || 0,
+          totalAmount: totalAmount,
+          currency: form.currency || 'INR',
+          customResponses,
+          paymentStatus: 'paid',
+          paymentMethod: 'Test / Bypass Mode',
+          transactionId: `TEST-${Date.now().toString(36).toUpperCase()}`,
+        });
+
+        setSubmittedData(testSub);
+        onSuccess?.(testSub);
+      } catch (err: any) {
+        setErrorMsg(err.message || 'Error executing test submission.');
+      } finally {
+        setIsSubmitting(false);
+      }
       return;
     }
 
-    // Live mode: If total amount is 0 (Free event), register directly without payment gateway
+    // Free event submission
     if (totalAmount <= 0) {
       try {
         setIsSubmitting(true);
-        const resolvedName = resolveFieldValue('name', ['first name', 'delegate name', 'name', 'full name']);
-        const resolvedLastName = resolveFieldValue('lastName', ['last name', 'surname', 'family name']);
-        const resolvedEmail = resolveFieldValue('email', ['email', 'email address']);
-        const resolvedPhone = fullPhoneNumber || resolveFieldValue('phone', ['phone', 'mobile', 'contact', 'whatsapp']);
-        const resolvedGender = resolveFieldValue('gender', ['gender', 'sex']);
-        const resolvedAge = resolveFieldValue('age', ['age']);
-        const resolvedAddress = resolveFieldValue('address', ['address', 'residential address']);
-        const resolvedCity = resolveFieldValue('city', ['city']);
-        const resolvedState = resolveFieldValue('state', ['state']);
-        const resolvedPincode = resolveFieldValue('pincode', ['pincode', 'pin code', 'postal code', 'zip']);
-        const resolvedChurchName = resolveFieldValue('churchName', ['church name', 'church']);
-        const resolvedChurchRole = resolveFieldValue('churchRole', ['role in the church', 'role in church', 'church role', 'designation']);
-        const resolvedHowHeard = resolveFieldValue('howHeard', ['how did you hear', 'how heard']);
-        const resolvedAttendedBefore = resolveFieldValue('attendedBefore', ['have you attended', 'attended before', 'attended']);
-
         const submission = formRepository.createSubmission({
           formId: form.id,
           eventId: form.eventId,
@@ -222,7 +228,7 @@ export function EventRegistrationFormCard({
       return;
     }
 
-    // Live mode: Paid Event via Razorpay Payment Gateway
+    // Live Razorpay payment
     try {
       setIsSubmitting(true);
 
@@ -476,7 +482,7 @@ export function EventRegistrationFormCard({
         )}
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); processSubmission(false); }} className="space-y-4">
           {/* 1. Amount Row with Counter */}
           <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
             <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600 leading-snug">
@@ -693,18 +699,32 @@ export function EventRegistrationFormCard({
               {form.showPaymentLogos && <PaymentBadges />}
             </div>
 
-            {/* Pay Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
-            >
-              {isSubmitting ? (
-                <span>Processing...</span>
-              ) : (
-                <span>Pay {form.currencySymbol} {totalAmount.toFixed(2)}</span>
-              )}
-            </button>
+            {/* Buttons: Test Mode + Live Pay */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              {/* Test / No-Payment Direct Submission Button */}
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => processSubmission(true)}
+                title="Submits this registration entry directly to Google Sheets & database without asking for payment"
+                className="w-full sm:w-auto bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 text-slate-700 border border-slate-300 active:scale-95 font-medium text-xs sm:text-[13px] px-3.5 py-2.5 rounded transition shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+              >
+                <span>🧪 Submit Test (No Payment)</span>
+              </button>
+
+              {/* Pay Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+              >
+                {isSubmitting ? (
+                  <span>Processing...</span>
+                ) : (
+                  <span>Pay {form.currencySymbol} {totalAmount.toFixed(2)}</span>
+                )}
+              </button>
+            </div>
           </div>
         </form>
       </div>
