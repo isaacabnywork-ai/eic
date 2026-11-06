@@ -265,8 +265,10 @@ export function EventRegisterPage() {
 
             {/* ======================================================== */}
             {/* LEFT / MAIN COLUMN (~60%): Flyer & Rich Event Body       */}
+            {/* On mobile/tablet (< lg), order-2 places it AFTER the form */}
+            {/* On desktop (>= lg), lg:order-1 keeps it on the left      */}
             {/* ======================================================== */}
-            <div className="lg:col-span-7 xl:col-span-7 space-y-8">
+            <div className="order-2 lg:order-1 lg:col-span-7 xl:col-span-7 space-y-8">
               {event?.featuredImage && (
                 <div className="overflow-hidden rounded-2xl bg-slate-950 border border-[#D0E1F0] dark:border-white/10 shadow-xl flex items-center justify-center">
                   <img
@@ -374,8 +376,10 @@ export function EventRegisterPage() {
 
             {/* ======================================================== */}
             {/* RIGHT SIDEBAR (~40%): Balanced Registration Form (5 cols) */}
+            {/* On mobile/tablet (< lg), order-1 places it FIRST on screen*/}
+            {/* On desktop (>= lg), lg:order-2 keeps it on the right     */}
             {/* ======================================================== */}
-            <aside className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 w-full">
+            <aside className="order-1 lg:order-2 lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 w-full">
               <EventRegistrationFormCard
                 form={form}
                 isPreview={false}
