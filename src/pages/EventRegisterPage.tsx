@@ -260,13 +260,13 @@ export function EventRegisterPage() {
             <span className="text-slate-800 dark:text-white font-bold">Register</span>
           </nav>
 
-          {/* 2-Column Responsive Layout: 70% Left Main Content (8-9 cols), 30% Right Form (3-4 cols) */}
+          {/* 2-Column Responsive Layout: ~60% Left Main Content (7 cols), ~40% Right Form (5 cols) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
 
             {/* ======================================================== */}
-            {/* LEFT / MAIN COLUMN (~70%): Flyer & Rich Event Body       */}
+            {/* LEFT / MAIN COLUMN (~60%): Flyer & Rich Event Body       */}
             {/* ======================================================== */}
-            <div className="lg:col-span-8 xl:col-span-8 space-y-8">
+            <div className="lg:col-span-7 xl:col-span-7 space-y-8">
               {event?.featuredImage && (
                 <div className="overflow-hidden rounded-2xl bg-slate-950 border border-[#D0E1F0] dark:border-white/10 shadow-xl flex items-center justify-center">
                   <img
@@ -373,9 +373,9 @@ export function EventRegisterPage() {
             </div>
 
             {/* ======================================================== */}
-            {/* RIGHT SIDEBAR (~30%): Sleek Registration Form (4 cols)   */}
+            {/* RIGHT SIDEBAR (~40%): Balanced Registration Form (5 cols) */}
             {/* ======================================================== */}
-            <aside className="lg:col-span-4 xl:col-span-4 lg:sticky lg:top-24 w-full">
+            <aside className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 w-full">
               <EventRegistrationFormCard
                 form={form}
                 isPreview={false}
