@@ -47,20 +47,14 @@ export function AdminLoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-[#F0F6FB] p-4 text-[#182541] font-sans selection:bg-[#094899] selection:text-white">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Card Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center">
           <div className="mx-auto flex items-center justify-center">
             <img
-              src="/eic-logo.png"
+              src="/eic-logo-dark.png"
               alt="Equip Indian Churches Logo"
-              className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
+              className="h-12 sm:h-14 w-auto object-contain"
             />
           </div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#182541]">
-            Equip Indian Churches
-          </h1>
-          <p className="text-xs uppercase tracking-widest font-semibold text-[#094899]">
-            Custom Administrative Console
-          </p>
         </div>
 
         {/* Login Box */}
