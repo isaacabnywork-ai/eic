@@ -153,24 +153,53 @@ export function EventRegistrationFormCard({
     // Live mode: persist in repository
     try {
       setIsSubmitting(true);
+
+      // Smart resolution of primary attendee details whether using standard field keys or custom fields
+      const resolveFieldValue = (matchKey: string, matchLabels: string[]): string => {
+        if (formData[matchKey]?.trim()) return formData[matchKey].trim();
+        for (const f of enabledFields) {
+          const l = f.label.toLowerCase().trim();
+          if (matchLabels.some((ml) => l === ml || l.startsWith(ml))) {
+            const val = formData[f.name];
+            if (val && val.trim()) return val.trim();
+          }
+        }
+        return '';
+      };
+
+      const resolvedName = resolveFieldValue('name', ['first name', 'delegate name', 'name', 'full name']);
+      const resolvedLastName = resolveFieldValue('lastName', ['last name', 'surname', 'family name']);
+      const resolvedEmail = resolveFieldValue('email', ['email', 'email address']);
+      const resolvedPhone = fullPhoneNumber || resolveFieldValue('phone', ['phone', 'mobile', 'contact', 'whatsapp']);
+      const resolvedGender = resolveFieldValue('gender', ['gender', 'sex']);
+      const resolvedAge = resolveFieldValue('age', ['age']);
+      const resolvedAddress = resolveFieldValue('address', ['address', 'residential address']);
+      const resolvedCity = resolveFieldValue('city', ['city']);
+      const resolvedState = resolveFieldValue('state', ['state']);
+      const resolvedPincode = resolveFieldValue('pincode', ['pincode', 'pin code', 'postal code', 'zip']);
+      const resolvedChurchName = resolveFieldValue('churchName', ['church name', 'church']);
+      const resolvedChurchRole = resolveFieldValue('churchRole', ['role in the church', 'role in church', 'church role', 'designation']);
+      const resolvedHowHeard = resolveFieldValue('howHeard', ['how did you hear', 'how heard']);
+      const resolvedAttendedBefore = resolveFieldValue('attendedBefore', ['have you attended', 'attended before', 'attended']);
+
       const submission = formRepository.createSubmission({
         formId: form.id,
         eventId: form.eventId,
         eventTitle: form.eventTitle,
-        name: formData.name,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: fullPhoneNumber || formData.phone,
-        gender: formData.gender,
-        age: formData.age,
-        address: formData.address,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        churchName: formData.churchName,
-        churchRole: formData.churchRole,
-        howHeard: formData.howHeard,
-        attendedBefore: formData.attendedBefore,
+        name: resolvedName,
+        lastName: resolvedLastName,
+        email: resolvedEmail,
+        phone: resolvedPhone,
+        gender: resolvedGender || undefined,
+        age: resolvedAge || undefined,
+        address: resolvedAddress || undefined,
+        city: resolvedCity || undefined,
+        pincode: resolvedPincode || undefined,
+        state: resolvedState || undefined,
+        churchName: resolvedChurchName || undefined,
+        churchRole: resolvedChurchRole || undefined,
+        howHeard: resolvedHowHeard || undefined,
+        attendedBefore: resolvedAttendedBefore || undefined,
         quantity,
         unitAmount: form.baseAmount,
         ticketTotal: totalTicketAmount,
