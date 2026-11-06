@@ -5,12 +5,12 @@ import { eventRepository } from '@/admin/db/repositories/eventRepository';
 import { taxonomyRepository } from '@/admin/db/repositories/taxonomyRepository';
 import { adminDb } from '@/admin/db/storage';
 import { usePublishedEvents } from '@/lib/publicEvents';
-import { useContentItem, useContentList } from '@/hooks/queries';
+import { useContentItem } from '@/hooks/queries';
 import { EventRegistrationFormCard } from '@/components/forms/EventRegistrationFormCard';
 import { RichContent } from '@/components/content/RichContent';
 import { SeoHead } from '@/components/seo/SeoHead';
 import type { EventRegistrationForm, CustomEvent, Venue, Organizer, EventCategory } from '@/admin/db/types';
-import { ArrowLeft, ArrowRight, ChevronRight, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, AlertCircle } from 'lucide-react';
 
 function getGoogleCalendarUrl(event: {
   title: string;
@@ -89,26 +89,6 @@ export function EventRegisterPage() {
     'event',
     matchedCustomEvent ? undefined : eventSlug,
   );
-
-  // Query all events for Related / Prev / Next navigation
-  const { data: allWpEvents } = useContentList('event', { perPage: 10 });
-  const allEventList = useMemo(() => {
-    const list: Array<{ slug: string; title: string }> = [];
-    customEvents.forEach((ce) => list.push({ slug: ce.slug, title: ce.title }));
-    if (allWpEvents?.items) {
-      allWpEvents.items.forEach((item) => {
-        if (!list.some((l) => l.slug === item.slug)) {
-          list.push({ slug: item.slug, title: item.title });
-        }
-      });
-    }
-    return list;
-  }, [customEvents, allWpEvents]);
-
-  // Calculate Previous and Next event slugs
-  const currentIndex = allEventList.findIndex((e) => e.slug.toLowerCase() === eventSlug?.toLowerCase());
-  const prevEvent = currentIndex > 0 ? allEventList[currentIndex - 1] : allEventList[allEventList.length - 1];
-  const nextEvent = currentIndex >= 0 && currentIndex < allEventList.length - 1 ? allEventList[currentIndex + 1] : allEventList[0];
 
   // Resolve custom entity relations
   const venue: Venue | null = useMemo(() => {
@@ -341,37 +321,6 @@ export function EventRegisterPage() {
                   </a>
                 </div>
               )}
-
-              {/* Related Events Navigation */}
-              <div className="pt-8 pb-6 border-t border-[#D0E1F0] dark:border-white/10">
-                <div className="border-b-2 border-[#182541] dark:border-white pb-2 mb-6">
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-[#182541] dark:text-white">
-                    Related Events
-                  </h2>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  {prevEvent ? (
-                    <Link
-                      to={`/events/${prevEvent.slug}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 text-xs font-bold text-slate-700 dark:text-white hover:border-[#182541] dark:hover:border-white transition shadow-xs"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>PRV Event</span>
-                    </Link>
-                  ) : <div />}
-
-                  {nextEvent ? (
-                    <Link
-                      to={`/events/${nextEvent.slug}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-white/5 text-xs font-bold text-slate-700 dark:text-white hover:border-[#182541] dark:hover:border-white transition shadow-xs"
-                    >
-                      <span>NXT Event</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  ) : <div />}
-                </div>
-              </div>
             </div>
 
             {/* ======================================================== */}
