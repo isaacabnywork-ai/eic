@@ -454,14 +454,14 @@ export function EventRegistrationFormCard({
   const enabledFields = (form.fields || []).filter((f) => f.enabled);
 
   return (
-    <div className="w-full max-w-[480px] mx-auto bg-white rounded-lg shadow-xl border border-slate-200/80 overflow-hidden text-slate-800 transition-all font-sans">
+    <div className="w-full bg-white rounded-xl shadow-md border border-slate-200/90 overflow-hidden text-slate-800 transition-all font-sans">
       {/* Form Header */}
       <div className="p-6 sm:p-7 pb-4">
         <h2 className="text-[#182541] font-bold text-xl sm:text-2xl tracking-tight">
           {form.title || 'Payment Details'}
         </h2>
         {/* Underline bar matching user screenshot */}
-        <div className="h-1 w-9 bg-[#182541] rounded-full mt-2 mb-4" />
+        <div className="h-1.5 w-10 bg-[#0D1117] rounded-sm mt-2.5 mb-5" />
 
         {form.subtitle && (
           <p className="text-xs text-slate-500 leading-relaxed mb-4">
@@ -476,15 +476,15 @@ export function EventRegistrationFormCard({
         )}
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* 1. Amount Row with Counter */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-3">
-            <label className="sm:col-span-4 text-xs sm:text-sm font-medium text-slate-700">
-              Amount <span className="text-rose-500 font-bold">*</span>
+          <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
+            <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
+              Amount <span className="text-rose-500">*</span>
             </label>
             <div className="sm:col-span-8">
-              <div className="flex items-center justify-between border border-blue-200/80 bg-white rounded-md px-3 py-1.5 shadow-2xs">
-                <span className="font-bold text-slate-900 text-sm">
+              <div className="flex items-center justify-between border border-blue-200 bg-white rounded px-3 py-2">
+                <span className="font-bold text-[#182541] text-sm">
                   {form.currencySymbol} {totalTicketAmount.toFixed(2)}
                 </span>
                 {form.allowQuantity && (
@@ -498,7 +498,7 @@ export function EventRegistrationFormCard({
                     >
                       -
                     </button>
-                    <span className="px-2.5 py-0.5 font-semibold text-slate-800 border-x border-slate-200 min-w-6 text-center">
+                    <span className="px-2.5 py-0.5 font-normal text-slate-700 border-x border-slate-200 min-w-6 text-center">
                       {quantity}
                     </span>
                     <button
@@ -518,12 +518,12 @@ export function EventRegistrationFormCard({
 
           {/* 2. Optional Donation Row */}
           {form.allowDonation && (
-            <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-3">
-              <label className="sm:col-span-4 text-xs sm:text-sm font-medium text-slate-700">
+            <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
+              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
                 Donation
               </label>
               <div className="sm:col-span-8 relative flex items-center">
-                <span className="absolute left-3 text-sm font-medium text-slate-400 pointer-events-none">
+                <span className="absolute left-3 text-sm font-normal text-slate-400 pointer-events-none">
                   {form.currencySymbol}
                 </span>
                 <input
@@ -533,7 +533,7 @@ export function EventRegistrationFormCard({
                   value={donation || ''}
                   onChange={(e) => setDonation(e.target.value ? Math.max(0, Number(e.target.value)) : 0)}
                   placeholder={form.donationPlaceholder || 'Enter Amount'}
-                  className="w-full pl-7 pr-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs transition"
+                  className="w-full pl-7 pr-3 py-2 text-sm rounded border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-400 transition"
                 />
               </div>
             </div>
@@ -541,65 +541,69 @@ export function EventRegistrationFormCard({
 
           {/* 3. Attendee Input Fields */}
           {enabledFields.map((field) => (
-            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-3">
-              <label className="sm:col-span-4 text-xs sm:text-sm font-medium text-slate-700">
-                {field.label} {field.required && <span className="text-rose-500 font-bold">*</span>}
+            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
+              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
+                {field.label} {field.required && <span className="text-rose-500">*</span>}
               </label>
               <div className="sm:col-span-8">
-                {/* Phone Split Input with Country Code Selector & Strict 10-digit limit */}
+                {/* Phone Split Input with Country Code Selector */}
                 {field.name === 'phone' || field.type === 'tel' ? (
-                  <div className="space-y-1">
-                    <div className="flex rounded-md border border-slate-200 overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+                  <div className="flex rounded border border-slate-200 overflow-hidden bg-white focus-within:border-blue-400">
+                    <div className="bg-white border-r border-slate-200 px-3 py-2 text-xs text-slate-700 shrink-0 flex items-center gap-1">
                       <select
                         value={phoneCountryCode}
                         onChange={(e) => setPhoneCountryCode(e.target.value)}
-                        className="bg-slate-50 border-r border-slate-200 px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none cursor-pointer shrink-0 hover:bg-slate-100 transition"
+                        className="bg-transparent border-none text-xs font-normal text-slate-700 outline-none cursor-pointer pr-1"
                         title="Select Country Dial Code"
                       >
                         {COUNTRY_DIAL_CODES.map((c) => (
                           <option key={c.code} value={c.code}>
-                            {c.country} ({c.code})
+                            {c.country} {c.code}
                           </option>
                         ))}
                       </select>
-                      <input
-                        type="tel"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={10}
-                        required={field.required}
-                        value={phoneNumberDigits}
-                        onChange={(e) => {
-                          const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
-                          setPhoneNumberDigits(digitsOnly);
-                          setFormData({
-                            ...formData,
-                            [field.name]: `${phoneCountryCode} ${digitsOnly}`.trim(),
-                          });
-                        }}
-                        placeholder={field.placeholder || '10-digit mobile number'}
-                        className="flex-1 px-3 py-1.5 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none tracking-wider"
-                      />
-                      <div className="flex items-center pr-3 text-[11px] font-mono font-medium text-slate-400 select-none shrink-0">
-                        {phoneNumberDigits.length}/10
-                      </div>
                     </div>
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={10}
+                      required={field.required}
+                      value={phoneNumberDigits}
+                      onChange={(e) => {
+                        const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setPhoneNumberDigits(digitsOnly);
+                        setFormData({
+                          ...formData,
+                          [field.name]: `${phoneCountryCode} ${digitsOnly}`.trim(),
+                        });
+                      }}
+                      placeholder={field.placeholder || ''}
+                      className="flex-1 px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
+                    />
                   </div>
                 ) : field.type === 'select' ? (
                   /* Select Dropdown */
-                  <select
-                    required={field.required}
-                    value={formData[field.name] || ''}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                    className="w-full px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs cursor-pointer"
-                  >
-                    <option value="">--Select--</option>
-                    {field.options?.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      required={field.required}
+                      value={formData[field.name] || ''}
+                      onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                      className="w-full appearance-none px-3 py-2 text-sm rounded border border-slate-200 bg-white text-slate-700 focus:outline-none focus:border-blue-400 cursor-pointer pr-8"
+                    >
+                      <option value="">--Select--</option>
+                      {field.options?.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-600">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
                 ) : field.type === 'radio' ? (
                   /* Radio Options List */
                   <div className="space-y-1.5 pt-0.5">
@@ -662,7 +666,7 @@ export function EventRegistrationFormCard({
                     value={formData[field.name] || ''}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder || ''}
-                    className="w-full px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs resize-y"
+                    className="w-full px-3 py-2 text-sm rounded border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-400 resize-y"
                   />
                 ) : (
                   /* Standard inputs (text, number, email, date, time, url, tel) */
@@ -672,7 +676,7 @@ export function EventRegistrationFormCard({
                     value={formData[field.name] || ''}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     placeholder={field.placeholder || ''}
-                    className="w-full px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                    className="w-full px-3 py-2 text-sm rounded border border-slate-200 bg-white text-slate-800 focus:outline-none focus:border-blue-400"
                   />
                 )}
                 {field.helpText && (
@@ -682,8 +686,8 @@ export function EventRegistrationFormCard({
             </div>
           ))}
 
-          {/* Form Checkout Footer Bar */}
-          <div className="border-t border-slate-200 -mx-6 sm:-mx-7 -mb-6 sm:-mb-7 mt-6 px-6 sm:px-7 py-3 bg-slate-50 flex items-center justify-between gap-3">
+          {/* Form Checkout Footer Bar: Full width, clean white on left with SVG logos, solid black pay button on right */}
+          <div className="border-t border-slate-100 -mx-6 sm:-mx-7 -mb-6 sm:-mb-7 mt-7 px-6 sm:px-7 py-3 bg-[#F8FAFC] flex items-center justify-between gap-3">
             {/* Payment Logos */}
             <div className="flex items-center gap-2">
               {form.showPaymentLogos && <PaymentBadges />}
@@ -693,7 +697,7 @@ export function EventRegistrationFormCard({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-md transition shadow-md cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <span>Processing...</span>
@@ -738,6 +742,11 @@ function PaymentBadges() {
       <div className="flex items-center font-bold text-[10px] text-[#2E3192] bg-white border border-slate-200 rounded px-1.5 py-0.5 shadow-2xs">
         <span>RuPay</span>
         <span className="text-[#00AEEF] text-[8px] ml-0.5">▶</span>
+      </div>
+
+      {/* Amex */}
+      <div className="flex items-center font-bold text-[9px] text-[#006FCF] bg-[#EBF4FA] border border-[#006FCF]/30 rounded px-1.5 py-0.5 shadow-2xs">
+        AMEX
       </div>
     </div>
   );
