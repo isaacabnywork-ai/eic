@@ -1940,6 +1940,28 @@ export function AdminFormsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {submissions.length > 0 && submissionFormFilter !== '__all_entries__' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const count = submissions.length;
+                        if (
+                          window.confirm(
+                            `Are you sure you want to delete all ${count} entries for this event form? This cannot be undone.`
+                          )
+                        ) {
+                          submissions.forEach((s) => formRepository.deleteSubmission(s.id));
+                          loadData();
+                          toast(`Deleted all ${count} entries for this form.`, 'success');
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                      title="Clear all entries for this form"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete All Entries ({submissions.length})</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleExportXLSX}
@@ -2025,7 +2047,7 @@ export function AdminFormsPage() {
                           <th className="py-3 px-4">Amount</th>
                           <th className="py-3 px-4">Status</th>
                           <th className="py-3 px-4">Date</th>
-                          <th className="py-3 px-4 text-right">Details</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
@@ -2084,14 +2106,31 @@ export function AdminFormsPage() {
                             </td>
 
                             <td className="py-3.5 px-4 text-right">
-                              <button
-                                type="button"
-                                onClick={() => setSelectedSubmission(sub)}
-                                className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                              >
-                                <Eye className="w-3.5 h-3.5 text-slate-500" />
-                                <span>View</span>
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedSubmission(sub)}
+                                  className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                                  title="View Entry Details"
+                                >
+                                  <Eye className="w-3.5 h-3.5 text-slate-500" />
+                                  <span>View</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (window.confirm(`Delete registration entry for "${sub.name} ${sub.lastName || ''}"?`)) {
+                                      formRepository.deleteSubmission(sub.id);
+                                      loadData();
+                                      toast('Registration entry deleted successfully.', 'success');
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition cursor-pointer"
+                                  title="Delete Registration Entry"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -2269,7 +2308,28 @@ export function AdminFormsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  if (
+                    selectedSubmission &&
+                    window.confirm(
+                      `Are you sure you want to delete this registration entry for "${selectedSubmission.name} ${selectedSubmission.lastName || ''}"?`
+                    )
+                  ) {
+                    formRepository.deleteSubmission(selectedSubmission.id);
+                    setSelectedSubmission(null);
+                    loadData();
+                    toast('Registration entry deleted.', 'success');
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 px-3.5 py-2 text-xs font-semibold transition cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Entry</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setSelectedSubmission(null)}
