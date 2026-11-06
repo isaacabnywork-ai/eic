@@ -524,6 +524,70 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Google Sheets / Excel Webhook Relay Proxy (Bypasses browser CORS & redirects)
+  if (pathname === '/api/forms/sync-sheet') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+      return;
+    }
+
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 512 * 1024) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload too large' }));
+        req.destroy();
+      }
+    });
+
+    req.on('end', async () => {
+      try {
+        const { webhookUrl, payload } = JSON.parse(body || '{}');
+
+        if (!webhookUrl || typeof webhookUrl !== 'string' || !webhookUrl.startsWith('http')) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid webhook URL provided' }));
+          return;
+        }
+
+        const relayRes = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload || {}),
+          redirect: 'follow', // Automatically follow Google Apps Script 302 redirects
+        });
+
+        const textResponse = await relayRes.text();
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: relayRes.ok,
+          status: relayRes.status,
+          response: textResponse.slice(0, 500),
+        }));
+      } catch (err) {
+        console.error('Error proxying sheet sync:', err);
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message || 'Error forwarding to Google Sheets' }));
+      }
+    });
+    return;
+  }
+
   // Health check endpoint
   if (pathname === '/healthz' || pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });

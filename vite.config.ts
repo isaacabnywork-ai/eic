@@ -281,6 +281,67 @@ function adminDbDevPlugin(): Plugin {
           return;
         }
 
+        // Google Sheets / Excel Webhook Relay Proxy
+        if (url === '/api/forms/sync-sheet') {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204;
+            res.end();
+            return;
+          }
+
+          if (req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+            return;
+          }
+
+          let body = '';
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const { webhookUrl, payload } = JSON.parse(body || '{}');
+
+              if (!webhookUrl || typeof webhookUrl !== 'string' || !webhookUrl.startsWith('http')) {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: 'Invalid webhook URL provided' }));
+                return;
+              }
+
+              const relayRes = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload || {}),
+                redirect: 'follow',
+              });
+
+              const textResponse = await relayRes.text();
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                success: relayRes.ok,
+                status: relayRes.status,
+                response: textResponse.slice(0, 500),
+              }));
+            } catch (err: any) {
+              res.statusCode = 502;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: false, error: err.message || 'Error forwarding to Google Sheets' }));
+            }
+          });
+          return;
+        }
+
         if (url !== '/api/admin/db') {
           return next();
         }

@@ -308,18 +308,38 @@ export const formRepository = {
         customResponses: submission.customResponses || {},
       };
 
-      // Native fetch with timeout
+      // Proxy through backend endpoint to handle Google Apps Script 302 redirects and avoid CORS issues,
+      // with graceful fallback to direct fetch.
+      try {
+        const proxyRes = await fetch('/api/forms/sync-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            webhookUrl: webhookUrl.trim(),
+            payload,
+          }),
+        });
+
+        if (proxyRes.ok) {
+          const proxyData = await proxyRes.json().catch(() => ({}));
+          return { success: true, message: proxyData.message || 'Successfully synced with spreadsheet!' };
+        }
+      } catch (proxyErr) {
+        console.warn('Backend proxy sync failed, falling back to direct browser fetch:', proxyErr);
+      }
+
+      // Fallback: direct fetch with no-cors
       await fetch(webhookUrl.trim(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json, text/plain, */*',
         },
-        mode: 'no-cors', // Enables cross-origin execution to Google Apps Script / Webhooks
+        mode: 'no-cors',
         body: JSON.stringify(payload),
       });
 
-      return { success: true };
+      return { success: true, message: 'Dispatched to Google Sheet!' };
     } catch (err: any) {
       console.error('Failed to trigger Excel webhook:', err);
       return { success: false, message: err.message || 'Failed to trigger Excel webhook.' };

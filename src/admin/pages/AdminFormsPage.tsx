@@ -1266,6 +1266,102 @@ export function AdminFormsPage() {
                       <span>Last auto-synced: {new Date(formData.excelLastSyncedAt).toLocaleString('en-IN')}</span>
                     </div>
                   )}
+
+                  {/* Google Sheets Easy Setup Guide Modal / Accordion */}
+                  <div className="mt-3 rounded-lg border border-emerald-200 bg-white p-3.5 text-xs text-slate-700 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-[11px]">
+                          ⚡
+                        </span>
+                        <span className="font-bold text-slate-900">How to connect with Google Sheets (1 Minute Setup)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const script = `function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // Auto-create header row on empty sheet
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp",
+        "Registration ID",
+        "Event Title",
+        "Full Name",
+        "Email",
+        "Phone",
+        "Quantity",
+        "Total Amount (INR)",
+        "Payment Status",
+        "Payment Method",
+        "Transaction / Order ID",
+        "Church Name",
+        "Role in Church",
+        "Gender",
+        "Age",
+        "City",
+        "State",
+        "Pincode"
+      ]);
+      sheet.getRange(1, 1, 1, 18).setFontWeight("bold").setBackground("#f1f5f9");
+    }
+    
+    // Append submission row
+    sheet.appendRow([
+      data.timestamp || new Date().toISOString(),
+      data.registrationId || "",
+      data.eventTitle || "",
+      data.fullName || data.name || "",
+      data.email || "",
+      data.phone || "",
+      data.quantity || 1,
+      data.totalAmount || 0,
+      data.paymentStatus || "pending",
+      data.paymentMethod || "Online",
+      data.transactionId || "",
+      data.churchName || "",
+      data.churchRole || "",
+      data.gender || "",
+      data.age || "",
+      data.city || "",
+      data.state || "",
+      data.pincode || ""
+    ]);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "success", message: "Row appended" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}`;
+                          navigator.clipboard.writeText(script);
+                          toast('Google Apps Script copied to clipboard!', 'success');
+                        }}
+                        className="rounded bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-800 hover:bg-emerald-100 border border-emerald-300 transition cursor-pointer"
+                      >
+                        Copy Google Script Code
+                      </button>
+                    </div>
+
+                    <ol className="mt-2.5 space-y-1.5 pl-4 list-decimal text-[11.5px] leading-relaxed text-slate-600">
+                      <li>Open a new or existing sheet on <a href="https://sheets.new" target="_blank" rel="noopener noreferrer" className="text-emerald-700 underline font-medium">Google Sheets</a>.</li>
+                      <li>In Google Sheets menu, click <strong>Extensions &rarr; Apps Script</strong>.</li>
+                      <li>Delete any code there, paste the copied script, and click <strong>Deploy &rarr; New deployment</strong>.</li>
+                      <li>Select type: <strong>Web app</strong>. Set <em>&quot;Execute as: Me&quot;</em> and <em>&quot;Who has access: Anyone&quot;</em>, then click <strong>Deploy</strong>.</li>
+                      <li>Copy the generated <strong>Web app URL</strong> (ends in <code>/exec</code>) and paste it into the <strong>Google Sheets / Webhook URL</strong> box above!</li>
+                    </ol>
+                  </div>
                 </div>
               </div>
 
