@@ -479,7 +479,7 @@ export function EventRegistrationFormCard({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 1. Amount Row with Counter */}
           <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
-            <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
+            <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600 leading-snug">
               Amount <span className="text-rose-500">*</span>
             </label>
             <div className="sm:col-span-8">
@@ -519,7 +519,7 @@ export function EventRegistrationFormCard({
           {/* 2. Optional Donation Row */}
           {form.allowDonation && (
             <div className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
-              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
+              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600 leading-snug">
                 Donation
               </label>
               <div className="sm:col-span-8 relative flex items-center">
@@ -542,14 +542,14 @@ export function EventRegistrationFormCard({
           {/* 3. Attendee Input Fields */}
           {enabledFields.map((field) => (
             <div key={field.id} className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
-              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600">
+              <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600 leading-snug break-words">
                 {field.label} {field.required && <span className="text-rose-500">*</span>}
               </label>
               <div className="sm:col-span-8">
                 {/* Phone Split Input with Country Code Selector */}
                 {field.name === 'phone' || field.type === 'tel' ? (
                   <div className="flex rounded border border-slate-200 overflow-hidden bg-white focus-within:border-blue-400">
-                    <div className="bg-white border-r border-slate-200 px-3 py-2 text-xs text-slate-700 shrink-0 flex items-center gap-1">
+                    <div className="bg-white border-r border-slate-200 px-2 sm:px-2.5 py-2 text-xs text-slate-700 shrink-0 flex items-center">
                       <select
                         value={phoneCountryCode}
                         onChange={(e) => setPhoneCountryCode(e.target.value)}
@@ -579,7 +579,7 @@ export function EventRegistrationFormCard({
                         });
                       }}
                       placeholder={field.placeholder || ''}
-                      className="flex-1 px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
+                      className="flex-1 min-w-0 px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
                     />
                   </div>
                 ) : field.type === 'select' ? (
@@ -687,9 +687,9 @@ export function EventRegistrationFormCard({
           ))}
 
           {/* Form Checkout Footer Bar: Full width, clean white on left with SVG logos, solid black pay button on right */}
-          <div className="border-t border-slate-100 -mx-6 sm:-mx-7 -mb-6 sm:-mb-7 mt-7 px-6 sm:px-7 py-3 bg-[#F8FAFC] flex items-center justify-between gap-3">
+          <div className="border-t border-slate-100 -mx-6 sm:-mx-7 -mb-6 sm:-mb-7 mt-7 px-4 sm:px-6 py-3.5 bg-[#F8FAFC] flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
             {/* Payment Logos */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {form.showPaymentLogos && <PaymentBadges />}
             </div>
 
@@ -697,7 +697,7 @@ export function EventRegistrationFormCard({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="w-full sm:w-auto bg-[#0D1117] hover:bg-[#182541] active:scale-95 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
             >
               {isSubmitting ? (
                 <span>Processing...</span>

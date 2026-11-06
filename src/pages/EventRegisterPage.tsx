@@ -242,7 +242,7 @@ export function EventRegisterPage() {
       />
 
       <div className="bg-[#F0F6FB] dark:bg-[#070A0F] text-[#182541] dark:text-white min-h-screen py-8 sm:py-12 transition-colors">
-        <div className="container-page max-w-6xl px-4 sm:px-6">
+        <div className="container-page max-w-7xl px-4 sm:px-6">
           {/* Breadcrumbs matching image 3 */}
           <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-white/60 mb-6">
             <Link to="/" className="hover:text-primary dark:hover:text-white transition">Home</Link>
@@ -260,14 +260,13 @@ export function EventRegisterPage() {
             <span className="text-slate-800 dark:text-white font-bold">Register</span>
           </nav>
 
-          {/* 2-Column Responsive Layout: Left 8-cols Flyer + Content, Right 4-cols Registration Form */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* 2-Column Responsive Layout: Left 6-7 cols Flyer + Content, Right 5-6 cols Registration Form */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
 
             {/* ======================================================== */}
-            {/* LEFT / MAIN COLUMN (7-8 cols): Flyer & Rich Event Body   */}
-            {/* Exactly matching EventSinglePage (Image 3)               */}
+            {/* LEFT / MAIN COLUMN (6-7 cols): Flyer & Rich Event Body   */}
             {/* ======================================================== */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-8">
+            <div className="lg:col-span-6 xl:col-span-6 space-y-8">
               {event?.featuredImage && (
                 <div className="overflow-hidden rounded-2xl bg-slate-950 border border-[#D0E1F0] dark:border-white/10 shadow-xl flex items-center justify-center">
                   <img
@@ -374,10 +373,9 @@ export function EventRegisterPage() {
             </div>
 
             {/* ======================================================== */}
-            {/* RIGHT SIDEBAR (4-5 cols): The Clean Registration Form    */}
-            {/* Replaces Date/Cost/Organizer/Socials with the Form       */}
+            {/* RIGHT SIDEBAR (6 cols): Spacious Clean Registration Form */}
             {/* ======================================================== */}
-            <aside className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 w-full">
+            <aside className="lg:col-span-6 xl:col-span-6 lg:sticky lg:top-24 w-full">
               <EventRegistrationFormCard
                 form={form}
                 isPreview={false}
