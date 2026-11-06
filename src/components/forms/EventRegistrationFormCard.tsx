@@ -541,7 +541,7 @@ export function EventRegistrationFormCard({
 
           {/* 3. Attendee Input Fields */}
           {enabledFields.map((field) => (
-            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-4">
+            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-1 sm:gap-3">
               <label className="sm:col-span-4 text-xs sm:text-sm font-normal text-slate-600 leading-snug break-words">
                 {field.label} {field.required && <span className="text-rose-500">*</span>}
               </label>
@@ -549,11 +549,11 @@ export function EventRegistrationFormCard({
                 {/* Phone Split Input with Country Code Selector */}
                 {field.name === 'phone' || field.type === 'tel' ? (
                   <div className="flex rounded border border-slate-200 overflow-hidden bg-white focus-within:border-blue-400">
-                    <div className="bg-white border-r border-slate-200 px-2 sm:px-2.5 py-2 text-xs text-slate-700 shrink-0 flex items-center">
+                    <div className="bg-white border-r border-slate-200 px-2 py-2 text-xs text-slate-700 shrink-0 flex items-center">
                       <select
                         value={phoneCountryCode}
                         onChange={(e) => setPhoneCountryCode(e.target.value)}
-                        className="bg-transparent border-none text-xs font-normal text-slate-700 outline-none cursor-pointer pr-1"
+                        className="bg-transparent border-none text-[11px] font-medium text-slate-700 outline-none cursor-pointer pr-0.5"
                         title="Select Country Dial Code"
                       >
                         {COUNTRY_DIAL_CODES.map((c) => (
@@ -579,7 +579,7 @@ export function EventRegistrationFormCard({
                         });
                       }}
                       placeholder={field.placeholder || ''}
-                      className="flex-1 min-w-0 px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
+                      className="flex-1 min-w-0 px-2.5 py-2 text-xs sm:text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none"
                     />
                   </div>
                 ) : field.type === 'select' ? (
