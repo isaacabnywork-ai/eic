@@ -163,14 +163,14 @@ export const navItems: NavItem[] = [
         {
           title: 'Our Movement',
           links: [
-            { label: 'About Equip Indian Churches', to: '/about' },
+            { label: 'About EIC', to: '/about' },
             { label: 'What is EIC?', to: '/about' },
           ],
         },
         {
           title: 'Doctrine & Contact',
           links: [
-            { label: 'What We Believe (Statement of Faith)', to: '/statement-of-faith' },
+            { label: 'What We Believe', to: '/statement-of-faith' },
             { label: 'Contact & Inquiries', to: '/contact' },
           ],
         },

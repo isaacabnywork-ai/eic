@@ -2111,7 +2111,7 @@ export const SEED_FOOTER_MENU: CustomFooterMenuConfig = {
       heading: 'About EIC',
       displayOrder: 1,
       links: [
-        { id: 'fl-about-1', label: 'About Equip Indian Churches', url: '/about', target: '_self', isEnabled: true, displayOrder: 1 },
+        { id: 'fl-about-1', label: 'About EIC', url: '/about', target: '_self', isEnabled: true, displayOrder: 1 },
         { id: 'fl-about-2', label: 'Statement of Faith', url: '/statement-of-faith', target: '_self', isEnabled: true, displayOrder: 2 },
         { id: 'fl-about-3', label: 'Pastoral Leadership Team', url: '/authors', target: '_self', isEnabled: true, displayOrder: 3 },
       ],
