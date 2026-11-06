@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, Globe, ArrowRight } from 'lucide-react';
+import { Globe, ArrowRight } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useAdminToast } from '../context/AdminToastContext';
 
@@ -48,8 +48,12 @@ export function AdminLoginPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Brand Card Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#182541] text-white font-black text-xl shadow-lg shadow-[#182541]/15 border border-[#D0E1F0]">
-            EIC
+          <div className="mx-auto flex items-center justify-center">
+            <img
+              src="/eic-logo.png"
+              alt="Equip Indian Churches Logo"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
+            />
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#182541]">
             Equip Indian Churches
@@ -61,25 +65,9 @@ export function AdminLoginPage() {
 
         {/* Login Box */}
         <div className="rounded-2xl border border-[#D0E1F0] bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/50 space-y-6">
-          <div className="border-b border-slate-100 pb-3">
+          {/* Header */}
+          <div className="border-b border-slate-100 pb-2">
             <h2 className="text-base font-bold text-[#182541]">Administrator Sign In</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Enter your WordPress credentials to manage events and content.
-            </p>
-          </div>
-
-          {/* WordPress SSO Notice */}
-          <div className="rounded-xl border border-[#D0E1F0] bg-[#F0F6FB] p-3 text-xs text-[#182541] flex items-start gap-2.5">
-            <ShieldCheck className="w-4 h-4 text-[#094899] shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="font-semibold text-[#094899] flex items-center gap-1.5">
-                <span>WordPress Single Sign-On</span>
-                <span className="inline-block px-1.5 py-0.2 bg-[#094899]/10 text-[#094899] text-[10px] font-bold rounded">LIVE</span>
-              </p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                Use the same username and password you use to log into <strong>admin.equipindianchurches.com</strong>.
-              </p>
-            </div>
           </div>
 
           {errorMessage && (
@@ -91,7 +79,7 @@ export function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#182541] block">
-                WordPress Username or Email
+                Username or Email
               </label>
               <input
                 type="text"
@@ -99,7 +87,7 @@ export function AdminLoginPage() {
                 autoComplete="username"
                 value={usernameOrEmail}
                 onChange={(e) => setUsernameOrEmail(e.target.value)}
-                placeholder="e.g. equipindianchurches or admin@..."
+                placeholder="Enter email or username"
                 className="w-full rounded-xl border border-[#D0E1F0] bg-slate-50/60 px-3.5 py-2.5 text-sm text-[#182541] placeholder-slate-400 focus:border-[#094899] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#094899]/20 transition"
               />
             </div>
