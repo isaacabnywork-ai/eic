@@ -15,7 +15,6 @@ import {
   BookmarkIcon,
   ExternalLinkIcon,
   ChevronDownIcon,
-  MailIcon,
   StarIcon,
   UserIcon,
   ArrowRightIcon,
@@ -39,8 +38,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
   const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
   // Auto-expand the accordion matching the current route or default to Articles
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
@@ -88,12 +85,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
     if (!searchQuery.trim()) return;
     onClose();
     navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-  };
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail.trim()) return;
-    setNewsletterSubscribed(true);
   };
 
   return (
@@ -184,42 +175,6 @@ export function MobileProfileDrawer({ open, onClose }: MobileProfileDrawerProps)
                 onClose={onClose}
               />
             ))}
-          </div>
-
-          {/* Weekly Gospel Digest Newsletter */}
-          <div className="rounded-xl border border-[#D0E1F0] dark:border-white/10 bg-white dark:bg-white/5 p-3.5 shadow-2xs dark:shadow-none mt-2">
-            <div className="flex items-center gap-2 mb-1.5 text-primary dark:text-[#F0F6FB]">
-              <MailIcon size={16} />
-              <span className="font-serif text-xs font-bold text-ink dark:text-white">
-                Weekly Gospel Digest
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 dark:text-white/70 leading-relaxed">
-              Get sound biblical sermons, articles, and book reviews in your inbox every Saturday.
-            </p>
-
-            {newsletterSubscribed ? (
-              <div className="mt-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-400 dark:border-emerald-500/40 p-2 text-center text-[11px] font-semibold text-emerald-800 dark:text-emerald-400">
-                ✓ You're subscribed to EIC updates!
-              </div>
-            ) : (
-              <form onSubmit={handleNewsletterSubmit} className="mt-2.5 flex gap-2">
-                <input
-                  type="email"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  placeholder="Your email address..."
-                  required
-                  className="h-8.5 flex-1 rounded-lg border border-[#D0E1F0] dark:border-white/15 bg-slate-50 dark:bg-white/10 px-2.5 text-xs text-[#182541] dark:text-white placeholder-slate-400 dark:placeholder-white/40 focus:border-primary focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="h-8.5 rounded-lg bg-[#182541] dark:bg-[#F0F6FB] px-3 text-[11px] font-bold text-white dark:text-[#070A0F] active:scale-95 transition cursor-pointer"
-                >
-                  Join
-                </button>
-              </form>
-            )}
           </div>
 
           {/* Quick Preferences */}
