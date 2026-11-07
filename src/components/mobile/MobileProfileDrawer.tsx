@@ -374,30 +374,30 @@ function DrawerNavItem({
       </button>
 
       {isOpen && (
-        <div className="border-t border-[#D0E1F0] dark:border-white/10 p-3.5 bg-white/80 dark:bg-black/20 space-y-4 animate-in fade-in duration-200">
+        <div className="border-t border-[#D0E1F0] dark:border-white/10 p-3 bg-slate-50/70 dark:bg-black/30 space-y-3 animate-in fade-in duration-200">
           {item.to && (
             <Link
               to={item.to}
               onClick={onClose}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary dark:text-[#F0F6FB] hover:underline px-1"
+              className="flex items-center justify-between rounded-xl bg-primary/5 dark:bg-white/10 border border-primary/15 dark:border-white/10 px-3 py-2 text-xs font-bold text-primary dark:text-[#F0F6FB] hover:bg-primary/10 transition"
             >
               <span>Explore All {item.label}</span>
-              <span>→</span>
+              <span className="text-sm">→</span>
             </Link>
           )}
 
-          <div className="space-y-4 pt-1">
+          <div className="space-y-3 pt-0.5">
             {item.mega.columns.map((col, idx) => (
               <DrawerColumnRenderer key={idx} column={col} onClose={onClose} />
             ))}
           </div>
 
           {item.mega.cta && (
-            <div className="pt-2 border-t border-[#D0E1F0]/70 dark:border-white/10">
+            <div className="pt-1">
               <Link
                 to={item.mega.cta.to}
                 onClick={onClose}
-                className="flex items-center justify-between text-xs font-semibold text-primary dark:text-[#F0F6FB] hover:underline px-1 py-0.5"
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-bold text-primary dark:text-[#F0F6FB] hover:underline"
               >
                 <span>{item.mega.cta.label}</span>
                 <span>→</span>
@@ -418,9 +418,9 @@ function DrawerColumnRenderer({
   onClose: () => void;
 }) {
   return (
-    <div className="space-y-2">
-      <h4 className="text-[11px] font-bold uppercase tracking-wider text-primary dark:text-[#F0F6FB] pb-1 border-b border-[#D0E1F0]/70 dark:border-white/10">
-        {column.title}
+    <div className="rounded-xl border border-[#D0E1F0]/80 dark:border-white/10 bg-white/70 dark:bg-white/5 p-3 space-y-2.5 shadow-2xs">
+      <h4 className="text-[11px] font-bold uppercase tracking-wider text-primary dark:text-[#F0F6FB] pb-1.5 border-b border-[#D0E1F0]/60 dark:border-white/10 flex items-center justify-between">
+        <span>{column.title}</span>
       </h4>
 
       {column.links && column.links.length > 0 && (
@@ -433,7 +433,7 @@ function DrawerColumnRenderer({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onClose}
-                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition"
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-white/90 hover:bg-[#F0F6FB] dark:hover:bg-white/10 hover:text-primary dark:hover:text-white transition"
               >
                 <span>{link.label}</span>
                 <ExternalLinkIcon size={12} className="text-slate-400 dark:text-white/40 shrink-0" />
@@ -443,10 +443,10 @@ function DrawerColumnRenderer({
                 key={link.to}
                 to={link.to}
                 onClick={onClose}
-                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition"
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-white/90 hover:bg-[#F0F6FB] dark:hover:bg-white/10 hover:text-primary dark:hover:text-white transition"
               >
                 <span>{link.label}</span>
-                <ArrowRightIcon size={11} className="text-slate-400 dark:text-white/30 shrink-0" />
+                <ArrowRightIcon size={11} className="text-primary dark:text-white/60 shrink-0" />
               </Link>
             ),
           )}
@@ -517,18 +517,23 @@ function DrawerDynamicTerms({
 
   // For series / sermon / video categories, render as clean sub-links
   return (
-    <div className="space-y-1 pt-1">
-      {list.map((term) => (
-        <Link
-          key={term.id}
-          to={getUrl(term)}
-          onClick={onClose}
-          className="flex items-center justify-between text-xs text-slate-600 dark:text-white/70 hover:text-primary dark:hover:text-[#F0F6FB] hover:underline py-0.5 transition-colors pl-1"
-        >
-          <span className="truncate">{term.name}</span>
-          <span className="text-slate-400 dark:text-white/30 text-[10px]">→</span>
-        </Link>
-      ))}
+    <div className="space-y-1 pt-1.5 border-t border-slate-100 dark:border-white/5 mt-1.5">
+      <div className="text-[10px] uppercase font-bold text-slate-400 dark:text-white/40 px-2.5 pb-0.5">
+        {taxonomy === 'series' ? 'Popular Series' : 'By Conference / Year'}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+        {list.map((term) => (
+          <Link
+            key={term.id}
+            to={getUrl(term)}
+            onClick={onClose}
+            className="flex items-center justify-between rounded-md px-2.5 py-1.5 text-xs text-slate-700 dark:text-white/80 hover:bg-[#F0F6FB] dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#F0F6FB] transition-colors"
+          >
+            <span className="truncate">{term.name}</span>
+            <span className="text-slate-400 dark:text-white/40 text-[10px]">→</span>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
