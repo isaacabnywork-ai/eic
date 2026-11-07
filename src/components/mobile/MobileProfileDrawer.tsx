@@ -375,12 +375,6 @@ function DrawerNavItem({
 
       {isOpen && (
         <div className="border-t border-[#D0E1F0] dark:border-white/10 p-3.5 bg-white/80 dark:bg-black/20 space-y-4 animate-in fade-in duration-200">
-          {item.mega.blurb && (
-            <p className="text-[11px] leading-relaxed text-slate-600 dark:text-white/70 italic px-1">
-              {item.mega.blurb}
-            </p>
-          )}
-
           {item.to && (
             <Link
               to={item.to}
