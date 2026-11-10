@@ -90,14 +90,6 @@ export function ContactPage() {
                 </div>
               </div>
             </div>
-
-            {/* Quick Note */}
-            <div className="rounded-2xl border border-line bg-surface-2 p-6 text-xs text-muted space-y-2">
-              <p className="font-semibold text-ink">Pastoral Ministry Notice</p>
-              <p className="leading-relaxed">
-                We are eager to partner with pastors, seminary leaders, and believers passionate about biblical truth and sound gospel growth across every state of India.
-              </p>
-            </div>
           </div>
 
           {/* Right Column: Contact Form (7 cols) */}
