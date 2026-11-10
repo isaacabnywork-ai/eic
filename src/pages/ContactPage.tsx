@@ -2,8 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { 
   Phone, 
   CheckCircle2, 
-  Send, 
-  User 
+  Send 
 } from 'lucide-react';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { PageHeader } from '@/components/ui/Section';
@@ -49,7 +48,7 @@ export function ContactPage() {
     <>
       <SeoHead
         title="Contact & Inquiries"
-        description="Get in touch with the pastoral team at Equip Indian Churches. Contact coordinator Bro. Santosh, phone, WhatsApp, and inquiry form."
+        description="Get in touch with the pastoral team at Equip Indian Churches via phone, WhatsApp, and inquiry form."
         path="/contact"
       />
 
@@ -69,23 +68,8 @@ export function ContactPage() {
                   Direct Inquiries
                 </h2>
                 <p className="mt-1 text-xs text-muted">
-                  Please feel free to connect with our coordinator.
+                  Please feel free to connect with our team.
                 </p>
-              </div>
-
-              {/* Contact Person */}
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-text">
-                  <User className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                    Contact Person
-                  </p>
-                  <p className="font-bold text-ink text-base mt-0.5">
-                    Bro. Santosh
-                  </p>
-                </div>
               </div>
 
               {/* Phone */}
